@@ -7,17 +7,21 @@ environment = "dev"
 
 # AWS region where the resources will be deployed
 region = "us-east-2"
+vpc_id = ""
+
+
+# KUBERNETES
+
+db_instance_type = "t3.micro"
+eks_cluster_name = "eyelevel"
+eks_cluster_version = "1.30"
 
 
 # NETWORK
 
 # Control whether to create new network resources
-create_security_groups = false
 create_subnets         = false
 create_vpc             = false
-
-# The VPC security group IDs for resources, must be set if not creating resources
-security_group_ids = ["sg-xxxxxxxx"]
 
 # The subnet IDs for resources, must be set if not creating resources
 subnet_ids = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"]
@@ -31,14 +35,6 @@ db_name = "eyelevel"
 # The username for the MySQL database
 db_username = "admin"
 
-# The password for the MySQL database
+# The password for the MySQL database, base64 encoded
+# echo -n 'supersecretpassword' | base64
 db_password = "supersecretpassword"
-
-# The identifier for the MySQL database instance
-db_instance_identifier = "eyelevel-metadata"
-
-# The instance type for the MySQL database
-db_instance_type = "db.t3.micro"
-
-# The allocated storage for the MySQL database (in GB)
-db_allocated_storage = 20

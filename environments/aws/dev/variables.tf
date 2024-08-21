@@ -20,13 +20,33 @@ variable "vpc_id" {
   default     = null
 }
 
-# NETWORK
+# KUBERNETES
 
-variable "create_security_groups" {
-  description = "Whether to create new security groups"
-  type        = bool
-  default     = false
+variable "cluster_id" {
+  description = "The ID for an existing cluster"
+  type        = string
+  default     = null
 }
+
+variable "eks_cluster_name" {
+  description = "The EKS cluster name"
+  type        = string
+  default     = "eyelevel"
+}
+
+variable "eks_cluster_version" {
+  description = "The EKS cluster version"
+  type        = string
+  default     = "1.30"
+}
+
+variable "db_instance_type" {
+  description = "The size of the base DB EKS instance"
+  type        = string
+  default     = "t3.micro"
+}
+
+# NETWORK
 
 variable "create_subnets" {
   description = "Whether to create new subnets"
@@ -40,11 +60,6 @@ variable "create_vpc" {
   default     = false
 }
 
-variable "security_group_ids" {
-  description = "The VPC security group IDs for resources"
-  type        = list(string)
-}
-
 variable "subnet_ids" {
   description = "The subnet IDs for resources"
   type        = list(string)
@@ -52,37 +67,17 @@ variable "subnet_ids" {
 
 # DATABASE
 
-variable "db_name" {
-  description = "The name of the MySQL database"
+variable "db_password" {
+  description = "MySQL root password"
   type        = string
-  default     = "eyelevel"
+}
+
+variable "db_name" {
+  description = "MySQL database name"
+  type        = string
 }
 
 variable "db_username" {
-  description = "The username for the MySQL database"
+  description = "MySQL root username"
   type        = string
-  default     = "admin"
-}
-
-variable "db_password" {
-  description = "The password for the MySQL database"
-  type        = string
-  sensitive   = true
-}
-
-variable "db_instance_identifier" {
-  description = "The identifier for the MySQL database instance"
-  type        = string
-}
-
-variable "db_instance_type" {
-  description = "The instance type for the MySQL database"
-  type        = string
-  default     = "db.t3.micro"
-}
-
-variable "db_allocated_storage" {
-  description = "The allocated storage for the MySQL database (in GB)"
-  type        = number
-  default     = 20
 }

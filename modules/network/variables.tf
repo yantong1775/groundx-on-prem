@@ -8,11 +8,6 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "security_group_ids" {
-  type        = list(string)
-  description = "List of VPC security group IDs"
-}
-
 variable "subnet_ids" {
   type        = list(string)
   description = "List of subnet IDs"
@@ -26,22 +21,6 @@ variable "network_cidr" {
 variable "subnet_cidrs" {
   description = "List of CIDR blocks for subnets"
   type        = list(string)
-}
-
-variable "security_rules" {
-  description = "A map of security rules for network access"
-  type        = map(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-  }))
-}
-
-variable "create_security_groups" {
-  description = "Whether to create new security groups"
-  type        = bool
-  default     = false
 }
 
 variable "create_subnets" {
