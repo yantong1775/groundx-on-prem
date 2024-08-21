@@ -5,6 +5,12 @@ variable "environment" {
   type        = string
 }
 
+variable "kubeconfig_path" {
+  description = "Path to the kubeconfig file"
+  type        = string
+  default     = "~/.kube/config"
+}
+
 
 # VPC
 
@@ -28,13 +34,13 @@ variable "cluster_id" {
   default     = null
 }
 
-variable "eks_cluster_name" {
+variable "cluster_name" {
   description = "The EKS cluster name"
   type        = string
   default     = "eyelevel"
 }
 
-variable "eks_cluster_version" {
+variable "cluster_version" {
   description = "The EKS cluster version"
   type        = string
   default     = "1.30"

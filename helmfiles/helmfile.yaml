@@ -1,0 +1,6 @@
+releases:
+  - name: mysql
+    namespace: default
+    chart: ./modules/mysql/helm_chart
+    values:
+      - ./modules/mysql/helm_chart/values.yaml

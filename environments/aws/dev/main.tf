@@ -14,8 +14,8 @@ module "eks" {
 
   source          = "terraform-aws-modules/eks/aws"
   version         = "20.24.0"
-  cluster_name    = var.eks_cluster_name
-  cluster_version = var.eks_cluster_version
+  cluster_name    = var.cluster_name
+  cluster_version = var.cluster_version
   subnet_ids      = module.network.subnet_ids
   vpc_id          = module.network.vpc_id
 
@@ -27,22 +27,21 @@ module "eks" {
       desired_size = 1
 
       instance_types = [var.db_instance_type]
+
+      labels = {
+        app = "mysql"
+      }
+
+      taints = [{
+        key    = "app"
+        value  = "mysql"
+        effect = "NO_SCHEDULE"
+      }]
     }
   }
-}
-
-output "debug_local_cluster_id" {
-  description = "Debugging output for local.cluster_id"
-  value       = local.cluster_id
-}
-
-output "debug_module_cluster_id" {
-  description = "Debugging output for module.eks[0].cluster_id"
-  value       = try(module.eks[0].cluster_id, "Cluster ID not available")
 }
 
 output "cluster_id" {
   description = "The ID of the EKS cluster"
   value       = local.cluster_id != null ? local.cluster_id : (try(module.eks[0].cluster_id, "Cluster ID not available"))
-
 }

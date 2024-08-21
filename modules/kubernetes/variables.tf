@@ -3,6 +3,12 @@ variable "environment" {
   type        = string
 }
 
+variable "kubeconfig_path" {
+  description = "Path to the kubeconfig file"
+  type        = string
+  default     = "~/.kube/config"
+}
+
 variable "vpc_id" {
   description = "The ID for an existing VPC"
   type        = string
@@ -10,6 +16,11 @@ variable "vpc_id" {
 
 variable "cluster_id" {
   description = "The ID for an existing cluster"
+  type        = string
+}
+
+variable "cluster_name" {
+  description = "The name for an existing cluster"
   type        = string
 }
 
