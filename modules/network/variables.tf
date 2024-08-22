@@ -13,6 +13,12 @@ variable "subnet_ids" {
   description = "List of subnet IDs"
 }
 
+variable "ingress_cidr" {
+  description = "The CIDR block for network ingress"
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
 variable "network_cidr" {
   description = "The CIDR block for the network (VPC, VNet, etc.)"
   type        = string

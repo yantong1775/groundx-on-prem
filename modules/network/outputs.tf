@@ -1,3 +1,8 @@
+output "ingress_cidr" {
+  description = "The CIDR block for network ingress"
+  value       = var.ingress_cidr
+}
+
 output "network_cidr" {
   description = "The CIDR block for the network (VPC, VNet, etc.)"
   value       = var.network_cidr

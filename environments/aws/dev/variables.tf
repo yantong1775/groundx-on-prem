@@ -5,10 +5,10 @@ variable "environment" {
   type        = string
 }
 
-variable "kubeconfig_path" {
-  description = "Path to the kubeconfig file"
+variable "admin_role_arn" {
+  description = "The ARN of the Admin role"
   type        = string
-  default     = "~/.kube/config"
+  default     = null
 }
 
 
@@ -64,6 +64,12 @@ variable "create_vpc" {
   description = "Whether to create a new VPC"
   type        = bool
   default     = false
+}
+
+variable "ingress_cidr" {
+  description = "The CIDR block for network ingress"
+  type        = string
+  default     = "0.0.0.0/0"
 }
 
 variable "subnet_ids" {

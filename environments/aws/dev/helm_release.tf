@@ -1,9 +1,3 @@
-provider "helm" {
-  kubernetes {
-    config_path = var.kubeconfig_path
-  }
-}
-
 resource "helm_release" "mysql" {
   name       = "mysql"
   repository = "https://charts.bitnami.com/bitnami"

@@ -2,6 +2,9 @@
 
 environment = "dev"
 
+# A role arn that will be granted access to the cluster
+# admin_role_arn = ""
+
 
 # VPC
 
@@ -20,8 +23,11 @@ cluster_version = "1.30"
 # NETWORK
 
 # Control whether to create new network resources
-create_subnets         = false
-create_vpc             = false
+create_subnets = false
+create_vpc = false
+
+# The CIDR block that has ingress access to Kubernetes
+ingress_cidr = "0.0.0.0/0"
 
 # The subnet IDs for resources, must be set if not creating resources
 subnet_ids = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"]
