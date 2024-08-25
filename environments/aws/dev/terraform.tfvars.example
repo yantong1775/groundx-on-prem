@@ -41,6 +41,5 @@ db_name = "eyelevel"
 # The username for the MySQL database
 db_username = "admin"
 
-# The password for the MySQL database, base64 encoded
-# echo -n 'supersecretpassword' | base64
+# The password for the MySQL database
 db_password = "supersecretpassword"

@@ -1,6 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mysql-config
+  name: my-configmap
+  namespace: "{{ .Values.service.namespace }}"
 data:
-  mysql-database: eyelevel
+  my.cnf: |-
+    {{ .Files.Get "files/my.cnf" | nindent 4 }}
+  init-db.sql: |-
+    {{ .Files.Get "files/init-db.sql" | nindent 4 }}

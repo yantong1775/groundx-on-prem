@@ -1,11 +1,13 @@
 replicaCount: 1
 
 image:
-  repository: mysql
-  tag: "8.0"
-  pullPolicy: IfNotPresent
+  repository: public.ecr.aws/c9r4x6y5/eyelevel/mysql
+  tag: latest
 
 service:
+  name: mysql
+  namespace: eyelevel
+  node: crc
   type: ClusterIP
   port: 3306
 
@@ -19,7 +21,14 @@ resources:
 
 persistence:
   enabled: true
-  storageClass: "gp2"
+  storageClass: "local-storage"
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   size: 1Gi
+  localPath: /Users/benjaminfletcher/mnt/mysql
+  mountPath: /var/lib/mysql
+
+securityContext:
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001

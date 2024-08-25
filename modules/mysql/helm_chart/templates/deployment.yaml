@@ -1,52 +1,68 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mysql
+  name: "{{ .Values.service.name }}"
   labels:
-    app: mysql
+    app: "{{ .Values.service.name }}"
 spec:
-  serviceName: "mysql"
-  replicas: 1
+  serviceName: "{{ .Values.service.name }}"
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: mysql
+      app: "{{ .Values.service.name }}"
   template:
     metadata:
       labels:
-        app: mysql
+        app: "{{ .Values.service.name }}"
     spec:
-      nodeSelector:
-        app: mysql
-        tolerations:
-        - key: "app"
-          operator: "Equal"
-          value: "mysql"
-          effect: "NoSchedule"
+      serviceAccountName: "{{ .Values.service.name }}-sa"
       containers:
-      - name: mysql
-        image: mysql:8.0
+      - name: "{{ .Values.service.name }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
         ports:
-        - containerPort: 3306
+        - containerPort: {{ .Values.service.port }}
+        securityContext:
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+          runAsGroup: {{ .Values.securityContext.runAsGroup }}
+          fsGroup: {{ .Values.securityContext.fsGroup }}
         env:
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.service.name }}-secret"
+              key: MYSQL_USER
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.service.name }}-secret"
+              key: MYSQL_PASSWORD
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-secret
-              key: mysql-root-password
+              name: "{{ .Values.service.name }}-secret"
+              key: MYSQL_ROOT_PASSWORD
         - name: MYSQL_DATABASE
           valueFrom:
-            configMapKeyRef:
-              name: mysql-config
-              key: mysql-database
+            secretKeyRef:
+              name: "{{ .Values.service.name }}-secret"
+              key: MYSQL_DATABASE
         volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
-  volumeClaimTemplates:
-  - metadata:
-      name: mysql-persistent-storage
-    spec:
-      accessModes: [ "ReadWriteMany" ]
-      storageClassName: "local-storage"
-      resources:
-        requests:
-          storage: 1Gi
+        - name: "{{ .Values.service.name }}-persistent-storage"
+          mountPath: "{{ .Values.persistence.mountPath }}"
+        - name: my-cnf
+          mountPath: /etc/my.cnf.d/my.cnf
+          subPath: my.cnf
+        - name: init-db
+          mountPath: /docker-entrypoint-initdb.d/init-db.sql
+          subPath: init-db.sql
+      volumes:
+      - name: "{{ .Values.service.name }}-persistent-storage"
+        persistentVolumeClaim:
+          claimName: "{{ .Values.service.name }}-pvc"
+      - name: my-cnf
+        configMap:
+          name: my-configmap
+      - name: init-db
+        configMap:
+          name: my-configmap

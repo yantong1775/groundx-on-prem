@@ -11,6 +11,8 @@ fi
 case "$CLOUD" in
   "aws")
     ;;
+  "onprem")
+    ;;
 
   *)
     echo "Unknown environment: $CLOUD"
@@ -27,6 +29,3 @@ terraform apply -auto-approve
 
 # Run Helm to deploy applications
 helmfile -f helmfiles/helmfile.yaml sync
-
-# Run Ansible playbooks
-ansible-playbook ansible_playbook.yaml
