@@ -5,12 +5,14 @@ FROM registry.redhat.io/rhel8/mysql-80:latest
 USER root
 
 # Dynamically get the UID and GID
-RUN MYSQL_UID=$(id -u mysql) && MYSQL_GID=$(id -g mysql) \
-    && chown -R ${MYSQL_UID}:${MYSQL_GID} /var/lib/mysql /etc/my.cnf.d /var/log/mysql /var/run/mysqld \
+RUN chown -R mysql:mysql /var/lib/mysql /etc/my.cnf.d /var/log/mysql /var/run/mysqld \
     && chmod -R 777 /var/lib/mysql /etc/my.cnf.d /var/log/mysql /var/run/mysqld
 
 # Set the default user back to the OpenShift random UID
-USER ${MYSQL_UID}
+USER mysql
 
-# Entry point for the MySQL container
-CMD ["run-mysqld"]
+# Copy custom MySQL configuration file
+COPY my.cnf /etc/my.cnf.d/my.cnf
+
+# Copy SQL scripts to initialize the database
+COPY init-db.sql /docker-entrypoint-initdb.d/

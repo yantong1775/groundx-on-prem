@@ -20,12 +20,6 @@ case "$CLOUD" in
     ;;
 esac
 
-# Navigate to the correct environment directory
-cd environments/$CLOUD/$ENV
-
 # Initialize and apply Terraform
-terraform init
-terraform apply -auto-approve
-
-# Run Helm to deploy applications
-helmfile -f helmfiles/helmfile.yaml sync
+terraform -chdir=environments/$CLOUD/$ENV init
+terraform -chdir=environments/$CLOUD/$ENV apply --auto-approve

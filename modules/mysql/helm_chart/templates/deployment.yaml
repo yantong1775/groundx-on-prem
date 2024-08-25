@@ -6,7 +6,7 @@ metadata:
     app: "{{ .Values.service.name }}"
 spec:
   serviceName: "{{ .Values.service.name }}"
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.service.replicaCount }}
   selector:
     matchLabels:
       app: "{{ .Values.service.name }}"
@@ -19,7 +19,7 @@ spec:
       containers:
       - name: "{{ .Values.service.name }}"
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: Always
+        imagePullPolicy: "{{ .Values.image.pull }}"
         ports:
         - containerPort: {{ .Values.service.port }}
         securityContext:
@@ -50,19 +50,7 @@ spec:
         volumeMounts:
         - name: "{{ .Values.service.name }}-persistent-storage"
           mountPath: "{{ .Values.persistence.mountPath }}"
-        - name: my-cnf
-          mountPath: /etc/my.cnf.d/my.cnf
-          subPath: my.cnf
-        - name: init-db
-          mountPath: /docker-entrypoint-initdb.d/init-db.sql
-          subPath: init-db.sql
       volumes:
       - name: "{{ .Values.service.name }}-persistent-storage"
         persistentVolumeClaim:
-          claimName: "{{ .Values.service.name }}-pvc"
-      - name: my-cnf
-        configMap:
-          name: my-configmap
-      - name: init-db
-        configMap:
-          name: my-configmap
+          claimName: "{{ .Values.persistence.claim }}"

@@ -1,7 +1,0 @@
-# DATABASE
-
-# The password for the MySQL database
-db_root_password = "supersecretpassword"
-db_name = "eyelevel"
-db_username = "eyelevel"
-db_password = "userpassword"
