@@ -1,17 +1,16 @@
 #!/bin/bash
 
-ENV=$1
-CLOUD=$2
+CLOUD=$1
 
-if [[ -z "$ENV" || -z "$CLOUD" ]]; then
-    echo "Usage: $0 <environment> <cloud_provider>"
+if [[ -z "$CLOUD" ]]; then
+    echo "Usage: $0 <cloud_provider>"
     exit 1
 fi
 
 case "$CLOUD" in
   "aws")
     ;;
-  "onprem")
+  "private")
     ;;
 
   *)
@@ -21,5 +20,5 @@ case "$CLOUD" in
 esac
 
 # Initialize and apply Terraform
-terraform -chdir=environments/$CLOUD/$ENV init
-terraform -chdir=environments/$CLOUD/$ENV apply --auto-approve
+terraform -chdir=environments/$CLOUD init
+terraform -chdir=environments/$CLOUD apply --auto-approve

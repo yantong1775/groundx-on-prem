@@ -26,43 +26,9 @@ spec:
           runAsUser: {{ .Values.securityContext.runAsUser }}
           runAsGroup: {{ .Values.securityContext.runAsGroup }}
           fsGroup: {{ .Values.securityContext.fsGroup }}
-        env:
-        - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.service.name }}-secret"
-              key: MYSQL_USER
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.service.name }}-secret"
-              key: MYSQL_PASSWORD
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.service.name }}-secret"
-              key: MYSQL_ROOT_PASSWORD
-        - name: MYSQL_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.service.name }}-secret"
-              key: MYSQL_DATABASE
         volumeMounts:
         - name: "{{ .Values.service.name }}-persistent-storage"
           mountPath: "{{ .Values.persistence.mountPath }}"
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - "/bin/sh"
-                - "-c"
-                - |
-                  while ! mysqladmin ping -h 127.0.0.1 --silent; do
-                    echo "Waiting for MySQL to start..."
-                    sleep 2
-                  done
-                  mysql -u $MYSQL_USER -p$MYSQL_PASSWORD < /docker-entrypoint-initdb.d/init-db.sql
-
       volumes:
       - name: "{{ .Values.service.name }}-persistent-storage"
         persistentVolumeClaim:

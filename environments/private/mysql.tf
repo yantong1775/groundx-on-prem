@@ -1,14 +1,9 @@
-resource "kubernetes_namespace" "eyelevel" {
-  metadata {
-    name = var.db_namespace
-  }
-}
-
 resource "kubernetes_persistent_volume" "mysql_pv" {
   metadata {
     name = "${var.db_service}-pv"
     labels = {
-      type = var.db_pv_class
+      type = var.pv_class
+      app = var.db_service
     }
   }
 
@@ -26,7 +21,7 @@ resource "kubernetes_persistent_volume" "mysql_pv" {
     }
 
     persistent_volume_reclaim_policy = "Retain"
-    storage_class_name               = var.db_pv_class
+    storage_class_name               = var.pv_class
 
     node_affinity {
       required {
@@ -45,14 +40,21 @@ resource "kubernetes_persistent_volume" "mysql_pv" {
 resource "kubernetes_persistent_volume_claim" "mysql_pvc" {
   metadata {
     name = "${var.db_service}-pvc"
-    namespace  = var.db_namespace
+    namespace  = var.namespace
     labels = {
-      type = var.db_pv_class
+      type = var.pv_class
+      app = var.db_service
     }
   }
 
   spec {
-    storage_class_name = var.db_pv_class
+    selector {
+      match_labels = {
+        app = var.db_service
+      }
+    }
+
+    storage_class_name = var.pv_class
 
     access_modes = [var.db_pv_access]
 
@@ -67,7 +69,7 @@ resource "kubernetes_persistent_volume_claim" "mysql_pvc" {
 resource "kubernetes_secret" "mysql_secret" {
   metadata {
     name      = "${var.db_service}-secret"
-    namespace = var.db_namespace
+    namespace = var.namespace
   }
 
   data = {
@@ -80,8 +82,8 @@ resource "kubernetes_secret" "mysql_secret" {
 
 resource "helm_release" "mysql" {
   name       = var.db_service
-  chart      = "${path.module}/../../../modules/mysql/helm_chart"
-  namespace  = var.db_namespace
+  chart      = "${path.module}/../../modules/mysql/helm_chart"
+  namespace  = var.namespace
 
   values = [
     yamlencode({
@@ -94,7 +96,7 @@ resource "helm_release" "mysql" {
       persistence = {
         claim        = "${var.db_service}-pvc"
         mountPath    = var.db_mount_path
-        storageClass = var.db_pv_class
+        storageClass = var.pv_class
         volume       = "${var.db_service}-pv"
       },
       securityContext = {
@@ -104,7 +106,7 @@ resource "helm_release" "mysql" {
       },
       service = {
         name         = var.db_service
-        namespace    = var.db_namespace
+        namespace    = var.namespace
         port         = var.db_port
         replicaCount = var.db_replicas
         type         = var.db_ip_type
