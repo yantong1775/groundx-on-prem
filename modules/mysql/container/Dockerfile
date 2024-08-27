@@ -4,10 +4,10 @@ FROM registry.redhat.io/rhel8/mysql-80:latest
 # Switch to root user to make changes
 USER root
 
-RUN chown -R mysql:mysql /var/lib/mysql /etc/my.cnf.d /var/log/mysql /var/run/mysqld \
+RUN chown -R 27:27 /var/lib/mysql /etc/my.cnf.d /var/log/mysql /var/run/mysqld \
     && chmod -R 777 /var/lib/mysql /etc/my.cnf.d /var/log/mysql /var/run/mysqld
 
-USER mysql
+USER 27
 
 # Copy custom MySQL configuration file
 COPY my.cnf /etc/my.cnf.d/my.cnf

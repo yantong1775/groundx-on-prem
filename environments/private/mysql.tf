@@ -1,4 +1,6 @@
 resource "kubernetes_persistent_volume" "mysql_pv" {
+  count = local.create_mysql ? 1 : 0
+
   metadata {
     name = "${var.db_service}-pv"
     labels = {
@@ -38,6 +40,8 @@ resource "kubernetes_persistent_volume" "mysql_pv" {
 }
 
 resource "kubernetes_persistent_volume_claim" "mysql_pvc" {
+  count = local.create_mysql ? 1 : 0
+
   metadata {
     name = "${var.db_service}-pvc"
     namespace  = var.namespace
@@ -67,6 +71,8 @@ resource "kubernetes_persistent_volume_claim" "mysql_pvc" {
 }
 
 resource "kubernetes_secret" "mysql_secret" {
+  count = local.create_mysql ? 1 : 0
+
   metadata {
     name      = "${var.db_service}-secret"
     namespace = var.namespace
@@ -81,6 +87,8 @@ resource "kubernetes_secret" "mysql_secret" {
 }
 
 resource "helm_release" "mysql" {
+  count = local.create_mysql ? 1 : 0
+
   name       = var.db_service
   chart      = "${path.module}/../../modules/mysql/helm_chart"
   namespace  = var.namespace
@@ -114,5 +122,5 @@ resource "helm_release" "mysql" {
     })
   ]
 
-  timeout = 60
+  timeout = 180
 }

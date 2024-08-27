@@ -1,4 +1,6 @@
 resource "kubernetes_persistent_volume" "redis_pv" {
+  count = local.create_redis ? 1 : 0
+
   metadata {
     name = "${var.cache_service}-pv"
     labels = {
@@ -38,6 +40,8 @@ resource "kubernetes_persistent_volume" "redis_pv" {
 }
 
 resource "kubernetes_persistent_volume_claim" "redis_pvc" {
+  count = local.create_redis ? 1 : 0
+
   metadata {
     name       = "${var.cache_service}-pvc"
     namespace  = var.namespace
@@ -67,6 +71,8 @@ resource "kubernetes_persistent_volume_claim" "redis_pvc" {
 }
 
 resource "helm_release" "redis" {
+  count = local.create_redis ? 1 : 0
+
   name       = var.cache_service
   chart      = "${path.module}/../../modules/redis/helm_chart"
   namespace  = var.namespace
