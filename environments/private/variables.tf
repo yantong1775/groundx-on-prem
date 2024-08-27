@@ -12,6 +12,12 @@ variable "create_kafka" {
   default     = true
 }
 
+variable "create_minio" {
+  description = "Create MinIO service"
+  type        = bool
+  default     = true
+}
+
 variable "create_mysql" {
   description = "Create MySQL service"
   type        = bool
@@ -229,6 +235,128 @@ variable "db_replicas" {
 }
 
 
+# FILE
+
+variable "file_chart_operator" {
+  description = "Helm chart for MinIO operator"
+  type        = string
+  default     = "minio-operator/operator"
+}
+
+variable "file_chart_tenant" {
+  description = "Helm chart for MinIO tenant"
+  type        = string
+  default     = "minio-operator/tenant"
+}
+
+variable "file_chart_repository" {
+  description = "Helm chart repository for MinIO operator"
+  type        = string
+  default     = "https://operator.min.io"
+}
+
+variable "file_chart_repository_name" {
+  description = "Helm chart repository name for MinIO operator"
+  type        = string
+  default     = "minio-operator"
+}
+
+variable "file_chart_operator_version" {
+  description = "Helm chart version for MinIO operator"
+  type        = string
+  default     = "6.0.3"
+}
+
+variable "file_chart_tenant_version" {
+  description = "Helm chart version for MinIO tenant"
+  type        = string
+  default     = "6.0.3"
+}
+
+variable "file_cpu_limits" {
+  description = "CPU allocated to requests"
+  type        = string
+  default     = "4"
+}
+
+variable "file_cpu_requests" {
+  description = "CPU allocated to requests"
+  type        = string
+  default     = "2"
+}
+
+variable "file_memory_limits" {
+  description = "Memory allocated to limits"
+  type        = string
+  default     = "8Gi"
+}
+
+variable "file_memory_requests" {
+  description = "Memory allocated to requests"
+  type        = string
+  default     = "4Gi"
+}
+
+variable "file_node" {
+  description = "Node where the PersistentVolume will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "file_pool_server" {
+  description = "Servers allocated to MinIO deployment"
+  type        = number
+  default     = 4
+}
+
+variable "file_pool_server_volumes" {
+  description = "Volumes allocated per server"
+  type        = number
+  default     = 4
+}
+
+variable "file_pool_size" {
+  description = "Disk space allocated to MinIO deployment"
+  type        = string
+  default     = "1Ti"
+}
+
+variable "file_pv_access" {
+  description = "Access modes for the PersistentVolume and PersistentVolumeClaim"
+  type        = string
+  default     = "ReadWriteMany"
+}
+
+variable "file_pv_path" {
+  description = "Local path for the PersistentVolume"
+  type        = string
+}
+
+variable "file_replicas_operator" {
+  description = "Number of initial operator replicas"
+  type        = number
+  default     = 2
+}
+
+variable "file_replicas_tenant" {
+  description = "Number of initial tenant replicas"
+  type        = number
+  default     = 2
+}
+
+variable "file_service" {
+  description = "Name for service"
+  type        = string
+  default     = "minio"
+}
+
+variable "file_version" {
+  description = "MinIO version"
+  type        = string
+  default     = "6.0.3"
+}
+
+
 # STREAM
 
 variable "stream_chart" {
@@ -246,25 +374,25 @@ variable "stream_chart_version" {
 variable "stream_cpu_limits" {
   description = "CPU allocated to limits"
   type        = string
-  default     = "200m"
+  default     = "4"
 }
 
 variable "stream_cpu_requests" {
   description = "CPU allocated to requests"
   type        = string
-  default     = "100m"
+  default     = "2"
 }
 
 variable "stream_memory_limits" {
   description = "Memory allocated to limits"
   type        = string
-  default     = "512Mi"
+  default     = "8Gi"
 }
 
 variable "stream_memory_requests" {
   description = "Memory allocated to requests"
   type        = string
-  default     = "256Mi"
+  default     = "4Gi"
 }
 
 variable "stream_port" {
@@ -300,13 +428,13 @@ variable "stream_service" {
 variable "stream_storage_service" {
   description = "Storage memory allocated to service"
   type        = string
-  default     = "2Gi"
+  default     = "20Gi"
 }
 
 variable "stream_storage_zookeeper" {
   description = "Storage memory allocated to zookeeper"
   type        = string
-  default     = "1Gi"
+  default     = "10Gi"
 }
 
 variable "stream_version" {
