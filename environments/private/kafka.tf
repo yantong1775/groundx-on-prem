@@ -33,8 +33,6 @@ resource "helm_release" "kafka_cluster" {
         }
       },
       service = {
-        name      = "${var.stream_service}-cluster"
-        namespace = var.namespace
         port      = var.stream_port
         replicas  = var.stream_replicas_service
         storage   = {

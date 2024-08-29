@@ -106,5 +106,5 @@ resource "helm_release" "redis" {
     })
   ]
 
-  timeout = 60
+  timeout = 180
 }

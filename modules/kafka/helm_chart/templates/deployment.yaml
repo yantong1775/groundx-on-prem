@@ -1,8 +1,10 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: {{ .Values.service.name }}
-  namespace: {{ .Values.service.namespace }}
+  labels:
+    app: {{ .Release.Name }}
+  name: "{{ .Release.Name }}-cluster"
+  namespace: {{ .Release.Namespace }}
 spec:
   kafka:
     version: {{ .Values.service.version }}

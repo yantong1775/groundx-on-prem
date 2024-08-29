@@ -55,3 +55,5 @@ docker-compose.override.yml
 # Other
 .idea/
 .DS_Store
+*.crt
+*.key
