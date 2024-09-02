@@ -1,9 +1,9 @@
 _mysql: &mysql
-  ro_addr: ${mysqlROAddr}
-  rw_addr: ${mysqlRWAddr}
-  user: ${mysqlUser}
-  password: ${mysqlPassword}
-  database: ${mysqlDB}
+  ro_addr: ${dbService}.${namespace}.svc.cluster.local
+  rw_addr: ${dbService}.${namespace}.svc.cluster.local
+  user: ${dbUser}
+  password: ${dbPassword}
+  database: ${dbName}
   maxIdle: 5
   maxOpen: 10
 
@@ -12,7 +12,7 @@ ai:
     search:
       baseURL: https://${searchService}.${namespace}.svc.cluster.local
       index: ${searchIndex}
-      username: ${searchUsername}
+      username: ${searchUser}
       password: ${searchPassword}
   eyelevelSearch:
     apiKey: ${groundxServiceKey}
@@ -115,11 +115,11 @@ rec:
   mysql: *mysql
   session:
     addr: ${cacheService}.${namespace}.svc.cluster.local
-    notCluster: ${notCluster}
+    notCluster: ${dbNotCluster}
 
 ssp:
-  baseURL: https://devssp.eyelevel.ai
-  dashboardURL: https://devdashboard.eyelevel.ai
+  baseURL: https://${dashboardService}.${namespace}.svc.cluster.local
+  dashboardURL: https://${dashboardService}.${namespace}.svc.cluster.local
 
 summaryServer:
   baseURL: https://${summaryService}.${namespace}.svc.cluster.local

@@ -180,12 +180,27 @@ variable "cache_version" {
 }
 
 
+# DASHBOARD
+
+variable "dashboard_service" {
+  description = "Name for service"
+  type        = string
+  default     = "dashboard"
+}
+
+
 # DATABASE
 
 variable "db_backup_enable" {
   description = "Enable database backups"
   type        = bool
   default     = true
+}
+
+variable "db_ip_type" {
+  description = "Type of IP address"
+  type        = string
+  default     = "ClusterIP"
 }
 
 variable "db_ha_proxy_enable" {
@@ -426,6 +441,18 @@ variable "groundx_service" {
   default     = "groundx"
 }
 
+variable "groundx_service_key" {
+  description = "API key for GroundX service"
+  type        = string
+  default     = "0c2f6b3e-0746-4280-8ef2-2c65f596b40b"
+}
+
+variable "groundx_username" {
+  description = "Username for GroundX service"
+  type        = string
+  default     = "0c2f6b3e-0746-4280-8ef2-2c65f596b40b"
+}
+
 variable "groundx_version" {
   description = "GroundX version"
   type        = string
@@ -433,7 +460,61 @@ variable "groundx_version" {
 }
 
 
-# Search
+# LAYOUT
+
+variable "layout_service" {
+  description = "Name for service"
+  type        = string
+  default     = "layout"
+}
+
+
+# LAYOUT WEBHOOK
+
+variable "layout_webhook_service" {
+  description = "Name for service"
+  type        = string
+  default     = "layout-webhook"
+}
+
+
+# QUEUE
+
+variable "queue_service" {
+  description = "Name for service"
+  type        = string
+  default     = "queue"
+}
+
+
+# PREPROCESS
+
+variable "preprocess_service" {
+  description = "Name for service"
+  type        = string
+  default     = "preprocess"
+}
+
+
+# PROCESS
+
+variable "process_service" {
+  description = "Name for service"
+  type        = string
+  default     = "process"
+}
+
+
+# RANKER
+
+variable "ranker_service" {
+  description = "Name for service"
+  type        = string
+  default     = "ranker"
+}
+
+
+# SEARCH
 
 variable "search_chart_name" {
   description = "Helm chart for Open Search operator"
@@ -477,6 +558,12 @@ variable "search_image_url" {
   default     = "public.ecr.aws/c9r4x6y5"
 }
 
+variable "search_index" {
+  description = "Search index name where new records will be created"
+  type        = string
+  default     = "prod-1"
+}
+
 variable "search_memory_requests" {
   description = "Memory allocated to requests"
   type        = string
@@ -487,6 +574,12 @@ variable "search_node" {
   description = "Node where the service will be available"
   type        = string
   default     = "crc"
+}
+
+variable "search_password" {
+  description = "Search user password"
+  type        = string
+  default     = "password"
 }
 
 variable "search_pv_size" {
@@ -511,6 +604,12 @@ variable "search_service" {
   description = "Name for service"
   type        = string
   default     = "opensearch"
+}
+
+variable "search_user" {
+  description = "Search user username"
+  type        = string
+  default     = "eyelevel"
 }
 
 variable "search_version" {
@@ -610,4 +709,22 @@ variable "stream_version" {
   description = "Kafka version"
   type        = string
   default     = "3.4.0"
+}
+
+
+# SUMMARY
+
+variable "summary_service" {
+  description = "Name for service"
+  type        = string
+  default     = "summary"
+}
+
+
+# UPLOAD
+
+variable "upload_service" {
+  description = "Name for service"
+  type        = string
+  default     = "upload"
 }
