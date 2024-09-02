@@ -6,12 +6,7 @@ locals {
   create_opensearch = var.create_all ? var.create_all : var.create_opensearch
   create_redis      = var.create_all ? var.create_all : var.create_redis
 
-  create_none = var.create_all == false &&
-    var.create_groundx == false &&
-    var.create_kafka == false &&
-    var.create_minio == false &&
-    var.create_mysql == false &&
-    var.create_redis == false
+  create_none = var.create_all == false && var.create_groundx == false && var.create_kafka == false && var.create_minio == false &&var.create_mysql == false && var.create_redis == false
 }
 
 provider "kubernetes" {
