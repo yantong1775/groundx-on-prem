@@ -13,6 +13,12 @@ variable "create_all" {
   default     = true
 }
 
+variable "create_groundx" {
+  description = "Create GroundX service"
+  type        = bool
+  default     = true
+}
+
 variable "create_kafka" {
   description = "Create Kafka service"
   type        = bool
@@ -117,7 +123,7 @@ variable "cache_service" {
 variable "cache_image_pull" {
   description = "Pull policy for container image"
   type        = string
-  default     = "IfNotPresent"
+  default     = "Always"
 }
 
 variable "cache_image_tag" {
@@ -393,10 +399,37 @@ variable "file_version" {
   default     = "6.0.3"
 }
 
-variable "search_replicas" {
-  description = "Number of initial search replicas"
-  type        = number
-  default     = 3
+
+# GROUNDX
+
+variable "groundx_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "groundx_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "groundx_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/groundx"
+}
+
+variable "groundx_service" {
+  description = "Name for service"
+  type        = string
+  default     = "groundx"
+}
+
+variable "groundx_version" {
+  description = "GroundX version"
+  type        = string
+  default     = "0.0.1"
 }
 
 
@@ -460,6 +493,12 @@ variable "search_pv_size" {
   description = "Memory allocated to requests"
   type        = string
   default     = "1Gi"
+}
+
+variable "search_replicas" {
+  description = "Number of initial search replicas"
+  type        = number
+  default     = 3
 }
 
 variable "search_root_password" {

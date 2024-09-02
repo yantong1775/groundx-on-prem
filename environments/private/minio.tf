@@ -9,7 +9,7 @@ resource "null_resource" "minio_helm_repo" {
 resource "helm_release" "minio_operator" {
   count = local.create_minio ? 1 : 0
 
-  depends_on = [null_resource.minio_helm_repo]
+  depends_on = [null_resource.minio_helm_repo, kubernetes_namespace.eyelevel]
   name       = "${var.file_service}-operator"
   namespace  = var.namespace
   chart      = var.file_chart_operator

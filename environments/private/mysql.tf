@@ -9,7 +9,7 @@ resource "null_resource" "percona_helm_repo" {
 resource "helm_release" "percona_operator" {
   count      = local.create_mysql ? 1 : 0
 
-  depends_on = [null_resource.percona_helm_repo]
+  depends_on = [null_resource.percona_helm_repo, kubernetes_namespace.eyelevel]
   name       = "${var.db_service}-operator"
   namespace  = var.namespace
   chart      = "percona/pxc-operator"

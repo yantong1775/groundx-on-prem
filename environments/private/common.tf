@@ -1,11 +1,17 @@
 locals {
+  create_groundx    = var.create_all ? var.create_all : var.create_groundx
   create_kafka      = var.create_all ? var.create_all : var.create_kafka
   create_minio      = var.create_all ? var.create_all : var.create_minio
   create_mysql      = var.create_all ? var.create_all : var.create_mysql
   create_opensearch = var.create_all ? var.create_all : var.create_opensearch
   create_redis      = var.create_all ? var.create_all : var.create_redis
 
-  create_none = var.create_all == false && var.create_kafka == false && var.create_minio == false && var.create_mysql == false && var.create_redis == false
+  create_none = var.create_all == false &&
+    var.create_groundx == false &&
+    var.create_kafka == false &&
+    var.create_minio == false &&
+    var.create_mysql == false &&
+    var.create_redis == false
 }
 
 provider "kubernetes" {
@@ -103,6 +109,8 @@ resource "tls_locally_signed_cert" "service_cert" {
 
 resource "kubernetes_secret" "ssl_cert" {
   count = local.create_none ? 0 : 1
+
+  depends_on = [kubernetes_namespace.eyelevel]
 
   metadata {
     name      = "${var.namespace}-cert"

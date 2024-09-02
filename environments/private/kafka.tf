@@ -1,6 +1,8 @@
 resource "helm_release" "strimzi_operator" {
   count = local.create_kafka ? 1 : 0
 
+  depends_on = [kubernetes_namespace.eyelevel]
+
   name       = "${var.stream_service}-operator"
   namespace  = var.namespace
   chart      = var.stream_chart
@@ -15,6 +17,8 @@ resource "helm_release" "strimzi_operator" {
 
 resource "helm_release" "kafka_cluster" {
   count = local.create_kafka ? 1 : 0
+
+  depends_on = [helm_release.strimzi_operator]
 
   name       = "${var.stream_service}-cluster"
   namespace  = var.namespace
