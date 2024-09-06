@@ -1,18 +1,19 @@
-resource "helm_release" "ranker_api_service" {
+resource "helm_release" "ranker_inference_service" {
   count = local.create_ranker ? 1 : 0
 
   depends_on = [kubernetes_namespace.eyelevel, kubernetes_config_map.ranker_config_file]
 
-  name       = "${var.ranker_service}-api-cluster"
+  name       = "${var.ranker_service}-inference-cluster"
   namespace  = var.namespace
-  chart      = "${path.module}/../../modules/ranker/api/helm_chart"
+
+  chart      = "${path.module}/../../../modules/ranker/inference/helm_chart"
 
   values = [
     yamlencode({
       image = {
-        pull       = var.ranker_api_image_pull
-        repository = var.ranker_api_image_url
-        tag        = var.ranker_api_image_tag
+        pull       = var.ranker_inference_image_pull
+        repository = var.ranker_inference_image_url
+        tag        = var.ranker_inference_image_tag
       }
       securityContext = {
         runAsUser  = data.external.get_uid_gid.result.UID
@@ -20,10 +21,12 @@ resource "helm_release" "ranker_api_service" {
         fsGroup    = data.external.get_uid_gid.result.GID
       }
       service = {
-        name      = "${var.ranker_service}-api"
+        name      = "${var.ranker_service}-inference"
         namespace = var.namespace
         version   = var.ranker_version
       }
     })
   ]
+
+  timeout = 1800
 }

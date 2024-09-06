@@ -14,6 +14,10 @@ spec:
       labels:
         app: {{ .Values.service.name }}
     spec:
+      initContainers:
+      - name: wait-for-services
+        image: busybox
+        command: ["/app/wait-for-it.sh", "{{ .Values.dependencies.cache }}", "-t", "300", "--", "{{ .Values.dependencies.database }}", "-t", "300"]
       containers:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

@@ -5,6 +5,7 @@ resource "helm_release" "opensearch_operator" {
 
   name       = "${var.search_service}-operator"
   namespace  = var.namespace
+
   chart      = var.search_chart_name
   repository = var.search_chart_url
   version    = var.search_chart_version

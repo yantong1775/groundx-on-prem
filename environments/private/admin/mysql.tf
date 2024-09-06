@@ -10,8 +10,10 @@ resource "helm_release" "percona_operator" {
   count      = local.create_mysql ? 1 : 0
 
   depends_on = [null_resource.percona_helm_repo, kubernetes_namespace.eyelevel]
+
   name       = "${var.db_service}-operator"
   namespace  = var.namespace
+
   chart      = "percona/pxc-operator"
 }
 
@@ -19,8 +21,10 @@ resource "helm_release" "percona_cluster" {
   count      = local.create_mysql ? 1 : 0
 
   depends_on = [helm_release.percona_operator]
+
   name       = "${var.db_service}-cluster"
   namespace  = var.namespace
+
   chart      = "percona/pxc-db"
 
   values = [
@@ -30,6 +34,16 @@ resource "helm_release" "percona_cluster" {
       }
       haproxy = {
         enabled = var.db_ha_proxy_enable
+        resources = {
+          limits = {
+            cpu    = var.db_ha_proxy_cpu_limits
+            memory = var.db_ha_proxy_memory_limits
+          }
+          requests = {
+            cpu    = var.db_ha_proxy_cpu_requests
+            memory = var.db_ha_proxy_memory_requests
+          }
+        }
         size    = var.db_ha_proxy_replicas
       }
       logcollector = {
@@ -45,6 +59,16 @@ resource "helm_release" "percona_cluster" {
       pxc = {
         persistence = {
           size = var.db_pv_size
+        }
+        resources = {
+          limits = {
+            cpu    = var.db_pxc_cpu_limits
+            memory = var.db_pxc_memory_limits
+          }
+          requests = {
+            cpu    = var.db_pxc_cpu_requests
+            memory = var.db_pxc_memory_requests
+          }
         }
         size = var.db_replicas
       }
@@ -62,6 +86,10 @@ resource "helm_release" "percona_cluster" {
           cluster  = "${var.namespace}-cert"
           internal = "${var.namespace}-cert"
         }
+      }
+      unsafeFlags = {
+        pxcSize   = var.db_disable_check_unsafe
+        proxySize = var.db_disable_check_unsafe
       }
     })
   ]

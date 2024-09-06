@@ -31,5 +31,9 @@ spec:
           mountPath: "{{ .Values.persistence.mountPath }}"
       volumes:
       - name: "{{ .Values.service.name }}-persistent-storage"
+        {{- if eq .Values.persistence.storageClass "empty" }}
+        emptyDir: {}
+        {{- else }}
         persistentVolumeClaim:
           claimName: "{{ .Values.persistence.claim }}"
+        {{- end }}

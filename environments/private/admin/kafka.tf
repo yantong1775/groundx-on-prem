@@ -22,7 +22,7 @@ resource "helm_release" "kafka_cluster" {
 
   name       = "${var.stream_service}-cluster"
   namespace  = var.namespace
-  chart      = "${path.module}/../../modules/kafka/helm_chart"
+  chart      = "${path.module}/../../../modules/kafka/helm_chart"
 
   values = [
     yamlencode({

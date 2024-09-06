@@ -1,9 +1,7 @@
 data "template_file" "ranker_config_py" {
   count = local.create_none ? 0 : 1
 
-  depends_on = [kubernetes_namespace.eyelevel]
-
-  template = file("${path.module}/../../modules/python/ranker.config.py.tpl")
+  template = file("${path.module}/../../../modules/python/ranker.config.py.tpl")
 
   vars = {
     cacheService    = var.cache_service
@@ -20,6 +18,8 @@ data "template_file" "ranker_config_py" {
 resource "kubernetes_config_map" "ranker_config_file" {
   count = local.create_none ? 0 : 1
 
+  depends_on = [kubernetes_namespace.eyelevel]
+
   metadata {
     name      = "ranker-config-py-map"
     namespace = var.namespace
@@ -33,9 +33,7 @@ resource "kubernetes_config_map" "ranker_config_file" {
 data "template_file" "config_yaml" {
   count = local.create_none ? 0 : 1
 
-  depends_on = [kubernetes_namespace.eyelevel]
-
-  template = file("${path.module}/../../modules/golang/config.yaml.tpl")
+  template = file("${path.module}/../../../modules/golang/config.yaml.tpl")
 
   vars = {
     cacheService         = var.cache_service
@@ -67,6 +65,8 @@ data "template_file" "config_yaml" {
 
 resource "kubernetes_config_map" "cashbot_config_file" {
   count = local.create_none ? 0 : 1
+
+  depends_on = [kubernetes_namespace.eyelevel]
 
   metadata {
     name      = "config-yaml-map"

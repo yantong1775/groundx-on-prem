@@ -10,8 +10,10 @@ resource "helm_release" "minio_operator" {
   count = local.create_minio ? 1 : 0
 
   depends_on = [null_resource.minio_helm_repo, kubernetes_namespace.eyelevel]
+
   name       = "${var.file_service}-operator"
   namespace  = var.namespace
+
   chart      = var.file_chart_operator
   version    = var.file_chart_operator_version
 
@@ -38,8 +40,10 @@ resource "helm_release" "minio_tenant" {
   count = local.create_minio ? 1 : 0
 
   depends_on = [helm_release.minio_operator]
+
   name       = "${var.file_service}-tenant"
   namespace  = var.namespace
+
   chart      = var.file_chart_tenant
   version    = var.file_chart_tenant_version
 

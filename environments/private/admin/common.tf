@@ -112,7 +112,7 @@ resource "tls_locally_signed_cert" "service_cert" {
 resource "kubernetes_secret" "ssl_cert" {
   count = local.create_none ? 0 : 1
 
-  depends_on = [kubernetes_namespace.eyelevel, tls_locally_signed_cert.service_cert]
+  depends_on = [tls_locally_signed_cert.service_cert, kubernetes_namespace.eyelevel]
 
   metadata {
     name      = "${var.namespace}-cert"

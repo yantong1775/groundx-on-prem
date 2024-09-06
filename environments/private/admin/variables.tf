@@ -1,5 +1,10 @@
 # GLOBALS
 
+variable "cluster_role" {
+  description = "Your cluster role (developer, admin)"
+  type        = string
+  default     = "developer"
+}
 
 variable "cluster_type" {
   description = "Type of Kubernetes cluster"
@@ -209,6 +214,12 @@ variable "db_backup_enable" {
   default     = true
 }
 
+variable "db_disable_check_unsafe" {
+  description = "Disable unsafe checks"
+  type        = bool
+  default     = false
+}
+
 variable "db_ip_type" {
   description = "Type of IP address"
   type        = string
@@ -219,6 +230,30 @@ variable "db_ha_proxy_enable" {
   description = "Enable high availability proxy"
   type        = bool
   default     = true
+}
+
+variable "db_ha_proxy_cpu_limits" {
+  description = "CPU allocated to requests"
+  type        = string
+  default     = "600m"
+}
+
+variable "db_ha_proxy_cpu_requests" {
+  description = "CPU allocated to requests"
+  type        = string
+  default     = "600m"
+}
+
+variable "db_ha_proxy_memory_limits" {
+  description = "Memory allocated to limits"
+  type        = string
+  default     = "1Gi"
+}
+
+variable "db_ha_proxy_memory_requests" {
+  description = "Memory allocated to requests"
+  type        = string
+  default     = "1Gi"
 }
 
 variable "db_ha_proxy_replicas" {
@@ -260,6 +295,30 @@ variable "db_pv_size" {
   description = "Size of the PersistentVolume and PersistentVolumeClaim"
   type        = string
   default     = "20Gi"
+}
+
+variable "db_pxc_cpu_limits" {
+  description = "CPU allocated to requests"
+  type        = string
+  default     = "600m"
+}
+
+variable "db_pxc_cpu_requests" {
+  description = "CPU allocated to requests"
+  type        = string
+  default     = "600m"
+}
+
+variable "db_pxc_memory_limits" {
+  description = "Memory allocated to limits"
+  type        = string
+  default     = "1Gi"
+}
+
+variable "db_pxc_memory_requests" {
+  description = "Memory allocated to requests"
+  type        = string
+  default     = "1Gi"
 }
 
 variable "db_replicas" {

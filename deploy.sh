@@ -11,6 +11,7 @@ case "$CLOUD" in
   "aws")
     ;;
   "private")
+    CLOUD=private/admin
     ;;
 
   *)
