@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curl-test
+  namespace: eyelevel
+spec:
+  containers:
+  - name: curl-container
+    image: curlimages/curl:latest  # This image has curl pre-installed
+    command: [ "sleep", "3600" ]   # Keep the pod running for testing
+  restartPolicy: Never

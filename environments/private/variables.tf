@@ -43,6 +43,12 @@ variable "create_opensearch" {
   default     = true
 }
 
+variable "create_ranker" {
+  description = "Create GroundX Search ranker service, sets create_redis to true when true"
+  type        = bool
+  default     = true
+}
+
 variable "create_redis" {
   description = "Create Redis service"
   type        = bool
@@ -181,6 +187,12 @@ variable "cache_version" {
 
 
 # DASHBOARD
+
+variable "dashboard_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
 
 variable "dashboard_service" {
   description = "Name for service"
@@ -435,6 +447,12 @@ variable "groundx_image_url" {
   default     = "public.ecr.aws/c9r4x6y5/eyelevel/groundx"
 }
 
+variable "groundx_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
+
 variable "groundx_service" {
   description = "Name for service"
   type        = string
@@ -453,6 +471,14 @@ variable "groundx_username" {
   default     = "0c2f6b3e-0746-4280-8ef2-2c65f596b40b"
 }
 
+variable "groundx_valid_service_keys" {
+  description = "List of valid service API keys for internal service requests"
+  type        = list(string)
+  default     = [
+    "0c2f6b3e-0746-4280-8ef2-2c65f596b40b"
+  ]
+}
+
 variable "groundx_version" {
   description = "GroundX version"
   type        = string
@@ -461,6 +487,18 @@ variable "groundx_version" {
 
 
 # LAYOUT
+
+variable "layout_api_node" {
+  description = "Node where the API (CPU) service will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "layout_inference_node" {
+  description = "Node where the inference (GPU) service will be available"
+  type        = string
+  default     = "crc"
+}
 
 variable "layout_service" {
   description = "Name for service"
@@ -471,6 +509,12 @@ variable "layout_service" {
 
 # LAYOUT WEBHOOK
 
+variable "layout_webhook_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
+
 variable "layout_webhook_service" {
   description = "Name for service"
   type        = string
@@ -479,6 +523,12 @@ variable "layout_webhook_service" {
 
 
 # QUEUE
+
+variable "queue_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
 
 variable "queue_service" {
   description = "Name for service"
@@ -489,6 +539,12 @@ variable "queue_service" {
 
 # PREPROCESS
 
+variable "preprocess_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
+
 variable "preprocess_service" {
   description = "Name for service"
   type        = string
@@ -497,6 +553,12 @@ variable "preprocess_service" {
 
 
 # PROCESS
+
+variable "process_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
 
 variable "process_service" {
   description = "Name for service"
@@ -507,10 +569,88 @@ variable "process_service" {
 
 # RANKER
 
+variable "ranker_api_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "ranker_api_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "ranker_api_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-api"
+}
+
+variable "ranker_api_node" {
+  description = "Node where the API (CPU) service will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "ranker_inference_device" {
+  description = "Device type for inference (cpu or cuda)"
+  type        = string
+  default     = "cuda"
+}
+
+variable "ranker_inference_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "ranker_inference_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "ranker_inference_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference"
+}
+
+variable "ranker_inference_max_batch" {
+  description = "Max number of prompts to process in a single inference"
+  type        = number
+  default     = 10
+}
+
+variable "ranker_inference_max_prompt" {
+  description = "Max number of prompt tokens to process in a single inference"
+  type        = number
+  default     = 2048
+}
+
+variable "ranker_inference_model" {
+  description = "Base ranker model"
+  type        = string
+  default     = "facebook/opt-350m"
+}
+
+variable "ranker_inference_node" {
+  description = "Node where the inference (GPU) service will be available"
+  type        = string
+  default     = "crc"
+}
+
 variable "ranker_service" {
   description = "Name for service"
   type        = string
   default     = "ranker"
+}
+
+variable "ranker_version" {
+  description = "Search Ranker version"
+  type        = string
+  default     = "0.0.1"
 }
 
 
@@ -714,6 +854,17 @@ variable "stream_version" {
 
 # SUMMARY
 
+variable "summary_api_node" {
+  description = "Node where the API (CPU) service will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "summary_inference_node" {
+  description = "Node where the inference (GPU) service will be available"
+  type        = string
+  default     = "crc"
+}
 variable "summary_service" {
   description = "Name for service"
   type        = string
@@ -722,6 +873,12 @@ variable "summary_service" {
 
 
 # UPLOAD
+
+variable "upload_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
 
 variable "upload_service" {
   description = "Name for service"

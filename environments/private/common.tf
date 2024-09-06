@@ -4,9 +4,10 @@ locals {
   create_minio      = var.create_all ? var.create_all : var.create_minio
   create_mysql      = var.create_all ? var.create_all : var.create_mysql
   create_opensearch = var.create_all ? var.create_all : var.create_opensearch
-  create_redis      = var.create_all ? var.create_all : var.create_redis
+  create_ranker     = var.create_all ? var.create_all : var.create_ranker
+  create_redis      = var.create_all ? var.create_all : (var.create_ranker ? var.create_ranker : var.create_redis)
 
-  create_none = var.create_all == false && var.create_groundx == false && var.create_kafka == false && var.create_minio == false &&var.create_mysql == false && var.create_redis == false
+  create_none = var.create_all == false && var.create_groundx == false && var.create_kafka == false && var.create_minio == false && var.create_mysql == false && var.create_ranker == false && var.create_redis == false
 }
 
 provider "kubernetes" {
@@ -49,6 +50,8 @@ resource "tls_private_key" "ca_key" {
 resource "tls_self_signed_cert" "ca_cert" {
   count           = local.create_none ? 0 : 1
 
+  depends_on = [tls_private_key.ca_key]
+
   private_key_pem = tls_private_key.ca_key[0].private_key_pem
   subject {
     common_name  = "Self-Signed Cluster Root CA"
@@ -75,6 +78,8 @@ resource "tls_private_key" "service_key" {
 resource "tls_cert_request" "service_csr" {
   count           = local.create_none ? 0 : 1
 
+  depends_on = [tls_private_key.service_key]
+
   private_key_pem = tls_private_key.service_key[0].private_key_pem
 
   subject {
@@ -87,6 +92,8 @@ resource "tls_cert_request" "service_csr" {
 
 resource "tls_locally_signed_cert" "service_cert" {
   count                 = local.create_none ? 0 : 1
+
+  depends_on = [tls_cert_request.service_csr, tls_private_key.ca_key, tls_self_signed_cert.ca_cert]
 
   cert_request_pem      = tls_cert_request.service_csr[0].cert_request_pem
   ca_private_key_pem    = tls_private_key.ca_key[0].private_key_pem
@@ -105,7 +112,7 @@ resource "tls_locally_signed_cert" "service_cert" {
 resource "kubernetes_secret" "ssl_cert" {
   count = local.create_none ? 0 : 1
 
-  depends_on = [kubernetes_namespace.eyelevel]
+  depends_on = [kubernetes_namespace.eyelevel, tls_locally_signed_cert.service_cert]
 
   metadata {
     name      = "${var.namespace}-cert"
