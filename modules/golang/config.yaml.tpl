@@ -142,7 +142,7 @@ summaryServer:
 
 upload:
   baseDomain: ${fileAccessKey}
-  baseURL: https://${fileService}.${namespace}.svc.cluster.local
+  baseUrl: https://${fileService}.${namespace}.svc.cluster.local
   bucketUrl: https://${fileService}.${namespace}.svc.cluster.local
   region: ${fileAccessSecret}
 
