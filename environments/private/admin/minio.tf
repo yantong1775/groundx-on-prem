@@ -50,6 +50,10 @@ resource "helm_release" "minio_tenant" {
   values = [
     yamlencode({
       tenant = {
+        configSecret = {
+          accessKey = var.file_access_key
+          secretKey = var.file_access_secret
+        }
         name = "${var.file_service}-tenant"
         pools = [{
           containerSecurityContext = {

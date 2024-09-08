@@ -15,6 +15,7 @@ spec:
         type: internal
         tls: false
     config:
+      default.replication.factor: {{ .Values.zookeeper.replicas }}
       offsets.topic.replication.factor: {{ .Values.service.replicas }}
       transaction.state.log.replication.factor: {{ .Values.service.replicas }}
       transaction.state.log.min.isr: 2

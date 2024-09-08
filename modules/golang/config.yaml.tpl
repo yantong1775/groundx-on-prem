@@ -32,6 +32,11 @@ groundxServer:
   baseURL: https://${groundxService}.${namespace}.svc.cluster.local
   port: 8080
 
+initMySQL:
+  rw_addr: ${dbService}.${namespace}.svc.cluster.local
+  user: root
+  password: ${dbRootPassword}
+
 integrationTests:
   search:
     duration: 3660
@@ -44,44 +49,54 @@ layoutWebhookServer:
 kafka:
   fileLayoutDev:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-layout-dev
   fileLayoutProd:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-layout-prod
   filePreProcess:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-pre-process
   fileProcess:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-process
   filePostProcess:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-post-process
   fileSummaryDev:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-summary-dev
   fileSummaryProd:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-summary-prod
   fileUpdate:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-update
   fileUpload:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: file-upload
   stripeEvent:
     brokers:
-    groupId: 
-    topic: 
+      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    groupId: eyelevel-kafka
+    topic: stripe-event
 
 owner:
   baseURL: https://${groundxService}.${namespace}.svc.cluster.local/api/v1
@@ -114,8 +129,8 @@ queueFileServer:
 rec:
   mysql: *mysql
   session:
-    addr: ${cacheService}.${namespace}.svc.cluster.local
-    notCluster: ${dbNotCluster}
+    addr: ${cacheService}.${namespace}.svc.cluster.local:6379
+    notCluster: ${cacheNotCluster}
 
 ssp:
   baseURL: https://${dashboardService}.${namespace}.svc.cluster.local
@@ -126,9 +141,10 @@ summaryServer:
   port: 8080
 
 upload:
-  baseDomain: ${namespace}.svc.cluster.local
+  baseDomain: ${fileAccessKey}
   baseURL: https://${fileService}.${namespace}.svc.cluster.local
   bucketUrl: https://${fileService}.${namespace}.svc.cluster.local
+  region: ${fileAccessSecret}
 
 uploadFileServer:
   baseURL: https://${uploadService}.${namespace}.svc.cluster.local

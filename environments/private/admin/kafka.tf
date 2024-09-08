@@ -37,12 +37,15 @@ resource "helm_release" "kafka_cluster" {
         }
       },
       service = {
-        port      = var.stream_port
-        replicas  = var.stream_replicas_service
-        storage   = {
+        partitions      = var.stream_partitions
+        port            = var.stream_port
+        replicas        = var.stream_replicas_service
+        retention_bytes = var.stream_retention_bytes
+        segment_bytes   = var.stream_segment_bytes
+        storage    = {
           size = var.stream_storage_service
         }
-        version   = var.stream_version
+        version = var.stream_version
       },
       zookeeper = {
         replicas = var.stream_replicas_zookeeper

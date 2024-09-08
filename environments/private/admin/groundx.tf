@@ -10,8 +10,10 @@ resource "helm_release" "groundx_service" {
   values = [
     yamlencode({
       dependencies = {
-        cache    = "${var.cache_service}.${var.namespace}.svc.cluster.local:6379"
-        database = "${var.db_service}.${var.namespace}.svc.cluster.local:3306"
+        cache    = "${var.cache_service}.${var.namespace}.svc.cluster.local"
+        database = "${var.db_service}-cluster-pxc-db-haproxy.${var.namespace}.svc.cluster.local"
+        file     = "${var.file_service}-tenant-hl.${var.namespace}.svc.cluster.local"
+        stream   = "${var.stream_service}-cluster-cluster-kafka-bootstrap.${var.namespace}.svc.cluster.local"
       }
       image = {
         pull       = var.groundx_image_pull

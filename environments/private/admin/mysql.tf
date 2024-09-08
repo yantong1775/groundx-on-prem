@@ -33,7 +33,7 @@ resource "helm_release" "percona_cluster" {
         enabled = var.db_backup_enable
       }
       haproxy = {
-        enabled = var.db_ha_proxy_enable
+        enabled = true
         resources = {
           limits = {
             cpu    = var.db_ha_proxy_cpu_limits
@@ -53,8 +53,7 @@ resource "helm_release" "percona_cluster" {
         enabled = var.db_pmm_enable
       }
       proxysql = {
-        enabled = var.db_sql_proxy_enable
-        size    = var.db_sql_proxy_replicas
+        enabled = false
       }
       pxc = {
         persistence = {

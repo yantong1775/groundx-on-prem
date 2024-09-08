@@ -36,13 +36,16 @@ data "template_file" "config_yaml" {
   template = file("${path.module}/../../../modules/golang/config.yaml.tpl")
 
   vars = {
+    cacheNotCluster      = var.cache_is_instance
     cacheService         = var.cache_service
     dashboardService     = var.dashboard_service
     dbName               = var.db_name
-    dbNotCluster         = var.db_ip_type != "ClusterIP"
     dbPassword           = var.db_password
-    dbService            = var.db_service
+    dbRootPassword       = var.db_root_password
+    dbService            = "${var.db_service}-cluster-pxc-db-haproxy"
     dbUser               = var.db_username
+    fileAccessKey        = var.file_access_key
+    fileAccessSecret     = var.file_access_secret
     fileService          = var.file_service
     groundxService       = var.groundx_service
     groundxServiceKey    = var.groundx_service_key
@@ -58,6 +61,7 @@ data "template_file" "config_yaml" {
     searchPassword       = var.search_password
     searchService        = var.search_service
     searchUser           = var.search_user
+    streamService        = var.stream_service
     summaryService       = var.summary_service
     uploadService        = var.upload_service
   }

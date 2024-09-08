@@ -155,6 +155,13 @@ variable "cache_ip_type" {
   default     = "ClusterIP"
 }
 
+
+variable "cache_is_instance" {
+  description = "Defines whether redis is a cluster or instance"
+  type        = bool
+  default     = true
+}
+
 variable "cache_mount_path" {
   description = "Container path where redis data will mount"
   type        = string
@@ -224,12 +231,6 @@ variable "db_ip_type" {
   description = "Type of IP address"
   type        = string
   default     = "ClusterIP"
-}
-
-variable "db_ha_proxy_enable" {
-  description = "Enable high availability proxy"
-  type        = bool
-  default     = true
 }
 
 variable "db_ha_proxy_cpu_limits" {
@@ -345,18 +346,6 @@ variable "db_service_version" {
   default     = "8.0"
 }
 
-variable "db_sql_proxy_enable" {
-  description = "Enable MySQL proxy"
-  type        = bool
-  default     = false
-}
-
-variable "db_sql_proxy_replicas" {
-  description = "Number of initial database proxy replicas"
-  type        = number
-  default     = 3
-}
-
 variable "db_username" {
   description = "MySQL user username"
   type        = string
@@ -365,6 +354,18 @@ variable "db_username" {
 
 
 # FILE
+
+variable "file_access_key" {
+  description = "MinIO access key"
+  type        = string
+  default     = "minio"
+}
+
+variable "file_access_secret" {
+  description = "MinIO access secret"
+  type        = string
+  default     = "minio123"
+}
 
 variable "file_chart_operator" {
   description = "Helm chart for MinIO operator"
@@ -862,6 +863,12 @@ variable "stream_node" {
   default     = "crc"
 }
 
+variable "stream_partitions" {
+  description = "Number of initial topic partitions"
+  type        = number
+  default     = 3
+}
+
 variable "stream_port" {
   description = "Local port for access"
   type        = number
@@ -884,6 +891,18 @@ variable "stream_replicas_zookeeper" {
   description = "Number of initial zookeeper replicas"
   type        = number
   default     = 3
+}
+
+variable "stream_retention_bytes" {
+  description = "Storage memory allocated to each topic retention"
+  type        = number
+  default     = 1073741824
+}
+
+variable "stream_segment_bytes" {
+  description = "Storage memory allocated to each topic partition"
+  type        = number
+  default     = 1073741824
 }
 
 variable "stream_service" {
