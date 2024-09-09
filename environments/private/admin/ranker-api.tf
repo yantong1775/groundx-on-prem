@@ -10,6 +10,9 @@ resource "helm_release" "ranker_api_service" {
 
   values = [
     yamlencode({
+      dependencies = {
+        cache = "${var.cache_service}.${var.namespace}.svc.cluster.local"
+      }
       image = {
         pull       = var.ranker_api_image_pull
         repository = var.ranker_api_image_url
