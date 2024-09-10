@@ -11,7 +11,7 @@ data "template_file" "ranker_config_py" {
     rankerMaxPrompt = var.ranker_inference_max_prompt
     rankerModelName = var.ranker_inference_model
     rankerService   = var.ranker_service
-    validAPIKey     = var.groundx_service_key
+    validAPIKey     = var.admin_api_key
   }
 }
 
@@ -48,8 +48,8 @@ data "template_file" "config_yaml" {
     fileAccessSecret     = var.file_access_secret
     fileService          = var.file_service
     groundxService       = var.groundx_service
-    groundxServiceKey    = var.groundx_service_key
-    groundxUsername      = var.groundx_username
+    groundxServiceKey    = var.admin_api_key
+    groundxUsername      = var.admin_username
     layoutService        = var.layout_service
     layoutWebhookService = var.layout_webhook_service
     namespace            = var.namespace
@@ -59,7 +59,8 @@ data "template_file" "config_yaml" {
     rankerService        = var.ranker_service
     searchIndex          = var.search_index
     searchPassword       = var.search_password
-    searchService        = var.search_service
+    searchRootPassword   = var.search_root_password
+    searchService        = "${var.search_service}-cluster-master"
     searchUser           = var.search_user
     streamService        = var.stream_service
     summaryService       = var.summary_service

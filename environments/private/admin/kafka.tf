@@ -55,4 +55,6 @@ resource "helm_release" "kafka_cluster" {
       }
     })
   ]
+
+  timeout = 600
 }

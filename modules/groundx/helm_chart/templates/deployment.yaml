@@ -18,7 +18,15 @@ spec:
       - name: wait-for-cache
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }} 6379; do echo waiting for cache; sleep 2; done"] 
+        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }} 6379; do echo waiting for cache; sleep 2; done"]
+      - name: wait-for-file-storage
+        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
+        imagePullPolicy: "Always"
+        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.file }} 9000; do echo waiting for file storage; sleep 2; done"]
+      - name: wait-for-search
+        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
+        imagePullPolicy: "Always"
+        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.search }} 9200; do echo waiting for search; sleep 2; done"]
       - name: wait-for-database
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
@@ -27,10 +35,6 @@ spec:
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.stream }} 9092; do echo waiting for stream; sleep 2; done"]
-      - name: wait-for-file-storage
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.file }} 9000; do echo waiting for file storage; sleep 2; done"]
       containers:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -46,18 +50,24 @@ spec:
             path: /health
             port: 8080
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 120
         readinessProbe:
           httpGet:
             path: /health
             port: 8080
           initialDelaySeconds: 10
-          periodSeconds: 5
+          periodSeconds: 60
         volumeMounts:
         - name: config-volume
           mountPath: /home/golang/.cashbot/config.yaml
           subPath: config.yaml
+        - name: init-db-volume
+          mountPath: /app/init-db.sql
+          subPath: init-db.sql
       volumes:
       - name: config-volume
         configMap:
           name: config-yaml-map
+      - name: init-db-volume
+        configMap:
+          name: init-database-file

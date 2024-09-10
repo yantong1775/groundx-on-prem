@@ -84,4 +84,6 @@ resource "helm_release" "minio_tenant" {
       }
     })
   ]
+
+  timeout = 600
 }

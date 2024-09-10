@@ -10,7 +10,7 @@ _mysql: &mysql
 ai:
   aws:
     search:
-      baseURL: https://${searchService}.${namespace}.svc.cluster.local
+      baseURL: https://${searchService}.${namespace}.svc.cluster.local:9200
       index: ${searchIndex}
       username: ${searchUser}
       password: ${searchPassword}
@@ -23,7 +23,7 @@ ai:
       baseURL: https://${layoutService}.${namespace}.svc.cluster.local
       callbackURL: https://${layoutWebhookService}.${namespace}.svc.cluster.local
   openai:
-    defaultKitId: 1
+    defaultKitId: 0
   search: eyelevel
 
 environment: prod
@@ -32,14 +32,19 @@ groundxServer:
   baseURL: https://${groundxService}.${namespace}.svc.cluster.local
   port: 8080
 
-initMySQL:
-  rw_addr: ${dbService}.${namespace}.svc.cluster.local
-  user: root
-  password: ${dbRootPassword}
+init:
+  mysql:
+    user: root
+    password: ${dbRootPassword}
+  search:
+    password: ${searchRootPassword}
+    searchModel: all_access
+    username: admin
 
 integrationTests:
   search:
     duration: 3660
+    fileId: ey-mtr6hapxq7d94zigammwir6xz4
     modelId: 10000000001
 
 layoutWebhookServer:
@@ -119,8 +124,8 @@ processors:
   skipMap: [6]
   skipSummarize: [7]
   summarize: [8]
-  summarizeChunks: [9]
-  summarizeSections: [10]
+  summarizeChunks: [10]
+  summarizeSections: [9]
 
 queueFileServer:
   baseURL: https://${queueService}.${namespace}.svc.cluster.local

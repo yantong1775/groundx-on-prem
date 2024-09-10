@@ -1,5 +1,27 @@
 # GLOBALS
 
+variable "admin_api_key" {
+  description = "API key UUID for the admin account, generate using uuid.sh"
+  type        = string
+}
+
+variable "admin_email" {
+  description = "Email associated with the admin account"
+  type        = string
+  default     = "support@yourcompany.com"
+}
+
+variable "admin_password" {
+  description = "Password associated with the admin of this application"
+  type        = string
+  default     = "password"
+}
+
+variable "admin_username" {
+  description = "Username UUID for the admin account, generate using uuid.sh"
+  type        = string
+}
+
 variable "cluster_role" {
   description = "Your cluster role (developer, admin)"
   type        = string
@@ -517,26 +539,6 @@ variable "groundx_service" {
   description = "Name for service"
   type        = string
   default     = "groundx"
-}
-
-variable "groundx_service_key" {
-  description = "API key for GroundX service"
-  type        = string
-  default     = "0c2f6b3e-0746-4280-8ef2-2c65f596b40b"
-}
-
-variable "groundx_username" {
-  description = "Username for GroundX service"
-  type        = string
-  default     = "0c2f6b3e-0746-4280-8ef2-2c65f596b40b"
-}
-
-variable "groundx_valid_service_keys" {
-  description = "List of valid service API keys for internal service requests"
-  type        = list(string)
-  default     = [
-    "0c2f6b3e-0746-4280-8ef2-2c65f596b40b"
-  ]
 }
 
 variable "groundx_version" {

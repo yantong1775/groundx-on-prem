@@ -92,4 +92,6 @@ resource "helm_release" "percona_cluster" {
       }
     })
   ]
+
+  timeout = 600
 }

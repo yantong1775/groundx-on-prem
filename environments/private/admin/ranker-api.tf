@@ -30,4 +30,6 @@ resource "helm_release" "ranker_api_service" {
       }
     })
   ]
+
+  timeout = 600
 }

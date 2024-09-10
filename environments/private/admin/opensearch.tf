@@ -51,4 +51,6 @@ resource "helm_release" "opensearch_operator" {
       singleNode = var.search_replicas == 1
     })
   ]
+
+  timeout = 600
 }
