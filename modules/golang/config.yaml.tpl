@@ -105,6 +105,7 @@ kafka:
 
 owner:
   baseURL: https://${groundxService}.${namespace}.svc.cluster.local/api/v1
+  name: on-prem
   username: ${groundxUsername}
 
 preProcessFileServer:

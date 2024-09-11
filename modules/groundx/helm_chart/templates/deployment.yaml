@@ -50,13 +50,13 @@ spec:
             path: /health
             port: 8080
           initialDelaySeconds: 30
-          periodSeconds: 120
+          periodSeconds: 30
         readinessProbe:
           httpGet:
             path: /health
             port: 8080
           initialDelaySeconds: 10
-          periodSeconds: 60
+          periodSeconds: 30
         volumeMounts:
         - name: config-volume
           mountPath: /home/golang/.cashbot/config.yaml

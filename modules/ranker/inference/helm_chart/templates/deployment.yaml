@@ -23,26 +23,30 @@ spec:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pull }}"
+        workingDir: /app
+        command:
+          - /bin/sh
+          - -c
+          - |
+            export PYTHONPATH=/app && celery -A search.celery.appSearch worker --loglevel=INFO --concurrency=1 --queues=inference_queue
         securityContext:
           runAsUser: {{ .Values.securityContext.runAsUser }}
-          runAsGroup: {{ .Values.securityContext.runAsGroup }}
-          fsGroup: {{ .Values.securityContext.fsGroup }}
         livenessProbe:
           exec:
             command:
             - /bin/sh
             - -c
-            - ps aux | grep '[c]elery worker' || exit 1
+            - ps aux | grep 'search.celery.appSearch' || exit 1
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 30
         readinessProbe:
           exec:
             command:
             - /bin/sh
             - -c
-            - ps aux | grep '[c]elery worker' || exit 1
+            - ps aux | grep 'search.celery.appSearch' || exit 1
           initialDelaySeconds: 10
-          periodSeconds: 5
+          periodSeconds: 30
         volumeMounts:
         - name: config-volume
           mountPath: /app/config.py

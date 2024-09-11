@@ -646,7 +646,7 @@ variable "ranker_api_image_tag" {
 variable "ranker_api_image_url" {
   description = "Address for container image"
   type        = string
-  default     = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-api"
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
 }
 
 variable "ranker_api_node" {
@@ -676,7 +676,7 @@ variable "ranker_inference_image_tag" {
 variable "ranker_inference_image_url" {
   description = "Address for container image"
   type        = string
-  default     = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference"
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/python-inference"
 }
 
 variable "ranker_inference_max_batch" {

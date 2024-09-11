@@ -1,5 +1,5 @@
 apiVersion: v2
-name: "{{ .Values.service.name }}"
-description: "A Helm chart for {{ .Values.service.name }}"
+name: "redis"
+description: "A Helm chart for redis"
 version: 0.0.1
-appVersion: "{{ .Values.image.version }}"
+appVersion: "0.0.1"
