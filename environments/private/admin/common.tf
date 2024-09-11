@@ -1,13 +1,52 @@
 locals {
-  create_groundx    = var.create_all ? var.create_all : var.create_groundx
-  create_kafka      = var.create_all ? var.create_all : var.create_kafka
-  create_minio      = var.create_all ? var.create_all : var.create_minio
-  create_mysql      = var.create_all ? var.create_all : var.create_mysql
-  create_opensearch = var.create_all ? var.create_all : var.create_opensearch
-  create_ranker     = var.create_all ? var.create_all : var.create_ranker
-  create_redis      = var.create_all ? var.create_all : (var.create_ranker ? var.create_ranker : var.create_redis)
+  create_groundx    = var.create_all ? var.create_all : (
+                        var.create_search ? var.create_search : (
+                          var.create_ingest ? var.create_ingest : var.create_groundx
+                        )
+                      )
+  create_kafka      = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_kafka
+                      )
+  create_minio      = var.create_all ? var.create_all : (
+                        var.create_search ? var.create_search : (
+                          var.create_ingest ? var.create_ingest : var.create_minio
+                        )
+                      )
+  create_mysql      = var.create_all ? var.create_all : (
+                        var.create_search ? var.create_search : (
+                          var.create_ingest ? var.create_ingest : var.create_mysql
+                        )
+                      )
+  create_opensearch = var.create_all ? var.create_all : (
+                        var.create_search ? var.create_search : (
+                          var.create_ingest ? var.create_ingest : var.create_opensearch
+                        )
+                      )
+  create_ranker     = var.create_all ? var.create_all : (
+                        var.create_search ? var.create_search : var.create_ranker
+                      )
+  create_redis      = var.create_all ? var.create_all : (
+                        var.create_search ? var.create_search : (
+                          var.create_ingest ? var.create_ingest : (
+                            var.create_ranker ? var.create_ranker : var.create_redis
+                          )
+                        )
+                      )
 
-  create_none = var.create_all == false && var.create_groundx == false && var.create_kafka == false && var.create_minio == false && var.create_mysql == false && var.create_ranker == false && var.create_redis == false
+  create_none = (
+                  var.create_all == false &&
+                  var.create_ingest == false &&
+                  var.create_search == false &&
+                  var.create_groundx == false &&
+                  var.create_kafka == false &&
+                  var.create_minio == false &&
+                  var.create_mysql == false &&
+                  var.create_opensearch == false &&
+                  var.create_ranker == false &&
+                  var.create_redis == false
+                )
+
+  is_openshift = var.cluster_type == "openshift"
 }
 
 provider "kubernetes" {
@@ -18,15 +57,6 @@ resource "kubernetes_namespace" "eyelevel" {
   metadata {
     name = var.namespace
   }
-}
-
-data "external" "get_uid_gid" {
-  depends_on = [kubernetes_namespace.eyelevel]
-
-  program = ["sh", "-c", <<-EOT
-    kubectl get namespace ${var.namespace} -o jsonpath='{.metadata.annotations.openshift\.io/sa\.scc\.uid-range}' | cut -d'/' -f1 | xargs -I {} jq -n --arg uid {} --arg gid {} '{"UID": $uid, "GID": $gid}'
-  EOT
-  ]
 }
 
 resource "kubernetes_storage_class_v1" "local_storage" {

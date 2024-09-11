@@ -40,6 +40,12 @@ variable "create_all" {
   default     = true
 }
 
+variable "create_ingest" {
+  description = "Create all ingest API related services"
+  type        = bool
+  default     = true
+}
+
 variable "create_groundx" {
   description = "Create GroundX service"
   type        = bool
@@ -78,6 +84,12 @@ variable "create_ranker" {
 
 variable "create_redis" {
   description = "Create Redis service"
+  type        = bool
+  default     = true
+}
+
+variable "create_search" {
+  description = "Create all search API related services"
   type        = bool
   default     = true
 }
@@ -545,6 +557,13 @@ variable "groundx_version" {
   description = "GroundX version"
   type        = string
   default     = "0.0.1"
+}
+
+
+# GROUNDX LOAD BALANCER
+
+variable "groundx_lb_port" {
+  default = 80
 }
 
 

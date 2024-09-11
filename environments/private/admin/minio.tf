@@ -21,15 +21,15 @@ resource "helm_release" "minio_operator" {
     yamlencode({
       operator = {
         containerSecurityContext = {
-          runAsUser  = tonumber(data.external.get_uid_gid.result.UID)
-          runAsGroup = tonumber(data.external.get_uid_gid.result.GID)
-          fsGroup    = tonumber(data.external.get_uid_gid.result.GID)
+          runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
+          runAsGroup = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
+          fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
         },
         replicaCount    = var.file_replicas_operator,
         securityContext = {
-          runAsUser  = tonumber(data.external.get_uid_gid.result.UID)
-          runAsGroup = tonumber(data.external.get_uid_gid.result.GID)
-          fsGroup    = tonumber(data.external.get_uid_gid.result.GID)
+          runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
+          runAsGroup = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
+          fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
         }
       }
     })
@@ -57,15 +57,15 @@ resource "helm_release" "minio_tenant" {
         name = "${var.file_service}-tenant"
         pools = [{
           containerSecurityContext = {
-            runAsUser  = tonumber(data.external.get_uid_gid.result.UID)
-            runAsGroup = tonumber(data.external.get_uid_gid.result.GID)
-            fsGroup    = tonumber(data.external.get_uid_gid.result.GID)
+            runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
+            runAsGroup = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
+            fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
           }
           name = "${var.file_service}-tenant-pool-0"
           securityContext = {
-            runAsUser  = tonumber(data.external.get_uid_gid.result.UID)
-            runAsGroup = tonumber(data.external.get_uid_gid.result.GID)
-            fsGroup    = tonumber(data.external.get_uid_gid.result.GID)
+            runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
+            runAsGroup = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
+            fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
           }
           servers          = var.file_pool_server
           size             = var.file_pool_size

@@ -44,6 +44,7 @@ data "template_file" "config_yaml" {
     dbRootPassword       = var.db_root_password
     dbService            = "${var.db_service}-cluster-pxc-db-haproxy"
     dbUser               = var.db_username
+    deploymentType       = local.create_kafka == false ? "search" : "all"
     fileAccessKey        = var.file_access_key
     fileAccessSecret     = var.file_access_secret
     fileService          = var.file_service
@@ -56,7 +57,7 @@ data "template_file" "config_yaml" {
     queueService         = var.queue_service
     preProcessService    = var.preprocess_service
     processService       = var.process_service
-    rankerService        = var.ranker_service
+    rankerService        = "${var.ranker_service}-api"
     searchIndex          = var.search_index
     searchPassword       = var.search_password
     searchRootPassword   = var.search_root_password

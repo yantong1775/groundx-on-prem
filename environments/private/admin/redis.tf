@@ -97,9 +97,9 @@ resource "helm_release" "redis" {
         volume       = "${var.cache_service}-pv"
       },
       securityContext = {
-        runAsUser  = data.external.get_uid_gid.result.UID
-        runAsGroup = data.external.get_uid_gid.result.GID
-        fsGroup    = data.external.get_uid_gid.result.GID
+        runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
+        runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
+        fsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
       },
       service = {
         name         = var.cache_service

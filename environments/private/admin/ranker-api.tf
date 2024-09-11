@@ -19,9 +19,7 @@ resource "helm_release" "ranker_api_service" {
         tag        = var.ranker_api_image_tag
       }
       securityContext = {
-        runAsUser  = data.external.get_uid_gid.result.UID
-        runAsGroup = data.external.get_uid_gid.result.GID
-        fsGroup    = data.external.get_uid_gid.result.GID
+        runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }
       service = {
         name      = "${var.ranker_service}-api"

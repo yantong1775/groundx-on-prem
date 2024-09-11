@@ -34,8 +34,8 @@ resource "helm_release" "opensearch_operator" {
         size = var.search_pv_size
       }
       podSecurityContext = {
-        runAsUser  = tonumber(data.external.get_uid_gid.result.UID)
-        fsGroup    = tonumber(data.external.get_uid_gid.result.GID)
+        runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
+        fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
       }
       replicas = var.search_replicas
       resources = {
@@ -45,12 +45,12 @@ resource "helm_release" "opensearch_operator" {
         }
       }
       securityContext = {
-        runAsUser    = tonumber(data.external.get_uid_gid.result.UID)
+        runAsUser    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         runAsNonRoot = true
       }
       singleNode = var.search_replicas == 1
     })
   ]
 
-  timeout = 600
+  timeout = 1200
 }

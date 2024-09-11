@@ -16,12 +16,12 @@ ai:
       password: ${searchPassword}
   eyelevelSearch:
     apiKey: ${groundxServiceKey}
-    baseURL: https://${rankerService}.${namespace}.svc.cluster.local
+    baseURL: http://${rankerService}.${namespace}.svc.cluster.local
   layout:
     client:
       apiKey: ${groundxServiceKey}
-      baseURL: https://${layoutService}.${namespace}.svc.cluster.local
-      callbackURL: https://${layoutWebhookService}.${namespace}.svc.cluster.local
+      baseURL: http://${layoutService}.${namespace}.svc.cluster.local
+      callbackURL: http://${layoutWebhookService}.${namespace}.svc.cluster.local
   openai:
     defaultKitId: 0
   search: eyelevel
@@ -29,7 +29,7 @@ ai:
 environment: prod
 
 groundxServer:
-  baseURL: https://${groundxService}.${namespace}.svc.cluster.local
+  baseURL: http://${groundxService}.${namespace}.svc.cluster.local
   port: 8080
 
 init:
@@ -48,7 +48,7 @@ integrationTests:
     modelId: 10000000001
 
 layoutWebhookServer:
-  baseURL: https://${layoutWebhookService}.${namespace}.svc.cluster.local
+  baseURL: http://${layoutWebhookService}.${namespace}.svc.cluster.local
   port: 8080
 
 kafka:
@@ -104,16 +104,17 @@ kafka:
     topic: stripe-event
 
 owner:
-  baseURL: https://${groundxService}.${namespace}.svc.cluster.local/api/v1
+  baseURL: http://${groundxService}.${namespace}.svc.cluster.local/api/v1
   name: on-prem
+  type: ${deploymentType}
   username: ${groundxUsername}
 
 preProcessFileServer:
-  baseURL: https://${preProcessService}.${namespace}.svc.cluster.local
+  baseURL: http://${preProcessService}.${namespace}.svc.cluster.local
   port: 8080
 
 processFileServer:
-  baseURL: https://${processService}.${namespace}.svc.cluster.local
+  baseURL: http://${processService}.${namespace}.svc.cluster.local
   port: 8080
 
 processors:
@@ -129,7 +130,7 @@ processors:
   summarizeSections: [9]
 
 queueFileServer:
-  baseURL: https://${queueService}.${namespace}.svc.cluster.local
+  baseURL: http://${queueService}.${namespace}.svc.cluster.local
   port: 8080
 
 rec:
@@ -139,19 +140,19 @@ rec:
     notCluster: ${cacheNotCluster}
 
 ssp:
-  baseURL: https://${dashboardService}.${namespace}.svc.cluster.local
-  dashboardURL: https://${dashboardService}.${namespace}.svc.cluster.local
+  baseURL: http://${dashboardService}.${namespace}.svc.cluster.local
+  dashboardURL: http://${dashboardService}.${namespace}.svc.cluster.local
 
 summaryServer:
-  baseURL: https://${summaryService}.${namespace}.svc.cluster.local
+  baseURL: http://${summaryService}.${namespace}.svc.cluster.local
   port: 8080
 
 upload:
   baseDomain: ${fileAccessKey}
-  baseUrl: https://${fileService}.${namespace}.svc.cluster.local
-  bucketUrl: https://${fileService}.${namespace}.svc.cluster.local
+  baseUrl: http://${fileService}.${namespace}.svc.cluster.local
+  bucketUrl: http://${fileService}.${namespace}.svc.cluster.local
   region: ${fileAccessSecret}
 
 uploadFileServer:
-  baseURL: https://${uploadService}.${namespace}.svc.cluster.local
+  baseURL: http://${uploadService}.${namespace}.svc.cluster.local
   port: 8080

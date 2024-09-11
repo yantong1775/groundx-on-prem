@@ -14,7 +14,6 @@ resource "helm_release" "groundx_service" {
         database = "${var.db_service}-cluster-pxc-db-haproxy.${var.namespace}.svc.cluster.local"
         file     = "${var.file_service}-tenant-hl.${var.namespace}.svc.cluster.local"
         search   = "${var.search_service}-cluster-master.${var.namespace}.svc.cluster.local"
-        stream   = "${var.stream_service}-cluster-cluster-kafka-bootstrap.${var.namespace}.svc.cluster.local"
       }
       image = {
         pull       = var.groundx_image_pull
@@ -22,9 +21,9 @@ resource "helm_release" "groundx_service" {
         tag        = var.groundx_image_tag
       }
       securityContext = {
-        runAsUser  = data.external.get_uid_gid.result.UID
-        runAsGroup = data.external.get_uid_gid.result.GID
-        fsGroup    = data.external.get_uid_gid.result.GID
+        runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
+        runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
+        fsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
       }
       service = {
         name      = var.groundx_service
@@ -34,5 +33,5 @@ resource "helm_release" "groundx_service" {
     })
   ]
 
-  timeout = 600
+  timeout = 1800
 }
