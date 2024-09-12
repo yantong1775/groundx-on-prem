@@ -40,20 +40,32 @@ variable "create_all" {
   default     = true
 }
 
-variable "create_ingest" {
-  description = "Create all ingest API related services"
-  type        = bool
-  default     = true
-}
-
 variable "create_groundx" {
   description = "Create GroundX service"
   type        = bool
   default     = true
 }
 
+variable "create_ingest" {
+  description = "Create all ingest API related services"
+  type        = bool
+  default     = true
+}
+
 variable "create_kafka" {
   description = "Create Kafka service"
+  type        = bool
+  default     = true
+}
+
+variable "create_layout" {
+  description = "Create Document layout service"
+  type        = bool
+  default     = true
+}
+
+variable "create_layout_webhook" {
+  description = "Create Layout Webhook service"
   type        = bool
   default     = true
 }
@@ -76,8 +88,26 @@ variable "create_opensearch" {
   default     = true
 }
 
+variable "create_pre_process" {
+  description = "Create Pre-Process files service"
+  type        = bool
+  default     = true
+}
+
+variable "create_process" {
+  description = "Create Process files service"
+  type        = bool
+  default     = true
+}
+
+variable "create_queue" {
+  description = "Create Queue files service"
+  type        = bool
+  default     = true
+}
+
 variable "create_ranker" {
-  description = "Create GroundX Search ranker service, sets create_redis to true when true"
+  description = "Create GroundX Search ranker service"
   type        = bool
   default     = true
 }
@@ -90,6 +120,30 @@ variable "create_redis" {
 
 variable "create_search" {
   description = "Create all search API related services"
+  type        = bool
+  default     = true
+}
+
+variable "create_summary" {
+  description = "Create GroundX file summary service"
+  type        = bool
+  default     = true
+}
+
+variable "create_summary_client" {
+  description = "Create Summary files client service"
+  type        = bool
+  default     = true
+}
+
+variable "create_upload" {
+  description = "Create Upload files service"
+  type        = bool
+  default     = true
+}
+
+variable "internet_access" {
+  description = "Defines whether the Kubernetes cluster has internet access"
   type        = bool
   default     = true
 }
@@ -554,7 +608,7 @@ variable "groundx_service" {
 }
 
 variable "groundx_version" {
-  description = "GroundX version"
+  description = "Service version"
   type        = string
   default     = "0.0.1"
 }
@@ -569,14 +623,92 @@ variable "groundx_lb_port" {
 
 # LAYOUT
 
+variable "layout_api_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "layout_api_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "layout_api_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
+}
+
 variable "layout_api_node" {
   description = "Node where the API (CPU) service will be available"
   type        = string
   default     = "crc"
 }
 
+variable "layout_inference_device" {
+  description = "Device type for inference (cpu or cuda)"
+  type        = string
+  default     = "cuda"
+}
+
+variable "layout_inference_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "layout_inference_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "layout_inference_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference"
+}
+
+variable "layout_inference_image_url_no_internet" {
+  description = "Address for container image - pre-cached model"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference-op"
+}
+
+variable "layout_inference_model" {
+  description = "Base layout model"
+  type        = string
+  default     = ""
+}
+
 variable "layout_inference_node" {
   description = "Node where the inference (GPU) service will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "layout_process_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "layout_process_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "layout_process_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/layout-process"
+}
+
+variable "layout_process_node" {
+  description = "Node where the process (CPU) service will be available"
   type        = string
   default     = "crc"
 }
@@ -587,8 +719,32 @@ variable "layout_service" {
   default     = "layout"
 }
 
+variable "layout_version" {
+  description = "Service version"
+  type        = string
+  default     = "0.0.1"
+}
+
 
 # LAYOUT WEBHOOK
+
+variable "layout_webhook_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "layout_webhook_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "layout_webhook_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/layout-webhook"
+}
 
 variable "layout_webhook_node" {
   description = "Node where the service will be available"
@@ -602,8 +758,110 @@ variable "layout_webhook_service" {
   default     = "layout-webhook"
 }
 
+variable "layout_webhook_version" {
+  description = "Service version"
+  type        = string
+  default     = "0.0.1"
+}
+
+
+# PRE-PROCESS
+
+variable "pre_process_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "pre_process_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "pre_process_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/pre-process"
+}
+
+variable "pre_process_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "pre_process_service" {
+  description = "Name for service"
+  type        = string
+  default     = "pre-process"
+}
+
+variable "pre_process_version" {
+  description = "Service version"
+  type        = string
+  default     = "0.0.1"
+}
+
+
+# PROCESS
+
+variable "process_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "process_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "process_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/process"
+}
+
+variable "process_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "process_service" {
+  description = "Name for service"
+  type        = string
+  default     = "process"
+}
+
+variable "process_version" {
+  description = "Service version"
+  type        = string
+  default     = "0.0.1"
+}
+
 
 # QUEUE
+
+variable "queue_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "queue_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "queue_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/queue"
+}
 
 variable "queue_node" {
   description = "Node where the service will be available"
@@ -617,34 +875,10 @@ variable "queue_service" {
   default     = "queue"
 }
 
-
-# PREPROCESS
-
-variable "preprocess_node" {
-  description = "Node where the service will be available"
+variable "queue_version" {
+  description = "Service version"
   type        = string
-  default     = "crc"
-}
-
-variable "preprocess_service" {
-  description = "Name for service"
-  type        = string
-  default     = "preprocess"
-}
-
-
-# PROCESS
-
-variable "process_node" {
-  description = "Node where the service will be available"
-  type        = string
-  default     = "crc"
-}
-
-variable "process_service" {
-  description = "Name for service"
-  type        = string
-  default     = "process"
+  default     = "0.0.1"
 }
 
 
@@ -695,7 +929,13 @@ variable "ranker_inference_image_tag" {
 variable "ranker_inference_image_url" {
   description = "Address for container image"
   type        = string
-  default     = "public.ecr.aws/c9r4x6y5/eyelevel/python-inference"
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference"
+}
+
+variable "ranker_inference_image_url_no_internet" {
+  description = "Address for container image - pre-cached model"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference-op"
 }
 
 variable "ranker_inference_max_batch" {
@@ -729,7 +969,7 @@ variable "ranker_service" {
 }
 
 variable "ranker_version" {
-  description = "Search Ranker version"
+  description = "Service version"
   type        = string
   default     = "0.0.1"
 }
@@ -953,10 +1193,76 @@ variable "stream_version" {
 
 # SUMMARY
 
+variable "summary_api_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "summary_api_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "summary_api_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
+}
+
 variable "summary_api_node" {
   description = "Node where the API (CPU) service will be available"
   type        = string
   default     = "crc"
+}
+
+variable "summary_inference_device" {
+  description = "Device type for inference (cpu or cuda)"
+  type        = string
+  default     = "cuda"
+}
+
+variable "summary_inference_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "summary_inference_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "summary_inference_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/summary-inference"
+}
+
+variable "summary_inference_image_url_no_internet" {
+  description = "Address for container image - pre-cached model"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/summary-inference-op"
+}
+
+variable "summary_inference_max_batch" {
+  description = "Max number of prompts to process in a single inference"
+  type        = number
+  default     = 10
+}
+
+variable "summary_inference_max_prompt" {
+  description = "Max number of prompt tokens to process in a single inference"
+  type        = number
+  default     = 2048
+}
+
+variable "summary_inference_model" {
+  description = "Base summary model"
+  type        = string
+  default     = "openbmb/MiniCPM-V-2_6"
 }
 
 variable "summary_inference_node" {
@@ -964,14 +1270,77 @@ variable "summary_inference_node" {
   type        = string
   default     = "crc"
 }
+
 variable "summary_service" {
   description = "Name for service"
   type        = string
   default     = "summary"
 }
 
+variable "summary_version" {
+  description = "Service version"
+  type        = string
+  default     = "0.0.1"
+}
+
+# SUMMARY CLIENT
+
+variable "summary_client_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "summary_client_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "summary_client_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/summary-client"
+}
+
+variable "summary_client_node" {
+  description = "Node where the service will be available"
+  type        = string
+  default     = "crc"
+}
+
+variable "summary_client_service" {
+  description = "Name for service"
+  type        = string
+  default     = "summary-client"
+}
+
+variable "summary_client_version" {
+  description = "Service version"
+  type        = string
+  default     = "0.0.1"
+}
+
 
 # UPLOAD
+
+variable "upload_image_pull" {
+  description = "Pull policy for container image"
+  type        = string
+  default     = "Always"
+}
+
+variable "upload_image_tag" {
+  description = "Tag for container image"
+  type        = string
+  default     = "latest"
+}
+
+variable "upload_image_url" {
+  description = "Address for container image"
+  type        = string
+  default     = "public.ecr.aws/c9r4x6y5/eyelevel/upload"
+}
 
 variable "upload_node" {
   description = "Node where the service will be available"
@@ -983,4 +1352,10 @@ variable "upload_service" {
   description = "Name for service"
   type        = string
   default     = "upload"
+}
+
+variable "upload_version" {
+  description = "Service version"
+  type        = string
+  default     = "0.0.1"
 }

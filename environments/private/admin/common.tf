@@ -1,36 +1,58 @@
 locals {
-  create_groundx    = var.create_all ? var.create_all : (
+  create_groundx        = var.create_all ? var.create_all : (
                         var.create_search ? var.create_search : (
                           var.create_ingest ? var.create_ingest : var.create_groundx
                         )
                       )
-  create_kafka      = var.create_all ? var.create_all : (
+  create_layout         = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_layout
+                      )
+  create_layout_webhook = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_layout_webhook
+                      )
+  create_kafka          = var.create_all ? var.create_all : (
                         var.create_ingest ? var.create_ingest : var.create_kafka
                       )
-  create_minio      = var.create_all ? var.create_all : (
+  create_minio          = var.create_all ? var.create_all : (
                         var.create_search ? var.create_search : (
                           var.create_ingest ? var.create_ingest : var.create_minio
                         )
                       )
-  create_mysql      = var.create_all ? var.create_all : (
+  create_mysql          = var.create_all ? var.create_all : (
                         var.create_search ? var.create_search : (
                           var.create_ingest ? var.create_ingest : var.create_mysql
                         )
                       )
-  create_opensearch = var.create_all ? var.create_all : (
+  create_opensearch     = var.create_all ? var.create_all : (
                         var.create_search ? var.create_search : (
                           var.create_ingest ? var.create_ingest : var.create_opensearch
                         )
                       )
-  create_ranker     = var.create_all ? var.create_all : (
+  create_pre_process    = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_pre_process
+                      )
+  create_process        = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_process
+                      )
+  create_queue          = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_queue
+                      )
+  create_ranker         = var.create_all ? var.create_all : (
                         var.create_search ? var.create_search : var.create_ranker
                       )
-  create_redis      = var.create_all ? var.create_all : (
+  create_redis          = var.create_all ? var.create_all : (
                         var.create_search ? var.create_search : (
-                          var.create_ingest ? var.create_ingest : (
-                            var.create_ranker ? var.create_ranker : var.create_redis
-                          )
+                          var.create_ingest ? var.create_ingest : var.create_redis
                         )
+                      )
+  create_summary        = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_summary
+                      )
+  create_summary_client = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_summary_client
+                      )
+  create_upload         = var.create_all ? var.create_all : (
+                        var.create_ingest ? var.create_ingest : var.create_upload
                       )
 
   create_none = (
@@ -39,11 +61,19 @@ locals {
                   var.create_search == false &&
                   var.create_groundx == false &&
                   var.create_kafka == false &&
+                  var.create_layout == false &&
+                  var.create_layout_webhook == false &&
                   var.create_minio == false &&
                   var.create_mysql == false &&
                   var.create_opensearch == false &&
+                  var.create_pre_process == false &&
+                  var.create_process == false &&
+                  var.create_queue == false &&
                   var.create_ranker == false &&
-                  var.create_redis == false
+                  var.create_redis == false &&
+                  var.create_summary == false &&
+                  var.create_summary_client == false &&
+                  var.create_upload == false
                 )
 
   is_openshift = var.cluster_type == "openshift"

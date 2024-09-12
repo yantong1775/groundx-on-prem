@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.service.name }}
+  namespace: {{ .Values.service.namespace }}
+  labels:
+    app: {{ .Values.service.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.service.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.service.name }}
+    spec:
+      initContainers:
+      - name: wait-for-cache
+        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
+        imagePullPolicy: "Always"
+        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }} 6379; do echo waiting for cache; sleep 2; done"] 
+      containers:
+      - name: {{ .Values.service.name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: "{{ .Values.image.pull }}"
+        workingDir: /app
+        command:
+          - /bin/sh
+          - -c
+          - |
+            export PYTHONPATH=/app && celery -A document.celery.appProcess worker --loglevel=INFO --concurrency=1 --queues=default_queue
+        securityContext:
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - ps aux | grep 'document.celery.appProcess' || exit 1
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - ps aux | grep 'document.celery.appProcess' || exit 1
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config.py
+          subPath: config.py
+      volumes:
+      - name: config-volume
+        configMap:
+          name: layout-config-py-map

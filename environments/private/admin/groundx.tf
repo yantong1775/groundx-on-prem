@@ -14,6 +14,7 @@ resource "helm_release" "groundx_service" {
         database = "${var.db_service}-cluster-pxc-db-haproxy.${var.namespace}.svc.cluster.local"
         file     = "${var.file_service}-tenant-hl.${var.namespace}.svc.cluster.local"
         search   = "${var.search_service}-cluster-master.${var.namespace}.svc.cluster.local"
+        stream   = "${var.stream_service}-cluster-cluster-kafka-bootstrap.${var.namespace}.svc.cluster.local"
       }
       image = {
         pull       = var.groundx_image_pull

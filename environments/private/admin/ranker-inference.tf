@@ -14,8 +14,8 @@ resource "helm_release" "ranker_inference_service" {
         cache = "${var.cache_service}.${var.namespace}.svc.cluster.local"
       }
       image = {
-        pull       = var.ranker_inference_image_pull
-        repository = var.ranker_inference_image_url
+        pull       = var.ranker_inference_image_pull 
+        repository = var.internet_access ? var.ranker_inference_image_url : var.ranker_inference_image_url_no_internet
         tag        = var.ranker_inference_image_tag
       }
       securityContext = {

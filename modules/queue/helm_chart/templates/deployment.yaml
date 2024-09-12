@@ -15,27 +15,6 @@ spec:
       labels:
         app: {{ .Values.service.name }}
     spec:
-      initContainers:
-      - name: wait-for-cache
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }} 6379; do echo waiting for cache; sleep 2; done"]
-      - name: wait-for-file-storage
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.file }} 9000; do echo waiting for file storage; sleep 2; done"]
-      - name: wait-for-search
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.search }} 9200; do echo waiting for search; sleep 2; done"]
-      - name: wait-for-database
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.database }} 3306; do echo waiting for database; sleep 2; done"]
-      - name: wait-for-stream
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.stream }} 9092; do echo waiting for stream; sleep 2; done"]
       containers:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
