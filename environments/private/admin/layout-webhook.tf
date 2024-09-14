@@ -3,7 +3,7 @@ resource "helm_release" "layout_webhook_service" {
 
   depends_on = [helm_release.groundx_service]
 
-  name       = "${var.layout_webhook_service}-cluster"
+  name       = "${var.layout_webhook_service}"
   namespace  = var.namespace
   chart      = "${path.module}/../../../modules/layout-webhook/helm_chart"
 

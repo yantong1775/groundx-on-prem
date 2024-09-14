@@ -5,10 +5,15 @@ data "template_file" "layout_config_py" {
 
   vars = {
     cacheService     = var.cache_service
-    deviceType       = var.layout_inference_device
+    deviceType       = var.layout_models.figure.device
+    fileAccessKey    = var.file_access_key
+    fileAccessSecret = var.file_access_secret
+    fileService      = var.file_service
+    fileSSL          = var.file_ssl
     namespace        = var.namespace
-    layoutModelName  = var.layout_inference_model
-    layoutService    = var.layout_service
+    layoutModelName  = var.layout_models.figure.model
+    layoutService    = var.layout_service.name
+    uploadBucket     = var.file_upload_bucket
     validAPIKey      = var.admin_api_key
   }
 }
@@ -110,10 +115,11 @@ data "template_file" "config_yaml" {
     fileAccessKey        = var.file_access_key
     fileAccessSecret     = var.file_access_secret
     fileService          = var.file_service
+    fileSSL              = var.file_ssl
     groundxService       = var.groundx_service
     groundxServiceKey    = var.admin_api_key
     groundxUsername      = var.admin_username
-    layoutService        = var.layout_service
+    layoutService        = var.layout_service.name
     layoutWebhookService = var.layout_webhook_service
     namespace            = var.namespace
     preProcessService    = var.pre_process_service

@@ -152,6 +152,7 @@ upload:
   baseUrl: http://${fileService}.${namespace}.svc.cluster.local
   bucketUrl: http://${fileService}.${namespace}.svc.cluster.local
   region: ${fileAccessSecret}
+  ssl: ${fileSSL}
 
 uploadFileServer:
   baseURL: http://${uploadService}.${namespace}.svc.cluster.local

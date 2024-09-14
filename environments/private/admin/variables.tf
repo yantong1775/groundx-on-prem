@@ -568,6 +568,18 @@ variable "file_service" {
   default     = "minio"
 }
 
+variable "file_ssl" {
+  description = "Enable SSL for file server"
+  type        = bool
+  default     = false
+}
+
+variable "file_upload_bucket" {
+  description = "Name for upload bucket"
+  type        = string
+  default     = "eyelevel-upload"
+}
+
 variable "file_version" {
   description = "MinIO version"
   type        = string
@@ -623,106 +635,124 @@ variable "groundx_lb_port" {
 
 # LAYOUT
 
-variable "layout_api_image_pull" {
-  description = "Pull policy for container image"
-  type        = string
-  default     = "Always"
+variable "layout_api_image" {
+  type         = object({
+    pull       = string
+    repository = string
+    tag        = string
+  })
+  default      = {
+    pull       = "Always"
+    repository = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
+    tag        = "latest"
+  }
 }
 
-variable "layout_api_image_tag" {
-  description = "Tag for container image"
-  type        = string
-  default     = "latest"
+variable "layout_inference_image" {
+  description  = "Container for environments WITH external internet access"
+  type         = object({
+    pull       = string
+    repository = string
+    tag        = string
+  })
+  default      = {
+    pull       = "Always"
+    repository = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference"
+    tag        = "latest"
+  }
 }
 
-variable "layout_api_image_url" {
-  description = "Address for container image"
-  type        = string
-  default     = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
+variable "layout_inference_image_op" {
+  description  = "Container for environments WITHOUT external internet access"
+  type         = object({
+    pull       = string
+    repository = string
+    tag        = string
+  })
+  default      = {
+    pull       = "Always"
+    repository = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference-op"
+    tag        = "latest"
+  }
 }
 
-variable "layout_api_node" {
-  description = "Node where the API (CPU) service will be available"
-  type        = string
-  default     = "crc"
+variable "layout_models" {
+  type       = object({
+    figure   = object({
+      device = string
+      model  = string
+    })
+    table    = object({
+      device = string
+      model  = string
+    })
+  })
+  default    = {
+    figure   = {
+      device = "cuda"
+      model  = ""
+    }
+    table   = {
+      device = "cuda"
+      model  = ""
+    }
+  }
 }
 
-variable "layout_inference_device" {
-  description = "Device type for inference (cpu or cuda)"
-  type        = string
-  default     = "cuda"
+variable "layout_nodes" {
+  type        = object({
+    api       = string
+    inference = string
+    ocr       = string
+    process   = string
+  })
+  default     = {
+    api       = "crc"
+    inference = "crc"
+    ocr       = "crc"
+    process   = "crc"
+  }
 }
 
-variable "layout_inference_image_pull" {
-  description = "Pull policy for container image"
-  type        = string
-  default     = "Always"
+variable "layout_ocr_handler" {
+  type            = object({
+    credentials   = string
+    project       = string
+    type          = string
+  })
+  default         = {
+    credentials   = "gcv_credentials.json"
+    project       = ""
+    type          = "google"
+  }
+  validation {
+    condition     = var.layout_ocr_handler.type != "google" || var.layout_ocr_handler.project != ""
+    error_message = "Project must be set if using Google OCR"
+  }
 }
 
-variable "layout_inference_image_tag" {
-  description = "Tag for container image"
-  type        = string
-  default     = "latest"
-}
-
-variable "layout_inference_image_url" {
-  description = "Address for container image"
-  type        = string
-  default     = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference"
-}
-
-variable "layout_inference_image_url_no_internet" {
-  description = "Address for container image - pre-cached model"
-  type        = string
-  default     = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference-op"
-}
-
-variable "layout_inference_model" {
-  description = "Base layout model"
-  type        = string
-  default     = ""
-}
-
-variable "layout_inference_node" {
-  description = "Node where the inference (GPU) service will be available"
-  type        = string
-  default     = "crc"
-}
-
-variable "layout_process_image_pull" {
-  description = "Pull policy for container image"
-  type        = string
-  default     = "Always"
-}
-
-variable "layout_process_image_tag" {
-  description = "Tag for container image"
-  type        = string
-  default     = "latest"
-}
-
-variable "layout_process_image_url" {
-  description = "Address for container image"
-  type        = string
-  default     = "public.ecr.aws/c9r4x6y5/eyelevel/layout-process"
-}
-
-variable "layout_process_node" {
-  description = "Node where the process (CPU) service will be available"
-  type        = string
-  default     = "crc"
+variable "layout_process_image" {
+  type         = object({
+    pull       = string
+    repository = string
+    tag        = string
+  })
+  default      = {
+    pull       = "Always"
+    repository = "public.ecr.aws/c9r4x6y5/eyelevel/layout-process"
+    tag        = "latest"
+  }
 }
 
 variable "layout_service" {
-  description = "Name for service"
-  type        = string
-  default     = "layout"
-}
-
-variable "layout_version" {
-  description = "Service version"
-  type        = string
-  default     = "0.0.1"
+  type      = object({
+    name    = string
+    version = string
+  })
+  default   = {
+    name    = "layout"
+    version = "0.0.1"
+  }
 }
 
 
