@@ -11,10 +11,10 @@ resource "helm_release" "percona_operator" {
 
   depends_on = [null_resource.percona_helm_repo, kubernetes_namespace.eyelevel]
 
-  name       = "${var.db_service}-operator"
-  namespace  = var.namespace
+  name       = "${var.db_internal.service}-operator"
+  namespace  = var.app.namespace
 
-  chart      = "percona/pxc-operator"
+  chart      = var.db_internal.chart.operator
 }
 
 resource "helm_release" "percona_cluster" {
@@ -22,73 +22,55 @@ resource "helm_release" "percona_cluster" {
 
   depends_on = [helm_release.percona_operator]
 
-  name       = "${var.db_service}-cluster"
-  namespace  = var.namespace
+  name       = "${var.db_internal.service}-cluster"
+  namespace  = var.app.namespace
 
-  chart      = "percona/pxc-db"
+  chart      = var.db_internal.chart.db
 
   values = [
     yamlencode({
       backup = {
-        enabled = var.db_backup_enable
+        enabled = var.db_internal.backup
       }
       haproxy = {
         enabled = true
-        resources = {
-          limits = {
-            cpu    = var.db_ha_proxy_cpu_limits
-            memory = var.db_ha_proxy_memory_limits
-          }
-          requests = {
-            cpu    = var.db_ha_proxy_cpu_requests
-            memory = var.db_ha_proxy_memory_requests
-          }
-        }
-        size    = var.db_ha_proxy_replicas
+        resources = var.db.proxy.resources
+        size    = var.db.proxy.replicas
       }
       logcollector = {
-        enabled = var.db_logcollector_enable
+        enabled = var.db_internal.logcollector_enable
       }
       pmm = {
-        enabled = var.db_pmm_enable
+        enabled = var.db_internal.pmm_enable
       }
       proxysql = {
         enabled = false
       }
       pxc = {
         persistence = {
-          size = var.db_pv_size
+          size = var.db.pv_size
         }
-        resources = {
-          limits = {
-            cpu    = var.db_pxc_cpu_limits
-            memory = var.db_pxc_memory_limits
-          }
-          requests = {
-            cpu    = var.db_pxc_cpu_requests
-            memory = var.db_pxc_memory_requests
-          }
-        }
-        size = var.db_replicas
+        resources = var.db.resources
+        size = var.db.replicas
       }
       secrets = {
         passwords = {
-          root         = var.db_root_password
-          xtrabackup   = var.db_root_password
-          monitor      = var.db_root_password
-          clustercheck = var.db_root_password
-          proxyadmin   = var.db_root_password
-          operator     = var.db_root_password
-          replication  = var.db_root_password
+          root         = var.db.db_root_password
+          xtrabackup   = var.db.db_root_password
+          monitor      = var.db.db_root_password
+          clustercheck = var.db.db_root_password
+          proxyadmin   = var.db.db_root_password
+          operator     = var.db.db_root_password
+          replication  = var.db.db_root_password
         }
         tls = {
-          cluster  = "${var.namespace}-cert"
-          internal = "${var.namespace}-cert"
+          cluster  = "${var.app.namespace}-cert"
+          internal = "${var.app.namespace}-cert"
         }
       }
       unsafeFlags = {
-        pxcSize   = var.db_disable_check_unsafe
-        proxySize = var.db_disable_check_unsafe
+        pxcSize   = var.db_internal.disable_unsafe_checks
+        proxySize = var.db_internal.disable_unsafe_checks
       }
     })
   ]

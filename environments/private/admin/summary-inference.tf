@@ -3,28 +3,24 @@ resource "helm_release" "summary_inference_service" {
 
   depends_on = [kubernetes_namespace.eyelevel, kubernetes_config_map.summary_config_file]
 
-  name       = "${var.summary_service}-inference-cluster"
-  namespace  = var.namespace
+  name       = "${var.summary_internal.service}-inference-cluster"
+  namespace  = var.app.namespace
 
   chart      = "${path.module}/../../../modules/summary/inference/helm_chart"
 
   values = [
     yamlencode({
       dependencies = {
-        cache = "${var.cache_service}.${var.namespace}.svc.cluster.local"
+        cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
       }
-      image = {
-        pull       = var.summary_inference_image_pull
-        repository = var.internet_access ? var.summary_inference_image_url : var.summary_inference_image_url_no_internet
-        tag        = var.summary_inference_image_tag
-      }
+      image = var.cluster.internet_access ? var.summary_internal.inference.image : var.summary_internal.inference.image_op
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }
       service = {
-        name      = "${var.summary_service}-inference"
-        namespace = var.namespace
-        version   = var.summary_version
+        name      = "${var.summary_internal.service}-inference"
+        namespace = var.app.namespace
+        version   = var.summary_internal.version
       }
     })
   ]

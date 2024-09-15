@@ -3,33 +3,28 @@ resource "helm_release" "groundx_service" {
 
   depends_on = [kubernetes_config_map.cashbot_config_file, kubernetes_namespace.eyelevel]
 
-  name       = "${var.groundx_service}-cluster"
-  namespace  = var.namespace
+  name       = "${var.groundx_internal.service}-cluster"
+  namespace  = var.app.namespace
   chart      = "${path.module}/../../../modules/groundx/helm_chart"
 
   values = [
     yamlencode({
       dependencies = {
-        cache    = "${var.cache_service}.${var.namespace}.svc.cluster.local"
-        database = "${var.db_service}-cluster-pxc-db-haproxy.${var.namespace}.svc.cluster.local"
-        file     = "${var.file_service}-tenant-hl.${var.namespace}.svc.cluster.local"
-        search   = "${var.search_service}-cluster-master.${var.namespace}.svc.cluster.local"
-        stream   = "${var.stream_service}-cluster-cluster-kafka-bootstrap.${var.namespace}.svc.cluster.local"
+        cache    = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
+        database = "${var.db_internal.service}-cluster-pxc-db-haproxy.${var.app.namespace}.svc.cluster.local"
+        file     = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
+        search   = "${var.search_internal.service}-cluster-master.${var.app.namespace}.svc.cluster.local"
+        stream   = "${var.stream_internal.service}-cluster-cluster-kafka-bootstrap.${var.app.namespace}.svc.cluster.local"
       }
-      image = {
-        pull       = var.groundx_image_pull
-        repository = var.groundx_image_url
-        tag        = var.groundx_image_tag
-      }
+      image = var.groundx_internal.image
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
         runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
         fsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
       }
       service = {
-        name      = var.groundx_service
-        namespace = var.namespace
-        version   = var.groundx_version
+        name      = var.groundx_internal.service
+        namespace = var.app.namespace
       }
     })
   ]

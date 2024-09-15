@@ -3,26 +3,22 @@ resource "helm_release" "layout_webhook_service" {
 
   depends_on = [helm_release.groundx_service]
 
-  name       = "${var.layout_webhook_service}"
-  namespace  = var.namespace
+  name       = "${var.layout_webhook_internal.service}"
+  namespace  = var.app.namespace
   chart      = "${path.module}/../../../modules/layout-webhook/helm_chart"
 
   values = [
     yamlencode({
-      image = {
-        pull       = var.layout_webhook_image_pull
-        repository = var.layout_webhook_image_url
-        tag        = var.layout_webhook_image_tag
-      }
+      image =var.layout_webhook_internal.image
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
         runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
         fsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
       }
       service = {
-        name      = var.layout_webhook_service
-        namespace = var.namespace
-        version   = var.layout_webhook_version
+        name      = var.layout_webhook_internal.service
+        namespace = var.app.namespace
+        version   = var.layout_webhook_internal.version
       }
     })
   ]

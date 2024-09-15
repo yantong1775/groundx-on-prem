@@ -29,7 +29,7 @@ spec:
           - /bin/sh
           - -c
           - |
-            export PYTHONPATH=/app && celery -A document.celery.appProcess worker --loglevel=INFO --concurrency=1 --queues=layout_queue
+            export PYTHONPATH=/app && celery -A document.celery_process.app worker --loglevel=INFO --concurrency=1 --queues=layout_queue
         securityContext:
           runAsUser: {{ .Values.securityContext.runAsUser }}
         livenessProbe:
@@ -37,7 +37,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - ps aux | grep 'document.celery.appProcess' || exit 1
+            - ps aux | grep 'document.celery_process.app' || exit 1
           initialDelaySeconds: 30
           periodSeconds: 30
         readinessProbe:
@@ -45,7 +45,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - ps aux | grep 'document.celery.appProcess' || exit 1
+            - ps aux | grep 'document.celery_process.app' || exit 1
           initialDelaySeconds: 10
           periodSeconds: 30
         volumeMounts:

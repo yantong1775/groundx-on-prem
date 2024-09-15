@@ -4,10 +4,10 @@ data "template_file" "init_database" {
   template = file("${path.module}/../../../modules/mysql/init-db.sql")
 
   vars = {
-    dbUserAPIKey = var.admin_api_key
-    dbUserEmail  = var.admin_email
-    dbUsername   = var.admin_username
-    searchIndex  = var.search_index
+    dbUserAPIKey = var.admin.api_key
+    dbUserEmail  = var.admin.email
+    dbUsername   = var.admin.username
+    searchIndex  = var.search_internal.index
   }
 }
 
@@ -18,7 +18,7 @@ resource "kubernetes_config_map" "init_database_file" {
 
   metadata {
     name      = "init-database-file"
-    namespace = var.namespace
+    namespace = var.app.namespace
   }
 
   data = {

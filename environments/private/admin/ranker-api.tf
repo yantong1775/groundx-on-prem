@@ -3,28 +3,24 @@ resource "helm_release" "ranker_api_service" {
 
   depends_on = [kubernetes_namespace.eyelevel, kubernetes_config_map.ranker_config_file]
 
-  name       = "${var.ranker_service}-api-cluster"
-  namespace  = var.namespace
+  name       = "${var.ranker_internal.service}-api-cluster"
+  namespace  = var.app.namespace
 
   chart      = "${path.module}/../../../modules/ranker/api/helm_chart"
 
   values = [
     yamlencode({
       dependencies = {
-        cache = "${var.cache_service}.${var.namespace}.svc.cluster.local"
+        cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
       }
-      image = {
-        pull       = var.ranker_api_image_pull
-        repository = var.ranker_api_image_url
-        tag        = var.ranker_api_image_tag
-      }
+      image = var.ranker_internal.api.image
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }
       service = {
-        name      = "${var.ranker_service}-api"
-        namespace = var.namespace
-        version   = var.ranker_version
+        name      = "${var.ranker_internal.service}-api"
+        namespace = var.app.namespace
+        version   = var.ranker_internal.version
       }
     })
   ]

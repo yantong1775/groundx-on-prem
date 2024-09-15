@@ -3,52 +3,47 @@ resource "helm_release" "opensearch_operator" {
 
   depends_on = [kubernetes_namespace.eyelevel]
 
-  name       = "${var.search_service}-operator"
-  namespace  = var.namespace
+  name       = "${var.search_internal.service}-operator"
+  namespace  = var.app.namespace
 
-  chart      = var.search_chart_name
-  repository = var.search_chart_url
-  version    = var.search_chart_version
+  chart      = var.search_internal.chart.name
+  repository = var.search_internal.chart.url
+  version    = var.search_internal.chart.version
 
   values = [
     yamlencode({
-      clusterName = "${var.search_service}-cluster"
+      clusterName = "${var.search_internal.service}-cluster"
       extraEnvs = [
         {
           name  = "OPENSEARCH_INITIAL_ADMIN_PASSWORD"
-          value = var.search_root_password
+          value = var.search.root_password
         },
       ]
       global = {
-        dockerRegistry = var.search_image_url
+        dockerRegistry = var.search_internal.image.repository
       }
       image = {
-        repository = var.search_image_repository
-        tag = var.search_image_tag
+        repository = var.search_internal.image.name
+        tag = var.search_internal.image.tag
       }
-      majorVersion = var.search_version
+      majorVersion = var.search_internal.version
       nodeGroup   = "master"
       persistence = {
         enabled = true
         enableInitChown = false
-        size = var.search_pv_size
+        size = var.search.pv_size
       }
       podSecurityContext = {
         runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
       }
-      replicas = var.search_replicas
-      resources = {
-        requests = {
-          cpu    = var.search_cpu_requests
-          memory = var.search_memory_requests
-        }
-      }
+      replicas = var.search.replicas
+      resources = var.search.resources
       securityContext = {
         runAsUser    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         runAsNonRoot = true
       }
-      singleNode = var.search_replicas == 1
+      singleNode = var.search.replicas == 1
     })
   ]
 

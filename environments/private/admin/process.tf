@@ -3,26 +3,22 @@ resource "helm_release" "process_service" {
 
   depends_on = [helm_release.groundx_service]
 
-  name       = "${var.process_service}-cluster"
-  namespace  = var.namespace
+  name       = "${var.process_internal.service}-cluster"
+  namespace  = var.app.namespace
   chart      = "${path.module}/../../../modules/process/helm_chart"
 
   values = [
     yamlencode({
-      image = {
-        pull       = var.process_image_pull
-        repository = var.process_image_url
-        tag        = var.process_image_tag
-      }
+      image = var.process_internal.image
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
         runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
         fsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
       }
       service = {
-        name      = var.process_service
-        namespace = var.namespace
-        version   = var.process_version
+        name      = var.process_internal.service
+        namespace = var.app.namespace
+        version   = var.process_internal.version
       }
     })
   ]

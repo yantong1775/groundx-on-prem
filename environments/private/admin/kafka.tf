@@ -3,14 +3,14 @@ resource "helm_release" "strimzi_operator" {
 
   depends_on = [kubernetes_namespace.eyelevel]
 
-  name       = "${var.stream_service}-operator"
-  namespace  = var.namespace
-  chart      = var.stream_chart
-  version    = var.stream_chart_version
+  name       = "${var.stream_internal.service}-operator"
+  namespace  = var.app.namespace
+  chart      = var.stream_internal.chart.url
+  version    = var.stream_internal.chart.version
 
   values = [
     yamlencode({
-      replicas = var.stream_replicas_operator
+      replicas = var.stream.operator.replicas
     })
   ]
 }
@@ -20,37 +20,28 @@ resource "helm_release" "kafka_cluster" {
 
   depends_on = [helm_release.strimzi_operator]
 
-  name       = "${var.stream_service}-cluster"
-  namespace  = var.namespace
+  name       = "${var.stream_internal.service}-cluster"
+  namespace  = var.app.namespace
   chart      = "${path.module}/../../../modules/kafka/helm_chart"
 
   values = [
     yamlencode({
-      resources = {
-        requests = {
-          memory = var.stream_memory_requests
-          cpu    = var.stream_cpu_requests
-        }
-        limits = {
-          memory = var.stream_memory_limits
-          cpu    = var.stream_cpu_limits
-        }
-      },
+      resources = var.stream.resources
       service = {
-        partitions      = var.stream_partitions
-        port            = var.stream_port
-        replicas        = var.stream_replicas_service
-        retention_bytes = var.stream_retention_bytes
-        segment_bytes   = var.stream_segment_bytes
+        partitions      = var.stream.partitions
+        port            = var.stream_internal.port
+        replicas        = var.stream.service.replicas
+        retention_bytes = var.stream.retention_bytes
+        segment_bytes   = var.stream.segment_bytes
         storage    = {
-          size = var.stream_storage_service
+          size = var.stream.service.storage
         }
-        version = var.stream_version
-      },
+        version = var.stream_internal.version
+      }
       zookeeper = {
-        replicas = var.stream_replicas_zookeeper
+        replicas = var.stream.zookeeper.replicas
         storage  = {
-          size = var.stream_storage_zookeeper
+          size = var.stream.zookeeper.storage
         }
       }
     })

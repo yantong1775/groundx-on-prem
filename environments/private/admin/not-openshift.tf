@@ -3,16 +3,16 @@ resource "helm_release" "groundx_lb" {
 
   depends_on = [helm_release.groundx_service]
 
-  name       = "${var.groundx_service}-cluster-lb"
-  namespace  = var.namespace
+  name       = "${var.groundx_internal.service}-cluster-lb"
+  namespace  = var.app.namespace
   chart      = "${path.module}/../../../modules/load-balancer/load-balancer/helm_chart"
 
   values = [
     yamlencode({
-      name      = "${var.groundx_service}-cluster-lb"
-      namespace = var.namespace
-      port      = var.groundx_lb_port
-      target    = "${var.groundx_service}"
+      name      = "${var.groundx_internal.service}-cluster-lb"
+      namespace = var.app.namespace
+      port      = var.groundx.load_balancer.port
+      target    = "${var.groundx_internal.service}"
     })
   ]
 }
