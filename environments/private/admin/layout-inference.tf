@@ -12,6 +12,7 @@ resource "helm_release" "layout_inference_service" {
     yamlencode({
       dependencies = {
         cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
+        file  = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
       }
       image = var.cluster.internet_access ? var.layout_internal.inference.image : var.layout_internal.inference.image_op
       securityContext = {

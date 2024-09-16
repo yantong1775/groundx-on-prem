@@ -12,6 +12,7 @@ resource "helm_release" "layout_ocr_service" {
     yamlencode({
       dependencies = {
         cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
+        file  = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
       }
       image = var.layout_internal.process.image
       securityContext = {
