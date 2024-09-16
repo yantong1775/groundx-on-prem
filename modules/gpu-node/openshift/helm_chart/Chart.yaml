@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gpu-node
+description: "A Helm chart for GPU nodes"
+version: 0.0.1
+appVersion: 0.0.1

@@ -1,0 +1,26 @@
+resource "helm_release" "layout_ocr_service" {
+  count = var.layout_ocr.type == "google" ? 0 : 1
+
+  name       = "${var.layout_internal.service}-ocr"
+  namespace  = var.app.namespace
+
+  chart      = "${local.module_path}/layout/ocr/helm_chart"
+
+  values = [
+    yamlencode({
+      dependencies = {
+        cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
+        file  = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
+      }
+      image = var.layout_internal.process.image
+      securityContext = {
+        runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
+      }
+      service = {
+        name      = "${var.layout_internal.service}-ocr"
+        namespace = var.app.namespace
+        version   = var.layout_internal.version
+      }
+    })
+  ]
+}

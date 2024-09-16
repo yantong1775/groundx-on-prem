@@ -1,0 +1,21 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-machineset: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-machineset: {{ .Values.name }}
+        nvidia.com/gpu: "true"
+    spec:
+      providerSpec:
+        value:
+          ami:
+            id: "{{ .Values.ami }}"
+          instanceType: "{{ .Values.instanceType }}"
