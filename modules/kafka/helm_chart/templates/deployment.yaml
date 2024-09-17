@@ -6,7 +6,19 @@ metadata:
   name: "{{ .Release.Name }}-cluster"
   namespace: {{ .Release.Namespace }}
 spec:
+  nodeSelector:
+    node: "{{ .Values.nodeSelector.node }}"
+  tolerations:
+    - key: "node"
+      value: "{{ .Values.nodeSelector.node }}"
+      effect: "NoSchedule"
   kafka:
+    nodeSelector:
+      node: "{{ .Values.nodeSelector.node }}"
+    tolerations:
+      - key: "node"
+        value: "{{ .Values.nodeSelector.node }}"
+        effect: "NoSchedule"
     version: {{ .Values.service.version }}
     replicas: {{ .Values.service.replicas }}
     listeners:
@@ -32,11 +44,35 @@ spec:
       size: {{ .Values.service.storage.size }}
       deleteClaim: false
   zookeeper:
+    nodeSelector:
+      node: "{{ .Values.nodeSelector.node }}"
+    tolerations:
+      - key: "node"
+        value: "{{ .Values.nodeSelector.node }}"
+        effect: "NoSchedule"
     replicas: {{ .Values.zookeeper.replicas }}
     storage:
       type: persistent-claim
       size: {{ .Values.zookeeper.storage.size }}
       deleteClaim: false
   entityOperator:
-    topicOperator: {}
-    userOperator: {}
+    nodeSelector:
+      node: "{{ .Values.nodeSelector.node }}"
+    tolerations:
+      - key: "node"
+        value: "{{ .Values.nodeSelector.node }}"
+        effect: "NoSchedule"
+    topicOperator:
+      nodeSelector:
+        node: "{{ .Values.nodeSelector.node }}"
+      tolerations:
+        - key: "node"
+          value: "{{ .Values.nodeSelector.node }}"
+          effect: "NoSchedule"
+    userOperator:
+      nodeSelector:
+        node: "{{ .Values.nodeSelector.node }}"
+      tolerations:
+        - key: "node"
+          value: "{{ .Values.nodeSelector.node }}"
+          effect: "NoSchedule"

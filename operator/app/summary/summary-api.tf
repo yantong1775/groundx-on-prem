@@ -10,6 +10,9 @@ resource "helm_release" "summary_api_service" {
         cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
       }
       image = var.summary_internal.api.image
+      nodeSelector = {
+        node = var.summary.nodes.api
+      }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

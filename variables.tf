@@ -26,6 +26,9 @@ variable "app" {
   }
 }
 
+
+# CLUSTER
+
 variable "cluster" {
   description = "Information about the Kubernetes cluster"
   type        = object({
@@ -70,7 +73,7 @@ variable "cache" {
     })
   })
   default      = {
-    node       = "crc"
+    node       = "cpu"
     replicas   = 3
     resources  = {
       limits   = {
@@ -124,7 +127,7 @@ variable "dashboard" {
     node      = string
   })
   default     = {
-    node      = "crc"
+    node      = "cpu"
   }
 }
 
@@ -189,7 +192,7 @@ variable "db" {
         }
       }
     }
-    node             = "crc"
+    node             = "cpu"
     pv_size          = "20Gi"
     replicas         = 3
     resources        = {
@@ -274,7 +277,7 @@ variable "file" {
   default               = {
     access_key          = "minio"
     access_secret       = "minio123"
-    node                = "crc"
+    node                = "cpu"
     operator            = {
       replicas          = 2
     }
@@ -347,7 +350,7 @@ variable "groundx" {
     load_balancer = {
       port        = 80
     }
-    node          = "crc"
+    node          = "cpu"
   }
 }
 
@@ -391,10 +394,10 @@ variable "layout" {
   })
   default       = {
     nodes       = {
-      api       = "crc"
-      inference = "crc"
-      ocr       = "crc"
-      process   = "crc"
+      api       = "cpu"
+      inference = "gpu"
+      ocr       = "cpu"
+      process   = "cpu"
     }
   }
 }
@@ -441,6 +444,10 @@ variable "layout_internal" {
         tag        = string
       })
     })
+    resources      = object({
+      gpuMemory    = string
+      replicas     = number
+    })
     service        = string
     version        = string
   })
@@ -484,6 +491,10 @@ variable "layout_internal" {
         tag        = "latest"
       }
     }
+    resources      = {
+      gpuMemory    = "16gb"
+      replicas     = 4
+    }
     service        = "layout"
     version        = "0.0.1"
   }
@@ -515,7 +526,7 @@ variable "layout_webhook" {
     node          = string
   })
   default         = {
-    node          = "crc"
+    node          = "cpu"
   }
 }
 
@@ -550,7 +561,7 @@ variable "pre_process" {
     node          = string
   })
   default         = {
-    node          = "crc"
+    node          = "cpu"
   }
 }
 
@@ -585,7 +596,7 @@ variable "process" {
     node          = string
   })
   default         = {
-    node          = "crc"
+    node          = "cpu"
   }
 }
 
@@ -620,7 +631,7 @@ variable "queue" {
     node          = string
   })
   default         = {
-    node          = "crc"
+    node          = "cpu"
   }
 }
 
@@ -659,8 +670,8 @@ variable "ranker" {
   })
   default       = {
     nodes       = {
-      api       = "crc"
-      inference = "crc"
+      api       = "cpu"
+      inference = "gpu"
     }
   }
 }
@@ -691,6 +702,10 @@ variable "ranker_internal" {
       max_prompt   = number
       model        = string
     })
+    resources      = object({
+      gpuMemory    = string
+      replicas     = number
+    })
     service        = string
     version        = string
   })
@@ -718,6 +733,10 @@ variable "ranker_internal" {
       max_prompt   = 2048
       model        = "facebook/opt-350m"
     }
+    resources      = {
+      gpuMemory    = "16gb"
+      replicas     = 7
+    }
     service        = "ranker"
     version        = "0.0.1"
   }
@@ -742,7 +761,7 @@ variable "search" {
     root_password = string
   })
   default         = {
-    node          = "crc"
+    node          = "cpu"
     password      = "R0otb_*t!kazs"
     pv_size       = "1Gi"
     replicas      = 3
@@ -825,7 +844,7 @@ variable "stream" {
     })
   })
   default           = {
-    node            = "crc"
+    node            = "cpu"
     operator        = {
       replicas      = 3
     }
@@ -888,8 +907,8 @@ variable "summary" {
   })
   default       = {
     nodes       = {
-      api       = "crc"
-      inference = "crc"
+      api       = "cpu"
+      inference = "gpu"
     }
   }
 }
@@ -920,6 +939,10 @@ variable "summary_internal" {
       max_prompt   = number
       model        = string
     })
+    resources      = object({
+      gpuMemory    = string
+      replicas     = number
+    })
     service        = string
     version        = string
   })
@@ -947,6 +970,10 @@ variable "summary_internal" {
       max_prompt   = 2048
       model        = "openbmb/MiniCPM-V-2_6"
     }
+    resources      = {
+      gpuMemory    = "24gb"
+      replicas     = 1
+    }
     service        = "summary"
     version        = "0.0.1"
   }
@@ -961,7 +988,7 @@ variable "summary_client" {
     node          = string
   })
   default         = {
-    node          = "crc"
+    node          = "cpu"
   }
 }
 
@@ -996,7 +1023,7 @@ variable "upload" {
     node          = string
   })
   default         = {
-    node          = "crc"
+    node          = "cpu"
   }
 }
 

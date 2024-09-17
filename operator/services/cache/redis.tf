@@ -7,6 +7,9 @@ resource "helm_release" "redis" {
   values = [
     yamlencode({
       image = var.cache_internal.image
+      nodeSelector = {
+        node = var.cache.node
+      }
       persistence = {
         mountPath = var.cache_internal.mount_path
       },

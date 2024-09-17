@@ -1,6 +1,4 @@
 resource "helm_release" "layout_ocr_service" {
-  count = var.layout_ocr.type == "google" ? 0 : 1
-
   name       = "${var.layout_internal.service}-ocr"
   namespace  = var.app.namespace
 
@@ -13,6 +11,9 @@ resource "helm_release" "layout_ocr_service" {
         file  = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
       }
       image = var.layout_internal.process.image
+      nodeSelector    = {
+        node          = var.layout.nodes.ocr
+      }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

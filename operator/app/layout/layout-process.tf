@@ -11,6 +11,9 @@ resource "helm_release" "layout_process_service" {
         file  = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
       }
       image = var.layout_internal.process.image
+      nodeSelector    = {
+        node          = var.layout.nodes.process
+      }
       queues = (
         var.layout_ocr.type == "google" ?
           "process_queue,ocr_queue,map_queue,save_queue" :

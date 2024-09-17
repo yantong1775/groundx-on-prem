@@ -10,6 +10,9 @@ resource "helm_release" "ranker_api_service" {
         cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
       }
       image = var.ranker_internal.api.image
+      nodeSelector = {
+        node = var.ranker.nodes.api
+      }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

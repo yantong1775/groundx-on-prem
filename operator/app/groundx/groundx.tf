@@ -13,6 +13,9 @@ resource "helm_release" "groundx_service" {
         stream   = "${var.stream_internal.service}-cluster-cluster-kafka-bootstrap.${var.app.namespace}.svc.cluster.local"
       }
       image = var.groundx_internal.image
+      nodeSelector = {
+        node = var.groundx.node
+      }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
         runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001

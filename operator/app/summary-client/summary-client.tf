@@ -9,6 +9,9 @@ resource "helm_release" "summary_client_service" {
         groundx  = "${var.groundx_internal.service}.${var.app.namespace}.svc.cluster.local"
       }
       image = var.summary_client_internal.image
+      nodeSelector = {
+        node = var.summary_client.node
+      }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
         runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001

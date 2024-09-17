@@ -6,6 +6,9 @@ resource "helm_release" "strimzi_operator" {
 
   values = [
     yamlencode({
+      nodeSelector = {
+        node = var.stream.node
+      }
       replicas = var.stream.operator.replicas
     })
   ]
@@ -20,8 +23,14 @@ resource "helm_release" "kafka_cluster" {
 
   values = [
     yamlencode({
+      nodeSelector = {
+        node = var.stream.node
+      }
       resources = var.stream.resources
       service = {
+        nodeSelector = {
+          node = var.stream.node
+        }
         partitions      = var.stream.partitions
         port            = var.stream_internal.port
         replicas        = var.stream.service.replicas
@@ -33,6 +42,9 @@ resource "helm_release" "kafka_cluster" {
         version = var.stream_internal.version
       }
       zookeeper = {
+        nodeSelector = {
+          node = var.stream.node
+        }
         replicas = var.stream.zookeeper.replicas
         storage  = {
           size = var.stream.zookeeper.storage

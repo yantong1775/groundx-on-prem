@@ -16,6 +16,12 @@ spec:
       labels:
         app: "{{ .Values.service.name }}"
     spec:
+      nodeSelector:
+        node: "{{ .Values.nodeSelector.node }}"
+      tolerations:
+        - key: "node"
+          value: "{{ .Values.nodeSelector.node }}"
+          effect: "NoSchedule"
       serviceAccountName: "{{ .Values.service.name }}-sa"
       containers:
       - name: "{{ .Values.service.name }}"

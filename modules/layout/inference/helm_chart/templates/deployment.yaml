@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.service.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: {{ .Values.service.name }}
@@ -15,6 +15,16 @@ spec:
       labels:
         app: {{ .Values.service.name }}
     spec:
+      nodeSelector:
+        gpu_memory: "{{ .Values.gpuMemory }}"
+        node: "{{ .Values.nodeSelector.node }}"
+      tolerations:
+        - key: "gpu_memory"
+          value: "{{ .Values.gpuMemory }}"
+          effect: "NoSchedule"
+        - key: "node"
+          value: "{{ .Values.nodeSelector.node }}"
+          effect: "NoSchedule"
       initContainers:
       - name: wait-for-cache
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
