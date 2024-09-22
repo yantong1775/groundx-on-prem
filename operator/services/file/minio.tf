@@ -47,6 +47,9 @@ resource "helm_release" "minio_tenant" {
   values = [
     yamlencode({
       tenant = {
+        certificate = {
+          requestAutoCert = false
+        }
         configSecret = {
           accessKey = var.file.access_key
           secretKey = var.file.access_secret

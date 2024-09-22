@@ -447,6 +447,7 @@ variable "layout_internal" {
     resources      = object({
       gpuMemory    = string
       replicas     = number
+      workers      = number
     })
     service        = string
     version        = string
@@ -493,7 +494,8 @@ variable "layout_internal" {
     }
     resources      = {
       gpuMemory    = "16gb"
-      replicas     = 4
+      replicas     = 1
+      workers      = 4
     }
     service        = "layout"
     version        = "0.0.1"
@@ -705,6 +707,7 @@ variable "ranker_internal" {
     resources      = object({
       gpuMemory    = string
       replicas     = number
+      workers      = number
     })
     service        = string
     version        = string
@@ -735,7 +738,8 @@ variable "ranker_internal" {
     }
     resources      = {
       gpuMemory    = "16gb"
-      replicas     = 7
+      replicas     = 1
+      workers      = 14
     }
     service        = "ranker"
     version        = "0.0.1"
@@ -942,6 +946,7 @@ variable "summary_internal" {
     resources      = object({
       gpuMemory    = string
       replicas     = number
+      workers      = number
     })
     service        = string
     version        = string
@@ -973,6 +978,7 @@ variable "summary_internal" {
     resources      = {
       gpuMemory    = "24gb"
       replicas     = 1
+      workers      = 1
     }
     service        = "summary"
     version        = "0.0.1"

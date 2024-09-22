@@ -62,7 +62,13 @@ spec:
         - name: config-volume
           mountPath: /app/config.py
           subPath: config.py
+        - name: credentials-volume
+          mountPath: /app/credentials.json
+          subPath: credentials.json
       volumes:
       - name: config-volume
         configMap:
           name: layout-config-py-map
+      - name: credentials-volume
+        configMap:
+          name: layout-ocr-credentials-map

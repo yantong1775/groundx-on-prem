@@ -25,6 +25,7 @@ resource "helm_release" "summary_inference_service" {
         namespace     = var.app.namespace
         version       = var.summary_internal.version
       }
+      workers         = var.summary_internal.resources.workers
     })
   ]
 }

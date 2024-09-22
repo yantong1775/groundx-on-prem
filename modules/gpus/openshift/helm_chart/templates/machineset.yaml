@@ -1,0 +1,62 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    machine.openshift.io/cluster-api-cluster: "{{ .Values.cluster }}"
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: "{{ .Values.cluster }}"
+      machine.openshift.io/cluster-api-machineset: "{{ .Values.name }}"
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: "{{ .Values.cluster }}"
+        machine.openshift.io/cluster-api-machine-role: "gpu" 
+        machine.openshift.io/cluster-api-machine-type: "gpu"
+        machine.openshift.io/cluster-api-machineset: {{ .Values.name }}
+        gpu_memory: {{ .Values.gpu_memory }}
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/gpu: ""
+      providerSpec:
+        value:
+          ami:
+            id: "{{ .Values.ami }}"
+          apiVersion: machine.openshift.io/v1beta1
+          credentialsSecret:
+            name: aws-cloud-credentials
+          deviceIndex: 0
+          iamInstanceProfile:
+            id: "{{ .Values.cluster }}-worker-profile"
+          instanceType: "{{ .Values.instanceType }}"
+          keyName: "{{ .Values.keyName }}"
+          kind: AWSMachineProviderConfig
+          placement:
+            availabilityZone: "{{ .Values.zone }}"
+            region: "{{ .Values.region }}"
+          securityGroups:
+            - filters:
+                - name: tag:Name
+                  values:
+                    - "{{ .Values.cluster }}-worker-sg"
+          subnet:
+            filters:
+              - name: tag:Name
+                values:
+                  - "{{ .Values.cluster }}-private-{{ .Values.zone }}"
+          tags:
+            - name: "kubernetes.io/cluster/{{ .Values.cluster }}" 
+              value: owned
+            - name: "gpu-{{ .Values.gpu_memory }}"
+              value: "gpu-{{ .Values.gpu_memory }}"
+          blockDevices:
+            - ebs:
+              volumeSize: {{ .Values.storage.volumeSize }}
+              volumeType: "{{ .Values.storage.volumeType }}"
+          userDataSecret:
+            name: worker-user-data

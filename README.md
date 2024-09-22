@@ -1,3 +1,10 @@
+# EyeLevel Kubernetes IAC Code
+
+## PRE-REQUISITES
+
+1. Copy env.tfvars.example to env.tfvars
+2. Change 
+
 ## DEPLOYING
 
 ```

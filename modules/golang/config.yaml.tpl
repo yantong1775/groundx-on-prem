@@ -23,6 +23,8 @@ ai:
       baseURL: http://${layoutService}.${namespace}.svc.cluster.local
       callbackURL: http://${layoutWebhookService}.${namespace}.svc.cluster.local
   openai:
+    apiKey: ${groundxServiceKey}
+    baseURL: http://${summaryService}.${namespace}.svc.cluster.local
     defaultKitId: 0
   search: eyelevel
 
@@ -45,7 +47,7 @@ integrationTests:
   search:
     duration: 3660
     fileId: ey-mtr6hapxq7d94zigammwir6xz4
-    modelId: 10000000001
+    modelId: 1
 
 layoutWebhookServer:
   baseURL: http://${layoutWebhookService}.${namespace}.svc.cluster.local
@@ -53,53 +55,43 @@ layoutWebhookServer:
 
 kafka:
   fileLayoutDev:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-layout-dev
   fileLayoutProd:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-layout-prod
   filePreProcess:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-pre-process
   fileProcess:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-process
   filePostProcess:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-post-process
   fileSummaryDev:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-summary-dev
   fileSummaryProd:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-summary-prod
   fileUpdate:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-update
   fileUpload:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: file-upload
   stripeEvent:
-    brokers:
-      - ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
     groupId: eyelevel-kafka
     topic: stripe-event
 
@@ -131,6 +123,7 @@ processors:
 
 queueFileServer:
   baseURL: http://${queueService}.${namespace}.svc.cluster.local
+  pollTime: 1
   port: 8080
 
 rec:
@@ -148,10 +141,13 @@ summaryServer:
   port: 8080
 
 upload:
-  baseDomain: ${fileAccessKey}
+  baseDomain: ${fileService}.${namespace}.svc.cluster.local
   baseUrl: http://${fileService}.${namespace}.svc.cluster.local
+  bucket: ${uploadBucket}
   bucketUrl: http://${fileService}.${namespace}.svc.cluster.local
-  region: ${fileAccessSecret}
+  id: ${fileAccessKey}
+  secret: ${fileAccessSecret}
+  service: minio
   ssl: ${fileSSL}
 
 uploadFileServer:

@@ -1,4 +1,6 @@
 resource "helm_release" "layout_ocr_service" {
+  count = var.layout_ocr.type == "google" ? 0 : 1
+
   name       = "${var.layout_internal.service}-ocr"
   namespace  = var.app.namespace
 

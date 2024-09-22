@@ -7,5 +7,5 @@ env = dict(
     searchMaxBatchSize=${rankerMaxBatch},
     searchMaxPromptLength=${rankerMaxPrompt},
     searchModelName="${rankerModelName}",
-    validAPIKeys=["${validAPIKey}"],
+    validAPIKeys=["${validAPIKey}", "${validUsername}"],
 )

@@ -6,7 +6,7 @@
 valid_groups=("init" "services" "app")
 recursive_types=("init" "services" "app")
 
-valid_apps=("groundx" "layout" "layout-webhook" "pre-process" "process" "queue" "ranker" "summary" "summary-client" "upload")
+valid_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload" "ranker" "layout" "summary")
 valid_init=("add" "config")
 valid_services=("cache" "db" "file" "search" "stream")
 

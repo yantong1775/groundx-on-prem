@@ -26,6 +26,7 @@ resource "helm_release" "layout_inference_service" {
         namespace     = var.app.namespace
         version       = var.layout_internal.version
       }
+      workers         = var.layout_internal.resources.workers
     })
   ]
 }

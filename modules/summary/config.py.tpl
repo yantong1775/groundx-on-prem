@@ -7,5 +7,5 @@ env = dict(
     summaryMaxBatchSize=${summaryMaxBatch},
     summaryMaxPromptLength=${summaryMaxPrompt},
     summaryModelName="${summaryModelName}",
-    validAPIKeys=["${validAPIKey}"],
+    validAPIKeys=["${validAPIKey}", "${validUsername}"],
 )

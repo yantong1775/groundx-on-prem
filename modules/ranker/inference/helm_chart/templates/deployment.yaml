@@ -39,7 +39,7 @@ spec:
           - /bin/sh
           - -c
           - |
-            export PYTHONPATH=/app && celery -A search.celery.appSearch worker --loglevel=INFO --concurrency=1 --queues=inference_queue
+            export PYTHONPATH=/app && supervisord -c /app/supervisord.conf
         securityContext:
           runAsUser: {{ .Values.securityContext.runAsUser }}
         livenessProbe:
@@ -58,11 +58,22 @@ spec:
             - ps aux | grep 'search.celery.appSearch' || exit 1
           initialDelaySeconds: 10
           periodSeconds: 30
+        resources:
+          limits:
+            nvidia.com/gpu: {{ .Values.replicas }}
+          requests:
+            nvidia.com/gpu: {{ .Values.replicas }}
         volumeMounts:
         - name: config-volume
           mountPath: /app/config.py
           subPath: config.py
+        - name: supervisord-volume
+          mountPath: /app/supervisord.conf
+          subPath: supervisord.conf
       volumes:
       - name: config-volume
         configMap:
           name: ranker-config-py-map
+      - name: supervisord-volume
+        configMap:
+          name: ranker-supervisord-16gb-conf-map
