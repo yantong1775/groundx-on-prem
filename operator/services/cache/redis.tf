@@ -1,4 +1,6 @@
 resource "helm_release" "redis" {
+  count = local.create_cache ? 1 : 0
+
   name       = var.cache_internal.service
   namespace  = var.app.namespace
 
@@ -8,7 +10,7 @@ resource "helm_release" "redis" {
     yamlencode({
       image = var.cache_internal.image
       nodeSelector = {
-        node = var.cache.node
+        node = var.cache_internal.node
       }
       persistence = {
         mountPath = var.cache_internal.mount_path
@@ -22,7 +24,7 @@ resource "helm_release" "redis" {
         name         = var.cache_internal.service
         namespace    = var.app.namespace
         port         = var.cache_internal.port
-        replicaCount = var.cache.replicas
+        replicaCount = var.cache_resources.replicas
       }
     })
   ]

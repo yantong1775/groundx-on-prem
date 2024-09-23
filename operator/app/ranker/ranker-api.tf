@@ -7,11 +7,11 @@ resource "helm_release" "ranker_api_service" {
   values = [
     yamlencode({
       dependencies = {
-        cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
+        cache = "${local.cache_settings.addr} ${local.cache_settings.port}"
       }
       image = var.ranker_internal.api.image
       nodeSelector = {
-        node = var.ranker.nodes.api
+        node = var.ranker_internal.nodes.api
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

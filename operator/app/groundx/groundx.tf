@@ -6,15 +6,15 @@ resource "helm_release" "groundx_service" {
   values = [
     yamlencode({
       dependencies = {
-        cache    = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
-        database = "${var.db_internal.service}-cluster-pxc-haproxy.${var.app.namespace}.svc.cluster.local"
-        file     = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
-        search   = "${var.search_internal.service}-cluster-master.${var.app.namespace}.svc.cluster.local"
-        stream   = "${var.stream_internal.service}-cluster-cluster-kafka-bootstrap.${var.app.namespace}.svc.cluster.local"
+        cache    = "${local.cache_settings.addr} ${local.cache_settings.port}"
+        database = "${local.db_endpoints.ro} ${local.db_endpoints.port}"
+        file     = "${local.file_settings.dependency} ${local.file_settings.port}"
+        search   = "${local.search_settings.base_domain} ${local.search_settings.port}"
+        stream   = "${local.stream_settings.base_domain} ${local.stream_settings.port}"
       }
       image = var.groundx_internal.image
       nodeSelector = {
-        node = var.groundx.node
+        node = var.groundx_internal.node
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

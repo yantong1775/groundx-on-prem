@@ -1,10 +1,14 @@
 resource "null_resource" "minio_helm_repo" {
+  count = local.create_file ? 1 : 0
+
   provisioner "local-exec" {
     command = "helm repo add ${var.file_internal.chart_base} ${var.file_internal.chart_repository} && helm repo update"
   }
 }
 
 resource "helm_release" "minio_operator" {
+  count = local.create_file ? 1 : 0
+
   depends_on = [null_resource.minio_helm_repo]
 
   name       = "${var.file_internal.service}-operator"
@@ -22,9 +26,9 @@ resource "helm_release" "minio_operator" {
           fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
         }
         nodeSelector = {
-          node = var.file.node
+          node = var.file_internal.node
         }
-        replicaCount    = var.file.operator.replicas
+        replicaCount    = var.file_resources.operator.replicas
         securityContext = {
           runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
           runAsGroup = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
@@ -36,6 +40,8 @@ resource "helm_release" "minio_operator" {
 }
 
 resource "helm_release" "minio_tenant" {
+  count = local.create_file ? 1 : 0
+
   depends_on = [helm_release.minio_operator]
 
   name       = "${var.file_internal.service}-tenant"
@@ -51,12 +57,12 @@ resource "helm_release" "minio_tenant" {
           requestAutoCert = false
         }
         configSecret = {
-          accessKey = var.file.access_key
-          secretKey = var.file.access_secret
+          accessKey = var.file.username
+          secretKey = var.file.password
         }
         name = "${var.file_internal.service}-tenant"
         nodeSelector = {
-          node = var.file.node
+          node = var.file_internal.node
         }
         pools = [{
           containerSecurityContext = {
@@ -66,18 +72,18 @@ resource "helm_release" "minio_tenant" {
           }
           name = "${var.file_internal.service}-tenant-pool-0"
           nodeSelector = {
-            node = var.file.node
+            node = var.file_internal.node
           }
           securityContext = {
             runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
             runAsGroup = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
             fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
           }
-          servers          = var.file.pool_servers
-          size             = var.file.pool_size
-          volumesPerServer = var.file.pool_server_volumes
+          servers          = var.file_resources.pool_servers
+          size             = var.file_resources.pool_size
+          volumesPerServer = var.file_resources.pool_server_volumes
         }]
-        resources = var.file.resources
+        resources = var.file_resources.resources
       }
     })
   ]

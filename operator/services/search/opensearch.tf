@@ -1,4 +1,6 @@
 resource "helm_release" "opensearch_operator" {
+  count = local.create_search ? 1 : 0
+
   name       = "${var.search_internal.service}-operator"
   namespace  = var.app.namespace
 
@@ -25,24 +27,24 @@ resource "helm_release" "opensearch_operator" {
       majorVersion = var.search_internal.version
       nodeGroup   = "master"
       nodeSelector = {
-        node = var.search.node
+        node = var.search_internal.node
       }
       persistence = {
         enabled = true
         enableInitChown = false
-        size = var.search.pv_size
+        size = var.search_resources.pv_size
       }
       podSecurityContext = {
         runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
       }
-      replicas = var.search.replicas
-      resources = var.search.resources
+      replicas = var.search_resources.replicas
+      resources = var.search_resources.resources
       securityContext = {
         runAsUser    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         runAsNonRoot = true
       }
-      singleNode = var.search.replicas == 1
+      singleNode = var.search_resources.replicas == 1
     })
   ]
 }

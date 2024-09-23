@@ -9,15 +9,15 @@ resource "helm_release" "layout_inference_service" {
   values = [
     yamlencode({
       dependencies    = {
-        cache         = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
-        file          = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
+        cache         = "${local.cache_settings.addr} ${local.cache_settings.port}"
+        file          = "${local.file_settings.dependency} ${local.file_settings.port}"
       }
-      gpuMemory       = var.layout_internal.resources.gpuMemory
+      gpuMemory       = var.layout_resources.inference.gpuMemory
       image           = var.cluster.internet_access ? var.layout_internal.inference.image : var.layout_internal.inference.image_op
       nodeSelector    = {
-        node          = var.layout.nodes.inference
+        node          = var.layout_internal.nodes.inference
       }
-      replicas        = var.layout_internal.resources.replicas
+      replicas        = var.layout_resources.inference.replicas
       securityContext = {
         runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }
@@ -26,7 +26,6 @@ resource "helm_release" "layout_inference_service" {
         namespace     = var.app.namespace
         version       = var.layout_internal.version
       }
-      workers         = var.layout_internal.resources.workers
     })
   ]
 }

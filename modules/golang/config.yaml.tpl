@@ -1,6 +1,6 @@
 _mysql: &mysql
-  ro_addr: ${dbService}.${namespace}.svc.cluster.local
-  rw_addr: ${dbService}.${namespace}.svc.cluster.local
+  ro_addr: ${dbRO}
+  rw_addr: ${dbRW}
   user: ${dbUser}
   password: ${dbPassword}
   database: ${dbName}
@@ -10,7 +10,7 @@ _mysql: &mysql
 ai:
   aws:
     search:
-      baseURL: https://${searchService}.${namespace}.svc.cluster.local:9200
+      baseURL: ${searchBaseUrl}
       index: ${searchIndex}
       username: ${searchUser}
       password: ${searchPassword}
@@ -23,8 +23,8 @@ ai:
       baseURL: http://${layoutService}.${namespace}.svc.cluster.local
       callbackURL: http://${layoutWebhookService}.${namespace}.svc.cluster.local
   openai:
-    apiKey: ${groundxServiceKey}
-    baseURL: http://${summaryService}.${namespace}.svc.cluster.local
+    apiKey: ${summaryApiKey}
+    baseURL: ${summaryBaseUrl}
     defaultKitId: 0
   search: eyelevel
 
@@ -55,43 +55,43 @@ layoutWebhookServer:
 
 kafka:
   fileLayoutDev:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-layout-dev
   fileLayoutProd:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-layout-prod
   filePreProcess:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-pre-process
   fileProcess:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-process
   filePostProcess:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-post-process
   fileSummaryDev:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-summary-dev
   fileSummaryProd:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-summary-prod
   fileUpdate:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-update
   fileUpload:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: file-upload
   stripeEvent:
-    broker: ${streamService}-cluster-cluster-kafka-bootstrap.${namespace}.svc.cluster.local:9092
+    broker: ${streamBaseUrl}
     groupId: eyelevel-kafka
     topic: stripe-event
 
@@ -129,7 +129,7 @@ queueFileServer:
 rec:
   mysql: *mysql
   session:
-    addr: ${cacheService}.${namespace}.svc.cluster.local:6379
+    addr: ${cacheAddr}:${cachePort}
     notCluster: ${cacheNotCluster}
 
 ssp:
@@ -141,12 +141,12 @@ summaryServer:
   port: 8080
 
 upload:
-  baseDomain: ${fileService}.${namespace}.svc.cluster.local
-  baseUrl: http://${fileService}.${namespace}.svc.cluster.local
+  baseDomain: ${fileBaseDomain}
+  baseUrl: ${fileSSL ? "https" : "http"}://${fileBaseDomain}
   bucket: ${uploadBucket}
-  bucketUrl: http://${fileService}.${namespace}.svc.cluster.local
-  id: ${fileAccessKey}
-  secret: ${fileAccessSecret}
+  bucketUrl: ${fileSSL ? "https" : "http"}://${fileBaseDomain}
+  id: ${fileUsername}
+  secret: ${filePassword}
   service: minio
   ssl: ${fileSSL}
 

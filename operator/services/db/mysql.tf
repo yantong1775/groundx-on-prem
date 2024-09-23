@@ -1,10 +1,14 @@
 resource "null_resource" "percona_helm_repo" {
+  count = local.create_database ? 1 : 0
+
   provisioner "local-exec" {
     command = "helm repo add ${var.db_internal.chart.base} ${var.db_internal.chart.repository} && helm repo update"
   }
 }
 
 resource "helm_release" "percona_operator" {
+  count = local.create_database ? 1 : 0
+
   depends_on = [null_resource.percona_helm_repo]
 
   name       = "${var.db_internal.service}-operator"
@@ -15,13 +19,15 @@ resource "helm_release" "percona_operator" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.db.node
+        node = var.db_internal.node
       }
     })
   ]
 }
 
 resource "helm_release" "percona_cluster" {
+  count = local.create_database ? 1 : 0
+
   depends_on = [helm_release.percona_operator]
 
   name       = "${var.db_internal.service}-cluster"
@@ -34,47 +40,47 @@ resource "helm_release" "percona_cluster" {
       backup = {
         enabled = var.db_internal.backup
         nodeSelector = {
-          node = var.db.node
+          node = var.db_internal.node
         }
       }
       haproxy = {
         enabled = true
         nodeSelector = {
-          node = var.db.node
+          node = var.db_internal.node
         }
-        resources = var.db.proxy.resources
-        size    = var.db.proxy.replicas
+        resources = var.db_resources.proxy.resources
+        size    = var.db_resources.proxy.replicas
       }
       logcollector = {
         enabled = var.db_internal.logcollector_enable
         nodeSelector = {
-          node = var.db.node
+          node = var.db_internal.node
         }
       }
       nodeSelector = {
-        node = var.db.node
+        node = var.db_internal.node
       }
       pmm = {
         enabled = var.db_internal.pmm_enable
         nodeSelector = {
-          node = var.db.node
+          node = var.db_internal.node
         }
       }
       proxysql = {
         enabled = false
         nodeSelector = {
-          node = var.db.node
+          node = var.db_internal.node
         }
       }
       pxc = {
         nodeSelector = {
-          node = var.db.node
+          node = var.db_internal.node
         }
         persistence = {
-          size = var.db.pv_size
+          size = var.db_resources.pv_size
         }
-        resources = var.db.resources
-        size = var.db.replicas
+        resources = var.db_resources.resources
+        size = var.db_resources.replicas
       }
       secrets = {
         passwords = {

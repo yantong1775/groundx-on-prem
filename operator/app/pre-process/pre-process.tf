@@ -10,7 +10,7 @@ resource "helm_release" "pre_process_service" {
       }
       image = var.pre_process_internal.image
       nodeSelector = {
-        node = var.pre_process.node
+        node = var.pre_process_internal.node
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

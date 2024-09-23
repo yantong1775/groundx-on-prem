@@ -7,15 +7,15 @@ resource "helm_release" "layout_process_service" {
   values = [
     yamlencode({
       dependencies = {
-        cache = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
-        file  = "${var.file_internal.service}-tenant-hl.${var.app.namespace}.svc.cluster.local"
+        cache = "${local.cache_settings.addr} ${local.cache_settings.port}"
+        file  = "${local.file_settings.dependency} ${local.file_settings.port}"
       }
       image = var.layout_internal.process.image
       nodeSelector    = {
-        node          = var.layout.nodes.process
+        node          = var.layout_internal.nodes.process
       }
       queues = (
-        var.layout_ocr.type == "google" ?
+        var.layout.ocr.type == "google" ?
           "process_queue,ocr_queue,map_queue,save_queue" :
           "process_queue,map_queue,save_queue"
       )

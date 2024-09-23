@@ -9,14 +9,14 @@ resource "helm_release" "ranker_inference_service" {
   values = [
     yamlencode({
       dependencies    = {
-        cache         = "${var.cache_internal.service}.${var.app.namespace}.svc.cluster.local"
+        cache = "${local.cache_settings.addr} ${local.cache_settings.port}"
       }
-      gpuMemory       = var.ranker_internal.resources.gpuMemory
+      gpuMemory       = var.ranker_resources.inference.gpuMemory
       image           = var.cluster.internet_access ? var.ranker_internal.inference.image : var.ranker_internal.inference.image_op
       nodeSelector = {
-        node = var.ranker.nodes.inference
+        node = var.ranker_internal.nodes.inference
       }
-      replicas        = var.ranker_internal.resources.replicas
+      replicas        = var.ranker_resources.inference.replicas
       securityContext = {
         runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

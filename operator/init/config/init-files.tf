@@ -5,7 +5,7 @@ data "template_file" "init_database" {
     dbUserAPIKey = var.admin.api_key
     dbUserEmail  = var.admin.email
     dbUsername   = var.admin.username
-    searchIndex  = var.search_internal.index
+    searchIndex  = var.search.index
   }
 }
 

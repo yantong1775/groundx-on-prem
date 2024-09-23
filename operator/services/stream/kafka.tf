@@ -1,4 +1,6 @@
 resource "helm_release" "strimzi_operator" {
+  count = local.create_stream ? 1 : 0
+
   name       = "${var.stream_internal.service}-operator"
   namespace  = var.app.namespace
   chart      = var.stream_internal.chart.url
@@ -7,14 +9,16 @@ resource "helm_release" "strimzi_operator" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.stream.node
+        node = var.stream_internal.node
       }
-      replicas = var.stream.operator.replicas
+      replicas = var.stream_resources.operator.replicas
     })
   ]
 }
 
 resource "helm_release" "kafka_cluster" {
+  count = local.create_stream ? 1 : 0
+
   depends_on = [helm_release.strimzi_operator]
 
   name       = "${var.stream_internal.service}-cluster"
@@ -24,30 +28,30 @@ resource "helm_release" "kafka_cluster" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.stream.node
+        node = var.stream_internal.node
       }
-      resources = var.stream.resources
+      resources = var.stream_resources.resources
       service = {
         nodeSelector = {
-          node = var.stream.node
+          node = var.stream_internal.node
         }
-        partitions      = var.stream.partitions
+        partitions      = var.stream_resources.partitions
         port            = var.stream_internal.port
-        replicas        = var.stream.service.replicas
-        retention_bytes = var.stream.retention_bytes
-        segment_bytes   = var.stream.segment_bytes
+        replicas        = var.stream_resources.service.replicas
+        retention_bytes = var.stream_resources.retention_bytes
+        segment_bytes   = var.stream_resources.segment_bytes
         storage    = {
-          size = var.stream.service.storage
+          size = var.stream_resources.service.storage
         }
         version = var.stream_internal.version
       }
       zookeeper = {
         nodeSelector = {
-          node = var.stream.node
+          node = var.stream_internal.node
         }
-        replicas = var.stream.zookeeper.replicas
+        replicas = var.stream_resources.zookeeper.replicas
         storage  = {
-          size = var.stream.zookeeper.storage
+          size = var.stream_resources.zookeeper.storage
         }
       }
     })

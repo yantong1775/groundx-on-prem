@@ -2,19 +2,22 @@ data "template_file" "config_yaml" {
   template = file("${local.module_path}/golang/config.yaml.tpl")
 
   vars = {
-    cacheNotCluster      = var.cache_internal.is_instance
-    cacheService         = var.cache_internal.service
+    cacheAddr            = local.cache_settings.addr
+    cacheNotCluster      = local.cache_settings.is_instance
+    cachePort            = local.cache_settings.port
     dashboardService     = var.dashboard_internal.service
-    dbName               = var.db_internal.db_name
+    dbName               = var.db.db_name
     dbPassword           = var.db.db_password
     dbRootPassword       = var.db.db_root_password
-    dbService            = "${var.db_internal.service}-cluster-pxc-haproxy"
-    dbUser               = var.db_internal.db_username
+    dbRO                 = local.db_endpoints.ro
+    dbRW                 = local.db_endpoints.rw
+    dbUser               = var.db.db_username
     deploymentType       = var.groundx_internal.type
-    fileAccessKey        = var.file.access_key
-    fileAccessSecret     = var.file.access_secret
+    fileBaseDomain       = local.file_settings.base_domain
+    filePassword         = local.file_settings.password
     fileService          = var.file_internal.service
-    fileSSL              = var.file.ssl
+    fileSSL              = local.file_settings.ssl
+    fileUsername         = local.file_settings.username
     groundxService       = var.groundx_internal.service
     groundxServiceKey    = var.admin.api_key
     groundxUsername      = var.admin.username
@@ -25,14 +28,16 @@ data "template_file" "config_yaml" {
     processService       = var.process_internal.service
     queueService         = var.queue_internal.service
     rankerService        = "${var.ranker_internal.service}-api"
-    searchIndex          = var.search_internal.index
+    searchBaseUrl        = local.search_settings.base_url
+    searchIndex          = var.search.index
     searchPassword       = var.search.password
     searchRootPassword   = var.search.root_password
-    searchService        = "${var.search_internal.service}-cluster-master"
-    searchUser           = var.search_internal.user
-    streamService        = var.stream_internal.service
-    summaryService       = "${var.summary_internal.service}-api"
-    uploadBucket         = var.file_internal.upload_bucket
+    searchUser           = var.search.user
+    streamBaseUrl        = "${local.stream_settings.base_domain}:${local.stream_settings.port}"
+    summaryApiKey        = local.summary_credentials.api_key
+    summaryBaseUrl       = local.summary_credentials.base_url
+    summaryService       = var.summary_internal.service
+    uploadBucket         = local.file_settings.bucket
     uploadService        = var.upload_internal.service
   }
 }
@@ -52,23 +57,25 @@ data "template_file" "layout_config_py" {
   template = file("${local.module_path}/layout/config.py.tpl")
 
   vars = {
-    cacheService     = var.cache_internal.service
+    cacheAddr        = local.cache_settings.addr
+    cachePort        = local.cache_settings.port
     deviceType       = var.layout_internal.models.device
     figureModel      = var.layout_internal.models.figure.name
     figureModelPth   = var.layout_internal.models.figure.pth
     figureModelYml   = var.layout_internal.models.figure.yml
-    fileAccessKey    = var.file.access_key
-    fileAccessSecret = var.file.access_secret
+    fileBaseDomain   = local.file_settings.base_domain
+    filePassword     = local.file_settings.password
     fileService      = var.file_internal.service
-    fileSSL          = var.file.ssl ? "True" : "False"
+    fileSSL          = local.file_settings.ssl
+    fileUsername     = local.file_settings.username
     namespace        = var.app.namespace
     layoutService    = var.layout_internal.service
-    ocrProject       = var.layout_ocr.project
-    ocrType          = var.layout_ocr.type
+    ocrProject       = var.layout.ocr.project
+    ocrType          = var.layout.ocr.type
     tableModel       = var.layout_internal.models.table.name
     tableModelPth    = var.layout_internal.models.table.pth
     tableModelYml    = var.layout_internal.models.table.yml
-    uploadBucket     = var.file_internal.upload_bucket
+    uploadBucket     = local.file_settings.bucket
     validAPIKey      = var.admin.api_key
     validUsername    = var.admin.username
   }
@@ -86,7 +93,7 @@ resource "kubernetes_config_map" "layout_config_file" {
 }
 
 resource "kubernetes_config_map" "layout_ocr_credentials" {
-  count = var.layout_ocr.credentials == "" || var.layout_ocr.type != "google" ? 0 : 1
+  count = var.layout.ocr.credentials == "" || var.layout.ocr.type != "google" ? 0 : 1
 
   metadata {
     name      = "layout-ocr-credentials-map"
@@ -94,12 +101,12 @@ resource "kubernetes_config_map" "layout_ocr_credentials" {
   }
 
   data = {
-    "credentials.json" = file("${path.module}/../../../${var.layout_ocr.credentials}")
+    "credentials.json" = file("${path.module}/../../../${var.layout.ocr.credentials}")
   }
 }
 
 data "template_file" "layout_supervisord_16gb_workers" {
-  count = var.layout_internal.resources.workers
+  count = var.layout_resources.inference.workers
 
   template = file("${local.module_path}/layout/supervisord.conf.tpl")
 
@@ -127,15 +134,15 @@ data "template_file" "ranker_config_py" {
   template = file("${local.module_path}/ranker/config.py.tpl")
 
   vars = {
-    cacheService    = var.cache_internal.service
+    cacheAddr       = local.cache_settings.addr
+    cachePort       = local.cache_settings.port
     deviceType      = var.ranker_internal.inference.device
-    namespace       = var.app.namespace
     rankerMaxBatch  = var.ranker_internal.inference.max_batch
     rankerMaxPrompt = var.ranker_internal.inference.max_prompt
     rankerModelName = var.ranker_internal.inference.model
     rankerService   = var.ranker_internal.service
-    validAPIKey      = var.admin.api_key
-    validUsername    = var.admin.username
+    validAPIKey     = var.admin.api_key
+    validUsername   = var.admin.username
   }
 }
 
@@ -151,7 +158,7 @@ resource "kubernetes_config_map" "ranker_config_file" {
 }
 
 data "template_file" "ranker_supervisord_16gb_workers" {
-  count = var.ranker_internal.resources.workers
+  count = var.ranker_resources.inference.workers
 
   template = file("${local.module_path}/ranker/supervisord.conf.tpl")
 
@@ -179,9 +186,9 @@ data "template_file" "summary_config_py" {
   template = file("${local.module_path}/summary/config.py.tpl")
 
   vars = {
-    cacheService     = var.cache_internal.service
+    cacheAddr        = local.cache_settings.addr
+    cachePort        = local.cache_settings.port
     deviceType       = var.summary_internal.inference.device
-    namespace        = var.app.namespace
     summaryMaxBatch  = var.summary_internal.inference.max_batch
     summaryMaxPrompt = var.summary_internal.inference.max_prompt
     summaryModelName = var.summary_internal.inference.model
@@ -203,7 +210,7 @@ resource "kubernetes_config_map" "summary_config_file" {
 }
 
 data "template_file" "summary_supervisord_24gb_workers" {
-  count = var.summary_internal.resources.workers
+  count = var.summary_resources.inference.workers
 
   template = file("${local.module_path}/summary/supervisord.conf.tpl")
 

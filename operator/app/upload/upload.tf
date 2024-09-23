@@ -10,7 +10,7 @@ resource "helm_release" "upload_service" {
       }
       image = var.upload_internal.image
       nodeSelector = {
-        node = var.upload.node
+        node = var.upload_internal.node
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

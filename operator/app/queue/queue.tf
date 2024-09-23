@@ -10,7 +10,7 @@ resource "helm_release" "queue_service" {
       }
       image = var.queue_internal.image
       nodeSelector = {
-        node = var.queue.node
+        node = var.queue_internal.node
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

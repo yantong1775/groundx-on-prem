@@ -10,7 +10,7 @@ resource "helm_release" "layout_webhook_service" {
       }
       image = var.layout_webhook_internal.image
       nodeSelector = {
-        node = var.layout_webhook.node
+        node = var.layout_webhook_internal.node
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
