@@ -18,6 +18,7 @@ spec:
       nodeSelector:
         gpu_memory: "{{ .Values.gpuMemory }}"
         node: "{{ .Values.nodeSelector.node }}"
+      runtimeClassName: nvidia
       tolerations:
         - key: "gpu_memory"
           value: "{{ .Values.gpuMemory }}"
