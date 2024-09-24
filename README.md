@@ -8,7 +8,29 @@
 ## DEPLOYING
 
 ```
-./deploy.sh <environment> <cloud_provider>
+./operator.sh <helm-release> -c -t
+```
+
+1. `./operator.sh init`
+2. `./operator.sh services`
+3. `./operator.sh app`
+
+Use groundx libraries / apis.
+
+`kubectl -n eyelevel get routes`
+
+To get API URL.
+
+```
+from groundx import Groundx
+from groundx.configuration import Configuration
+
+groundx = Groundx(
+    configuration=Configuration(
+        host="{RESULT FROM GET ROUTES}/api",
+        api_key="5c49be10-d228-4dd8-bbb0-d59300698ef6",
+    )
+)
 ```
 
 ### SELF-SIGNED CERTS

@@ -580,7 +580,7 @@ variable "layout_resources" {
     inference = {
       gpuMemory = "16gb"
       replicas  = 1
-      workers   = 14
+      workers   = 4
     }
   }
 }
