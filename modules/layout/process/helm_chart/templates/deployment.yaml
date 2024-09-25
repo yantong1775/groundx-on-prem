@@ -25,7 +25,7 @@ spec:
       - name: wait-for-cache
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"] 
+        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"]
       - name: wait-for-file-storage
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
@@ -34,12 +34,17 @@ spec:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pull }}"
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
         workingDir: /app
         command:
           - /bin/sh
           - -c
           - |
-            export PYTHONPATH=/app && celery -A document.celery_process.app worker --loglevel=INFO --concurrency=1 --queues={{ .Values.queues }}
+            export PYTHONPATH=/app && celery -A document.celery_process.app worker --loglevel=INFO --concurrency=1 --queues={{ .Values.queues }} -n ${POD_NAME}-w1
         securityContext:
           runAsUser: {{ .Values.securityContext.runAsUser }}
         livenessProbe:

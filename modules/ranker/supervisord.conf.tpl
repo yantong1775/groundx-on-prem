@@ -1,6 +1,6 @@
 
 [program:celery_worker_${worker_number}]
-command=celery -A search.celery.appSearch worker --loglevel=INFO --concurrency=1 --queues=inference_queue
+command=celery -A search.celery.appSearch worker -n %(ENV_POD_NAME)s-w${worker_number} --loglevel=INFO --concurrency=1 --queues=inference_queue
 autostart=true
 autorestart=true
 stdout_logfile=/dev/stdout
