@@ -1,18 +1,18 @@
 # EyeLevel Kubernetes IAC Code
 
-The repository contains logics that for deploying the GoundX RAG pipeline developed by EyeLevel AI to a self-hosted OpenShift cluster. In order for workflow described in this repository to execute successfully, please ensure the following software tool are installed on the execution environment:
+This repository enables you to deploy the GroundX RAG document ingestion and search capabilities, developed by EyeLevel.ai, to a self-hosted Kubernetes cluster. The code has been tested on OpenShift ROSA on AWS.
 
-# Terraform Deployment Script Documentation
+# Helm Operator Instructions
 
-The section of the documentation describes the end-user experience of this repository. The entry point to this repository is `operator.sh` file in the root of this repository. The following is a documentation of logic and usage of the file.
+Deployments are managed using the `operator.sh` script found in the root of this repository.
 
 ## Prerequisites
 
-Before using this script, ensure you have the following:
+Please ensure you have the following software tools installed before proceeding:
 
 1. Bash shell (version 4.0 or later recommended)
-2. Terraform installed and available in your system PATH
-3. Proper AWS credentials configured (if deploying to AWS)
+2. Terraform, installed and available in your system PATH
+3. Proper AWS credentials (if deploying to AWS)
 
 ## Script Structure
 
@@ -30,14 +30,14 @@ The script is organized into several main sections:
 ./operator.sh [component] [options]
 ```
 
-### Available Commands
+Component is the service, pod, configuration, or functional group you wish to manage.
 
-#### Components
+### Functional Groups
 - `init`
 - `services`
 - `app`
 
-#### Apps
+### App Pods
 - `groundx`
 - `layout-webhook`
 - `pre-process`
@@ -49,11 +49,11 @@ The script is organized into several main sections:
 - `layout`
 - `summary`
 
-#### Init Tasks
+### Init Configurations
 - `add`
 - `config`
 
-#### Services
+### Services
 - `cache`
 - `db`
 - `file`
