@@ -4,8 +4,6 @@ This repository enables you to deploy the GroundX RAG document ingestion and sea
 
 # Helm Operator Instructions
 
-Deployments are managed using the `operator.sh` script found in the root of this repository.
-
 ## Prerequisites
 
 Please ensure you have the following software tools installed before proceeding:
@@ -14,17 +12,9 @@ Please ensure you have the following software tools installed before proceeding:
 2. Terraform, installed and available in your system PATH
 3. Proper AWS credentials (if deploying to AWS)
 
-## Script Structure
-
-The script is organized into several main sections:
-
-1. Configuration arrays (valid groups, apps, init tasks, and services)
-2. Input parsing
-3. Option parsing
-4. Function definitions (deploy, destroy, recurse_directories)
-5. Main execution logic
-
 ## Usage
+
+Deployments are managed using the `operator.sh` script found in the root of this repository.
 
 ```
 ./operator.sh [component] [options]
