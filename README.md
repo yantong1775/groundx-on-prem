@@ -106,7 +106,7 @@ Ensure that the directory structure under the `operator/` folder matches these c
 
 For any other issues, check the Terraform output for specific error messages and consult the Terraform documentation.
 
-# Interacting with the Deployed GoundX instance
+# Interacting with the Deployed GroundX instance
 
 Use `kubectl -n eyelevel get routes` to list out all the available routes from the API server.
 
