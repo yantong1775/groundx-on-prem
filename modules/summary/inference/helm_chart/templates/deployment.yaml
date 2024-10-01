@@ -40,12 +40,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-        workingDir: /app
+        workingDir: /workspace
         command:
           - /bin/sh
           - -c
           - |
-            export PYTHONPATH=/app && supervisord -c /app/supervisord.conf
+            export PYTHONPATH=/workspace && supervisord -c /workspace/supervisord.conf
         securityContext:
           runAsUser: {{ .Values.securityContext.runAsUser }}
         livenessProbe:
@@ -71,10 +71,10 @@ spec:
             nvidia.com/gpu: {{ .Values.replicas }}
         volumeMounts:
         - name: config-volume
-          mountPath: /app/config.py
+          mountPath: /workspace/config.py
           subPath: config.py
         - name: supervisord-volume
-          mountPath: /app/supervisord.conf
+          mountPath: /workspace/supervisord.conf
           subPath: supervisord.conf
       volumes:
       - name: config-volume
