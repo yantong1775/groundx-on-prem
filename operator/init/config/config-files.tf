@@ -137,7 +137,6 @@ data "template_file" "ranker_config_py" {
     cacheAddr       = local.cache_settings.addr
     cachePort       = local.cache_settings.port
     deviceType      = var.ranker_internal.inference.device
-    rankerMaxBatch  = var.ranker_internal.inference.max_batch
     rankerMaxPrompt = var.ranker_internal.inference.max_prompt
     rankerModelName = var.ranker_internal.inference.model
     rankerService   = var.ranker_internal.service
@@ -189,7 +188,6 @@ data "template_file" "summary_config_py" {
     cacheAddr        = local.cache_settings.addr
     cachePort        = local.cache_settings.port
     deviceType       = var.summary_internal.inference.device
-    summaryMaxBatch  = var.summary_internal.inference.max_batch
     summaryMaxPrompt = var.summary_internal.inference.max_prompt
     summaryModelName = var.summary_internal.inference.model
     summaryService   = var.summary_internal.service

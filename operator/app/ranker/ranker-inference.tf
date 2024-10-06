@@ -16,7 +16,8 @@ resource "helm_release" "ranker_inference_service" {
       nodeSelector = {
         node = var.ranker_internal.nodes.inference
       }
-      replicas        = var.ranker_resources.inference.replicas
+      replicas        = var.ranker_resources.replicas
+      resources       = var.ranker_resources.resources
       securityContext = {
         runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

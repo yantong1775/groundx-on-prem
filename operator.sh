@@ -10,6 +10,11 @@ valid_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary-
 valid_init=("add" "config")
 valid_services=("cache" "db" "file" "search" "stream")
 
+# for helm release explicit clean up, in case terraform fails to clean up
+golang_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload")
+inference_apps=("ranker" "summary")
+inference_process_apps=("layout")
+
 GROUP=""
 APP=""
 INIT=""
@@ -84,6 +89,30 @@ destroy() {
       terraform -chdir="$dir" destroy
     else
       terraform -chdir="$dir" destroy --auto-approve
+      for app in "${inference_apps[@]}"; do
+        if [[ "$dir" == */"$app" ]]; then
+          helm delete -n eyelevel $app-api-cluster > /dev/null 2>&1
+          helm delete -n eyelevel $app-inference-cluster > /dev/null 2>&1
+          if [[ "$app" == "layout" ]]; then
+            helm delete -n eyelevel $app-process > /dev/null 2>&1
+          fi
+          return 0
+        fi
+      done
+      for app in "${inference_process_apps[@]}"; do
+        if [[ "$dir" == */"$app" ]]; then
+          helm delete -n eyelevel $app-api-cluster > /dev/null 2>&1
+          helm delete -n eyelevel $app-inference-cluster > /dev/null 2>&1
+          helm delete -n eyelevel $app-process > /dev/null 2>&1
+          return 0
+        fi
+      done
+      for app in "${golang_apps[@]}"; do
+        if [[ "$dir" == */"$app" ]]; then
+          helm delete -n eyelevel $app-cluster > /dev/null 2>&1
+          return 0
+        fi
+      done
     fi
   else
     echo "Error: Directory '$dir' does not exist."

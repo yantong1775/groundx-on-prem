@@ -15,7 +15,7 @@ variable "admin" {
 }
 
 variable "app" {
-  description = "EyeLevel application information"
+  description = "EyeLevel application information (do not change)"
   type        = object({
     namespace = string
     pv_class  = string
@@ -718,7 +718,6 @@ variable "ranker_internal" {
         repository = string
         tag        = string
       })
-      max_batch    = number
       max_prompt   = number
       model        = string
     })
@@ -749,7 +748,6 @@ variable "ranker_internal" {
         repository = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference-op"
         tag        = "latest"
       }
-      max_batch    = 10
       max_prompt   = 2048
       model        = "facebook/opt-350m"
     }
@@ -763,19 +761,43 @@ variable "ranker_internal" {
 }
 
 variable "ranker_resources" {
-  description = "Ranker compute resource information"
+  description   = "Ranker compute resource information"
   type          = object({
     inference   = object({
       gpuMemory = string
-      replicas  = number
       workers   = number
     })
+    replicas    = number
+    resources   = object({
+      limits    = object({
+        cpu     = string
+        memory  = string
+        gpu     = number
+      })
+      requests  = object({
+        cpu     = string
+        memory  = string
+        gpu     = number
+      })
+    })
   })
-  default     = {
-    inference = {
+  default       = {
+    inference   = {
       gpuMemory = "16gb"
-      replicas  = 1
-      workers   = 14
+      workers   = 10
+    }
+    replicas    = 1
+    resources   = {
+      limits    = {
+        cpu     = "4"
+        memory  = "14Gi"
+        gpu     = 1
+      }
+      requests  = {
+        cpu     = "3.5"
+        memory  = "10Gi"
+        gpu     = 1
+      }
     }
   }
 }
@@ -1023,7 +1045,6 @@ variable "summary_internal" {
         repository = string
         tag        = string
       })
-      max_batch    = number
       max_prompt   = number
       model        = string
     })
@@ -1054,7 +1075,6 @@ variable "summary_internal" {
         repository = "public.ecr.aws/c9r4x6y5/eyelevel/summary-inference-op"
         tag        = "latest"
       }
-      max_batch    = 10
       max_prompt   = 2048
       model        = "openbmb/MiniCPM-V-2_6"
     }
