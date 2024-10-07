@@ -18,7 +18,8 @@ resource "helm_release" "summary_inference_service" {
       nodeSelector = {
         node = var.summary_internal.nodes.inference
       }
-      replicas        = var.summary_resources.inference.replicas
+      replicas        = var.summary_resources.replicas
+      resources       = var.summary_resources.resources
       securityContext = {
         runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

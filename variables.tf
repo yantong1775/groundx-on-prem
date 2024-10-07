@@ -1092,15 +1092,39 @@ variable "summary_resources" {
   type          = object({
     inference   = object({
       gpuMemory = string
-      replicas  = number
       workers   = number
+    })
+    replicas    = number
+    resources   = object({
+      limits    = object({
+        cpu     = string
+        memory  = string
+        gpu     = number
+      })
+      requests  = object({
+        cpu     = string
+        memory  = string
+        gpu     = number
+      })
     })
   })
   default       = {
     inference   = {
       gpuMemory = "24gb"
-      replicas  = 1
       workers   = 1
+    }
+    replicas    = 1
+    resources   = {
+      limits    = {
+        cpu     = "3"
+        memory  = "12Gi"
+        gpu     = 1
+      }
+      requests  = {
+        cpu     = "2"
+        memory  = "8Gi"
+        gpu     = 1
+      }
     }
   }
 }
