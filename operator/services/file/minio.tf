@@ -12,7 +12,7 @@ resource "helm_release" "minio_operator" {
   depends_on = [null_resource.minio_helm_repo]
 
   name       = "${var.file_internal.service}-operator"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = var.file_internal.operator.chart
   version    = var.file_internal.operator.chart_version
@@ -45,7 +45,7 @@ resource "helm_release" "minio_tenant" {
   depends_on = [helm_release.minio_operator]
 
   name       = "${var.file_internal.service}-tenant"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = var.file_internal.tenant.chart
   version    = var.file_internal.tenant.chart_version

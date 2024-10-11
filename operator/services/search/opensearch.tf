@@ -2,7 +2,7 @@ resource "helm_release" "opensearch_operator" {
   count = local.create_search ? 1 : 0
 
   name       = "${var.search_internal.service}-operator"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = var.search_internal.chart.name
   repository = var.search_internal.chart.url
@@ -38,6 +38,7 @@ resource "helm_release" "opensearch_operator" {
         runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
       }
+      plugins = var.search.plugins
       replicas = var.search_resources.replicas
       resources = var.search_resources.resources
       securityContext = {

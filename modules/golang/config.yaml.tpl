@@ -12,6 +12,10 @@ ai:
     search:
       baseURL: ${searchBaseUrl}
       index: ${searchIndex}
+      languages:
+      %{ for language in languages ~}
+        - ${language}
+      %{ endfor ~}
       username: ${searchUser}
       password: ${searchPassword}
   eyelevelSearch:

@@ -1,6 +1,6 @@
 resource "helm_release" "groundx_service" {
   name       = "${var.groundx_internal.service}-cluster"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
   chart      = "${local.module_path}/groundx/helm_chart"
 
   values = [
@@ -23,7 +23,7 @@ resource "helm_release" "groundx_service" {
       }
       service = {
         name      = var.groundx_internal.service
-        namespace = var.app.namespace
+        namespace = var.app_internal.namespace
       }
     })
   ]

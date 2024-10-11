@@ -1,6 +1,6 @@
 resource "helm_release" "layout_process_service" {
   name       = "${var.layout_internal.service}-process"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = "${local.module_path}/layout/process/helm_chart"
 
@@ -24,7 +24,7 @@ resource "helm_release" "layout_process_service" {
       }
       service = {
         name      = "${var.layout_internal.service}-process"
-        namespace = var.app.namespace
+        namespace = var.app_internal.namespace
         version   = var.layout_internal.version
       }
     })

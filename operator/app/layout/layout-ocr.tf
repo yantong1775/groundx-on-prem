@@ -2,7 +2,7 @@ resource "helm_release" "layout_ocr_service" {
   count = var.layout.ocr.type == "google" ? 0 : 1
 
   name       = "${var.layout_internal.service}-ocr"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = "${local.module_path}/layout/ocr/helm_chart"
 
@@ -21,7 +21,7 @@ resource "helm_release" "layout_ocr_service" {
       }
       service = {
         name      = "${var.layout_internal.service}-ocr"
-        namespace = var.app.namespace
+        namespace = var.app_internal.namespace
         version   = var.layout_internal.version
       }
     })

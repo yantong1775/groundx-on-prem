@@ -1,12 +1,12 @@
 resource "helm_release" "upload_service" {
   name       = "${var.upload_internal.service}-cluster"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
   chart      = "${local.module_path}/upload/helm_chart"
 
   values = [
     yamlencode({
       dependencies = {
-        groundx  = "${var.groundx_internal.service}.${var.app.namespace}.svc.cluster.local"
+        groundx  = "${var.groundx_internal.service}.${var.app_internal.namespace}.svc.cluster.local"
       }
       image = var.upload_internal.image
       nodeSelector = {
@@ -19,7 +19,7 @@ resource "helm_release" "upload_service" {
       }
       service = {
         name      = var.upload_internal.service
-        namespace = var.app.namespace
+        namespace = var.app_internal.namespace
         version   = var.upload_internal.version
       }
     })

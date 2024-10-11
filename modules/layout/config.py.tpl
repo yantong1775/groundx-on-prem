@@ -1,9 +1,3 @@
-from document.constants import (
-    DefaultConfidence,
-    FGLabels,
-    TBLabels,
-)
-
 env = dict(
     accessKey="${fileUsername}",
     accessSecret="${filePassword}",
@@ -19,22 +13,6 @@ env = dict(
     ocrCredentials="credentials.json",
     ocrProject="${ocrProject}",
     ocrType="${ocrType}",
-    productionModels={
-        "figure": {
-            "confidence": DefaultConfidence,
-            "name": "${figureModel}",
-            "labels": FGLabels,
-            "pth": "${figureModelPth}",
-            "yml": "${figureModelYml}",
-        },
-        "table": {
-            "confidence": DefaultConfidence,
-            "name": "${tableModel}",
-            "labels": TBLabels,
-            "pth": "${tableModelPth}",
-            "yml": "${tableModelYml}",
-        },
-    },
     queueType="kafka",
     uploadBase="layout/processed/",
     uploadBaseURL="${fileBaseDomain}",

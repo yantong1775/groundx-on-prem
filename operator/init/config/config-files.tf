@@ -21,9 +21,10 @@ data "template_file" "config_yaml" {
     groundxService       = var.groundx_internal.service
     groundxServiceKey    = var.admin.api_key
     groundxUsername      = var.admin.username
+    languages            = var.app.languages
     layoutService        = "${var.layout_internal.service}-api"
     layoutWebhookService = var.layout_webhook_internal.service
-    namespace            = var.app.namespace
+    namespace            = var.app_internal.namespace
     preProcessService    = var.pre_process_internal.service
     processService       = var.process_internal.service
     queueService         = var.queue_internal.service
@@ -45,7 +46,7 @@ data "template_file" "config_yaml" {
 resource "kubernetes_config_map" "cashbot_config_file" {
   metadata {
     name      = "config-yaml-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {
@@ -60,21 +61,15 @@ data "template_file" "layout_config_py" {
     cacheAddr        = local.cache_settings.addr
     cachePort        = local.cache_settings.port
     deviceType       = var.layout_internal.models.device
-    figureModel      = var.layout_internal.models.figure.name
-    figureModelPth   = var.layout_internal.models.figure.pth
-    figureModelYml   = var.layout_internal.models.figure.yml
     fileBaseDomain   = local.file_settings.base_domain
     filePassword     = local.file_settings.password
     fileService      = var.file_internal.service
     fileSSL          = local.file_settings.ssl
     fileUsername     = local.file_settings.username
-    namespace        = var.app.namespace
+    namespace        = var.app_internal.namespace
     layoutService    = var.layout_internal.service
     ocrProject       = var.layout.ocr.project
     ocrType          = var.layout.ocr.type
-    tableModel       = var.layout_internal.models.table.name
-    tableModelPth    = var.layout_internal.models.table.pth
-    tableModelYml    = var.layout_internal.models.table.yml
     uploadBucket     = local.file_settings.bucket
     validAPIKey      = var.admin.api_key
     validUsername    = var.admin.username
@@ -84,11 +79,31 @@ data "template_file" "layout_config_py" {
 resource "kubernetes_config_map" "layout_config_file" {
   metadata {
     name      = "layout-config-py-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {
     "config.py" = data.template_file.layout_config_py.rendered
+  }
+}
+
+data "template_file" "layout_gunicorn_conf_py" {
+  template = file("${local.module_path}/layout/gunicorn_conf.py.tpl")
+
+  vars = {
+    threads = var.layout_resources.api.threads
+    workers = var.layout_resources.api.workers
+  }
+}
+
+resource "kubernetes_config_map" "layout_gunicorn_conf_file" {
+  metadata {
+    name      = "layout-gunicorn-conf-py-map"
+    namespace = var.app_internal.namespace
+  }
+
+  data = {
+    "gunicorn_conf.py" = data.template_file.layout_gunicorn_conf_py.rendered
   }
 }
 
@@ -97,7 +112,7 @@ resource "kubernetes_config_map" "layout_ocr_credentials" {
 
   metadata {
     name      = "layout-ocr-credentials-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {
@@ -122,7 +137,7 @@ data "template_file" "layout_supervisord_16gb_conf_template" {
 resource "kubernetes_config_map" "layout_supervisord_16gb_conf" {
   metadata {
     name      = "layout-supervisord-16gb-conf-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {
@@ -137,18 +152,36 @@ data "template_file" "ranker_config_py" {
     cacheAddr       = local.cache_settings.addr
     cachePort       = local.cache_settings.port
     deviceType      = var.ranker_internal.inference.device
-    rankerMaxPrompt = var.ranker_internal.inference.max_prompt
-    rankerModelName = var.ranker_internal.inference.model
     rankerService   = var.ranker_internal.service
     validAPIKey     = var.admin.api_key
     validUsername   = var.admin.username
   }
 }
 
+data "template_file" "ranker_gunicorn_conf_py" {
+  template = file("${local.module_path}/ranker/gunicorn_conf.py.tpl")
+
+  vars = {
+    threads = var.ranker_resources.api.threads
+    workers = var.ranker_resources.api.workers
+  }
+}
+
+resource "kubernetes_config_map" "ranker_gunicorn_conf_file" {
+  metadata {
+    name      = "ranker-gunicorn-conf-py-map"
+    namespace = var.app_internal.namespace
+  }
+
+  data = {
+    "gunicorn_conf.py" = data.template_file.ranker_gunicorn_conf_py.rendered
+  }
+}
+
 resource "kubernetes_config_map" "ranker_config_file" {
   metadata {
     name      = "ranker-config-py-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {
@@ -173,7 +206,7 @@ data "template_file" "ranker_supervisord_16gb_conf_template" {
 resource "kubernetes_config_map" "ranker_supervisord_16gb_conf" {
   metadata {
     name      = "ranker-supervisord-16gb-conf-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {
@@ -188,8 +221,6 @@ data "template_file" "summary_config_py" {
     cacheAddr        = local.cache_settings.addr
     cachePort        = local.cache_settings.port
     deviceType       = var.summary_internal.inference.device
-    summaryMaxPrompt = var.summary_internal.inference.max_prompt
-    summaryModelName = var.summary_internal.inference.model
     summaryService   = var.summary_internal.service
     validAPIKey      = var.admin.api_key
     validUsername    = var.admin.username
@@ -199,11 +230,31 @@ data "template_file" "summary_config_py" {
 resource "kubernetes_config_map" "summary_config_file" {
   metadata {
     name      = "summary-config-py-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {
     "config.py" = data.template_file.summary_config_py.rendered
+  }
+}
+
+data "template_file" "summary_gunicorn_conf_py" {
+  template = file("${local.module_path}/summary/gunicorn_conf.py.tpl")
+
+  vars = {
+    threads = var.summary_resources.api.threads
+    workers = var.summary_resources.api.workers
+  }
+}
+
+resource "kubernetes_config_map" "summary_gunicorn_conf_file" {
+  metadata {
+    name      = "summary-gunicorn-conf-py-map"
+    namespace = var.app_internal.namespace
+  }
+
+  data = {
+    "gunicorn_conf.py" = data.template_file.summary_gunicorn_conf_py.rendered
   }
 }
 
@@ -224,7 +275,7 @@ data "template_file" "summary_supervisord_24gb_conf_template" {
 resource "kubernetes_config_map" "summary_supervisord_24gb_conf" {
   metadata {
     name      = "summary-supervisord-24gb-conf-map"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {

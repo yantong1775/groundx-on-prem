@@ -1,14 +1,14 @@
 resource "kubernetes_namespace" "eyelevel" {
   metadata {
-    name = var.app.namespace
+    name = var.app_internal.namespace
   }
 }
 
 resource "kubernetes_storage_class_v1" "local_storage" {
-  count = var.app.pv_class != "empty" ? 1 : 0
+  count = var.app_internal.pv_class != "empty" ? 1 : 0
 
   metadata {
-    name = var.app.pv_class
+    name = var.app_internal.pv_class
   }
 
   storage_provisioner = "kubernetes.io/no-provisioner"
@@ -26,7 +26,7 @@ resource "tls_self_signed_cert" "ca_cert" {
   private_key_pem = tls_private_key.ca_key.private_key_pem
   subject {
     common_name  = "Self-Signed Cluster Root CA"
-    organization = var.app.namespace
+    organization = var.app_internal.namespace
   }
 
   validity_period_hours = 87600  # 10 years
@@ -50,11 +50,11 @@ resource "tls_cert_request" "service_csr" {
   private_key_pem = tls_private_key.service_key.private_key_pem
 
   subject {
-    common_name  = "*.${var.app.namespace}.svc"
-    organization = var.app.namespace
+    common_name  = "*.${var.app_internal.namespace}.svc"
+    organization = var.app_internal.namespace
   }
 
-  dns_names             = ["*.${var.app.namespace}.svc"]
+  dns_names             = ["*.${var.app_internal.namespace}.svc"]
 }
 
 resource "tls_locally_signed_cert" "service_cert" {
@@ -78,8 +78,8 @@ resource "kubernetes_secret" "ssl_cert" {
   depends_on = [tls_locally_signed_cert.service_cert, kubernetes_namespace.eyelevel]
 
   metadata {
-    name      = "${var.app.namespace}-cert"
-    namespace = var.app.namespace
+    name      = "${var.app_internal.namespace}-cert"
+    namespace = var.app_internal.namespace
   }
 
   data = {

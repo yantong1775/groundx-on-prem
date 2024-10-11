@@ -1,6 +1,6 @@
 resource "helm_release" "ranker_api_service" {
   name       = "${var.ranker_internal.service}-api-cluster"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = "${local.module_path}/ranker/api/helm_chart"
 
@@ -18,7 +18,7 @@ resource "helm_release" "ranker_api_service" {
       }
       service = {
         name      = "${var.ranker_internal.service}-api"
-        namespace = var.app.namespace
+        namespace = var.app_internal.namespace
         version   = var.ranker_internal.version
       }
     })

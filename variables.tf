@@ -15,7 +15,17 @@ variable "admin" {
 }
 
 variable "app" {
-  description = "EyeLevel application information (do not change)"
+  description = "EyeLevel application information"
+  type        = object({
+    languages = list(string)
+  })
+  default = {
+    languages = ["en"]
+  }
+}
+
+variable "app_internal" {
+  description = "EyeLevel application internal information (do not change)"
   type        = object({
     namespace = string
     pv_class  = string
@@ -489,16 +499,6 @@ variable "layout_internal" {
     })
     models         = object({
       device     = string
-      figure       = object({
-        name       = string
-        pth        = string
-        yml        = string
-      })
-      table        = object({
-        name       = string
-        pth        = string
-        yml        = string
-      })
     })
     nodes          = object({
       api          = string
@@ -538,16 +538,6 @@ variable "layout_internal" {
     }
     models         = {
       device       = "cuda"
-      figure       = {
-        name       = "fg_faster_rcnn_R_50_FPN_3x - fine tuned"
-        pth        = "https://upload.groundx.ai/layout/model/current/fg_faster_rcnn_R_50_FPN_3x.071924.pth"
-        yml        = "https://upload.groundx.ai/layout/model/current/fg_faster_rcnn_R_50_FPN_3x_config.071924.yml"
-      }
-      table        = {
-        name       = "tb_faster_rcnn_R_101_FPN_3x - fine tuned 2-21-2024"
-        pth        = "https://upload.groundx.ai/layout/model/current/tb_faster_rcnn_R_101_FPN_3x.pth"
-        yml        = "https://upload.groundx.ai/layout/model/current/tb_faster_rcnn_R_101_FPN_3x_config.yml"
-      }
     }
     nodes          = {
       api          = "cpu"
@@ -569,18 +559,72 @@ variable "layout_internal" {
 
 variable "layout_resources" {
   description   = "Layout compute resource information"
-  type          = object({
-    inference   = object({
-      gpuMemory = string
-      replicas  = number
-      workers   = number
+  type           = object({
+    api          = object({
+      replicas   = number
+      resources  = object({
+        limits   = object({
+          cpu    = string
+          memory = string
+        })
+        requests = object({
+          cpu    = string
+          memory = string
+        })
+      })
+      threads    = number
+      workers    = number
+    })
+    inference    = object({
+      gpuMemory  = string
+      replicas   = number
+      resources  = object({
+        limits   = object({
+          cpu    = string
+          memory = string
+          gpu    = number
+        })
+        requests = object({
+          cpu    = string
+          memory = string
+          gpu    = number
+        })
+      })
+      workers    = number
     })
   })
   default     = {
-    inference = {
-      gpuMemory = "16gb"
-      replicas  = 1
-      workers   = 4
+    api          = {
+      replicas   = 1
+      resources  = {
+        limits   = {
+          cpu    = "2"
+          memory = "1Gi"
+        }
+        requests = {
+          cpu    = "1.5"
+          memory = "500Mi"
+        }
+      }
+      threads    = 2
+      workers    = 2
+    }
+    inference    = {
+      gpuMemory  = "16gb"
+      replicas   = 1
+      resources  = {
+        limits   = {
+          cpu    = "3"
+          memory = "12Gi"
+          gpu    = 1
+        }
+        requests = {
+          cpu    = "2"
+          memory = "8Gi"
+          gpu    = 1
+        }
+      }
+      workers    = 4
     }
   }
 }
@@ -718,8 +762,6 @@ variable "ranker_internal" {
         repository = string
         tag        = string
       })
-      max_prompt   = number
-      model        = string
     })
     nodes       = object({
       api       = string
@@ -748,8 +790,6 @@ variable "ranker_internal" {
         repository = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference-op"
         tag        = "latest"
       }
-      max_prompt   = 2048
-      model        = "facebook/opt-350m"
     }
     nodes       = {
       api       = "cpu"
@@ -762,42 +802,72 @@ variable "ranker_internal" {
 
 variable "ranker_resources" {
   description   = "Ranker compute resource information"
-  type          = object({
-    inference   = object({
-      gpuMemory = string
-      workers   = number
+  type           = object({
+    api          = object({
+      replicas   = number
+      resources  = object({
+        limits   = object({
+          cpu    = string
+          memory = string
+        })
+        requests = object({
+          cpu    = string
+          memory = string
+        })
+      })
+      threads    = number
+      workers    = number
     })
-    replicas    = number
-    resources   = object({
-      limits    = object({
-        cpu     = string
-        memory  = string
-        gpu     = number
+    inference    = object({
+      gpuMemory  = string
+      replicas   = number
+      resources  = object({
+        limits   = object({
+          cpu    = string
+          memory = string
+          gpu    = number
+        })
+        requests = object({
+          cpu    = string
+          memory = string
+          gpu    = number
+        })
       })
-      requests  = object({
-        cpu     = string
-        memory  = string
-        gpu     = number
-      })
+      workers    = number
     })
   })
-  default       = {
-    inference   = {
-      gpuMemory = "16gb"
-      workers   = 10
+  default        = {
+    api          = {
+      replicas   = 1
+      resources  = {
+        limits   = {
+          cpu    = "2"
+          memory = "1Gi"
+        }
+        requests = {
+          cpu    = "1.5"
+          memory = "500Mi"
+        }
+      }
+      threads    = 2
+      workers    = 2
     }
-    replicas    = 1
-    resources   = {
-      limits    = {
-        cpu     = "4"
-        memory  = "14Gi"
-        gpu     = 1
+    inference    = {
+      gpuMemory  = "16gb"
+      replicas   = 1
+      resources  = {
+        limits   = {
+          cpu    = "4"
+          memory = "14Gi"
+          gpu    = 1
+        }
+        requests = {
+          cpu    = "3.5"
+          memory = "10Gi"
+          gpu    = 1
+        }
       }
-      requests  = {
-        cpu     = "3.5"
-        memory  = "10Gi"
-        gpu     = 1
-      }
+      workers    = 10
     }
   }
 }
@@ -810,12 +880,20 @@ variable "search" {
   type            = object({
     index         = string
     password      = string
+    plugins       = object({
+      enabled     = bool
+      installList = list(string)
+    })
     root_password = string
     user          = string
   })
   default         = {
     index         = "prod-1"
     password      = "R0otb_*t!kazs"
+    plugins       = {
+      enabled     = false
+      installList = []
+    }
     root_password = "R0otb_*t!kazs"
     user          = "eyelevel"
   }
@@ -1045,8 +1123,6 @@ variable "summary_internal" {
         repository = string
         tag        = string
       })
-      max_prompt   = number
-      model        = string
     })
     nodes          = object({
       api          = string
@@ -1075,8 +1151,6 @@ variable "summary_internal" {
         repository = "public.ecr.aws/c9r4x6y5/eyelevel/summary-inference-op"
         tag        = "latest"
       }
-      max_prompt   = 2048
-      model        = "openbmb/MiniCPM-V-2_6"
     }
     nodes          = {
       api          = "cpu"
@@ -1088,43 +1162,73 @@ variable "summary_internal" {
 }
 
 variable "summary_resources" {
-  description   = "Summary compute resource information"
-  type          = object({
-    inference   = object({
-      gpuMemory = string
-      workers   = number
+  description    = "Summary compute resource information"
+  type           = object({
+    api          = object({
+      replicas   = number
+      resources  = object({
+        limits   = object({
+          cpu    = string
+          memory = string
+        })
+        requests = object({
+          cpu    = string
+          memory = string
+        })
+      })
+      threads    = number
+      workers    = number
     })
-    replicas    = number
-    resources   = object({
-      limits    = object({
-        cpu     = string
-        memory  = string
-        gpu     = number
+    inference    = object({
+      gpuMemory  = string
+      replicas   = number
+      resources  = object({
+        limits   = object({
+          cpu    = string
+          memory = string
+          gpu    = number
+        })
+        requests = object({
+          cpu    = string
+          memory = string
+          gpu    = number
+        })
       })
-      requests  = object({
-        cpu     = string
-        memory  = string
-        gpu     = number
-      })
+      workers    = number
     })
   })
-  default       = {
-    inference   = {
-      gpuMemory = "24gb"
-      workers   = 1
+  default        = {
+    api          = {
+      replicas   = 1
+      resources  = {
+        limits   = {
+          cpu    = "2"
+          memory = "1Gi"
+        }
+        requests = {
+          cpu    = "1.5"
+          memory = "500Mi"
+        }
+      }
+      threads    = 2
+      workers    = 2
     }
-    replicas    = 1
-    resources   = {
-      limits    = {
-        cpu     = "3"
-        memory  = "12Gi"
-        gpu     = 1
+    inference    = {
+      gpuMemory  = "24gb"
+      replicas   = 1
+      resources  = {
+        limits   = {
+          cpu    = "3"
+          memory = "12Gi"
+          gpu    = 1
+        }
+        requests = {
+          cpu    = "2"
+          memory = "8Gi"
+          gpu    = 1
+        }
       }
-      requests  = {
-        cpu     = "2"
-        memory  = "8Gi"
-        gpu     = 1
-      }
+      workers    = 1
     }
   }
 }

@@ -2,7 +2,7 @@ resource "helm_release" "redis" {
   count = local.create_cache ? 1 : 0
 
   name       = var.cache_internal.service
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = "${local.module_path}/redis/helm_chart"
 
@@ -22,7 +22,7 @@ resource "helm_release" "redis" {
       },
       service = {
         name         = var.cache_internal.service
-        namespace    = var.app.namespace
+        namespace    = var.app_internal.namespace
         port         = var.cache_internal.port
         replicaCount = var.cache_resources.replicas
       }

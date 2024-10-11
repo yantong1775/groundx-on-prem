@@ -12,7 +12,7 @@ data "template_file" "init_database" {
 resource "kubernetes_config_map" "init_database_file" {
   metadata {
     name      = "init-database-file"
-    namespace = var.app.namespace
+    namespace = var.app_internal.namespace
   }
 
   data = {

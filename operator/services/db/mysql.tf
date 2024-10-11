@@ -12,7 +12,7 @@ resource "helm_release" "percona_operator" {
   depends_on = [null_resource.percona_helm_repo]
 
   name       = "${var.db_internal.service}-operator"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = var.db_internal.chart.operator
 
@@ -31,7 +31,7 @@ resource "helm_release" "percona_cluster" {
   depends_on = [helm_release.percona_operator]
 
   name       = "${var.db_internal.service}-cluster"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = var.db_internal.chart.db
 
@@ -93,8 +93,8 @@ resource "helm_release" "percona_cluster" {
           replication  = var.db.db_root_password
         }
         tls = {
-          cluster  = "${var.app.namespace}-cert"
-          internal = "${var.app.namespace}-cert"
+          cluster  = "${var.app_internal.namespace}-cert"
+          internal = "${var.app_internal.namespace}-cert"
         }
       }
       unsafeFlags = {

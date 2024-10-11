@@ -41,11 +41,14 @@ spec:
               fieldRef:
                 fieldPath: metadata.name
         workingDir: /workspace
+        # LOAD_MODEL=yes && LOCAL=0 && export PYTHONPATH=/workspace && celery -A summary.celery.appSummary worker -n summary-w1 --loglevel=INFO --concurrency=1 --queues=summary_inference_queue
         command:
-          - /bin/sh
+          - /bin/bash
           - -c
           - |
-            export PYTHONPATH=/workspace && supervisord -c /workspace/supervisord.conf
+            export PYTHONPATH=/workspace && while true; do sleep 30; done
+          #- |
+          #  export PYTHONPATH=/workspace && supervisord -c /workspace/supervisord.conf
         securityContext:
           runAsUser: {{ .Values.securityContext.runAsUser }}
         livenessProbe:

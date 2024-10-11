@@ -1,6 +1,6 @@
 resource "helm_release" "ranker_inference_service" {
   name       = "${var.ranker_internal.service}-inference-cluster"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
 
   chart      = "${local.module_path}/ranker/inference/helm_chart"
 
@@ -23,7 +23,7 @@ resource "helm_release" "ranker_inference_service" {
       }
       service = {
         name          = "${var.ranker_internal.service}-inference"
-        namespace     = var.app.namespace
+        namespace     = var.app_internal.namespace
         version       = var.ranker_internal.version
       }
     })

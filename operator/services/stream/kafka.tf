@@ -2,7 +2,7 @@ resource "helm_release" "strimzi_operator" {
   count = local.create_stream ? 1 : 0
 
   name       = "${var.stream_internal.service}-operator"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
   chart      = var.stream_internal.chart.url
   version    = var.stream_internal.chart.version
 
@@ -22,7 +22,7 @@ resource "helm_release" "kafka_cluster" {
   depends_on = [helm_release.strimzi_operator]
 
   name       = "${var.stream_internal.service}-cluster"
-  namespace  = var.app.namespace
+  namespace  = var.app_internal.namespace
   chart      = "${local.module_path}/kafka/helm_chart"
 
   values = [
