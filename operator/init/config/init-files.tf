@@ -1,12 +1,11 @@
-data "template_file" "init_database" {
-  template = file("${local.module_path}/mysql/init-db.sql")
-
-  vars = {
+locals {
+  init_db = templatefile(
+    "${local.module_path}/mysql/init-db.sql", {
     dbUserAPIKey = var.admin.api_key
     dbUserEmail  = var.admin.email
     dbUsername   = var.admin.username
-    searchIndex  = var.search.index
-  }
+    searchIndex  = var.search.index 
+  })
 }
 
 resource "kubernetes_config_map" "init_database_file" {
@@ -16,6 +15,6 @@ resource "kubernetes_config_map" "init_database_file" {
   }
 
   data = {
-    "init-db.sql" = data.template_file.init_database.rendered
+    "init-db.sql" = local.init_db
   }
 }

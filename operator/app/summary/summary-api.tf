@@ -13,7 +13,7 @@ resource "helm_release" "summary_api_service" {
       }
       image           = var.summary_internal.api.image
       nodeSelector    = {
-        node          = var.summary_internal.nodes.api
+        node          = var.cluster_internal.nodes.cpu_only
       }
       replicas        = var.summary_resources.api.replicas
       resources       = var.summary_resources.api.resources

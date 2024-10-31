@@ -14,7 +14,7 @@ resource "helm_release" "groundx_service" {
       }
       image = var.groundx_internal.image
       nodeSelector = {
-        node = var.groundx_internal.node
+        node = var.cluster_internal.nodes.cpu_only
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

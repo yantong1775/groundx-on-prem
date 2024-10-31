@@ -19,7 +19,7 @@ resource "helm_release" "percona_operator" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.db_internal.node
+        node = var.cluster_internal.nodes.cpu_memory
       }
     })
   ]
@@ -40,13 +40,13 @@ resource "helm_release" "percona_cluster" {
       backup = {
         enabled = var.db_internal.backup
         nodeSelector = {
-          node = var.db_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
       }
       haproxy = {
         enabled = true
         nodeSelector = {
-          node = var.db_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
         resources = var.db_resources.proxy.resources
         size    = var.db_resources.proxy.replicas
@@ -54,27 +54,27 @@ resource "helm_release" "percona_cluster" {
       logcollector = {
         enabled = var.db_internal.logcollector_enable
         nodeSelector = {
-          node = var.db_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
       }
       nodeSelector = {
-        node = var.db_internal.node
+        node = var.cluster_internal.nodes.cpu_memory
       }
       pmm = {
         enabled = var.db_internal.pmm_enable
         nodeSelector = {
-          node = var.db_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
       }
       proxysql = {
         enabled = false
         nodeSelector = {
-          node = var.db_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
       }
       pxc = {
         nodeSelector = {
-          node = var.db_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
         persistence = {
           size = var.db_resources.pv_size

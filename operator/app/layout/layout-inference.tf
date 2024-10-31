@@ -12,10 +12,9 @@ resource "helm_release" "layout_inference_service" {
         cache         = "${local.cache_settings.addr} ${local.cache_settings.port}"
         file          = "${local.file_settings.dependency} ${local.file_settings.port}"
       }
-      gpuMemory       = var.layout_resources.inference.gpuMemory
       image           = var.cluster.internet_access ? var.layout_internal.inference.image : var.layout_internal.inference.image_op
       nodeSelector    = {
-        node          = var.layout_internal.nodes.inference
+        node          = var.cluster_internal.nodes.gpu_layout
       }
       replicas        = var.layout_resources.inference.replicas
       securityContext = {

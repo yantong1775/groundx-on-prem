@@ -11,7 +11,7 @@ resource "helm_release" "ranker_api_service" {
       }
       image = var.ranker_internal.api.image
       nodeSelector = {
-        node = var.ranker_internal.nodes.api
+        node = var.cluster_internal.nodes.cpu_only
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

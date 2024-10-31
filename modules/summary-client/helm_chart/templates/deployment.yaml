@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.service.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: {{ .Values.service.name }}
@@ -48,6 +48,13 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 30
+        resources:
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"
         volumeMounts:
         - name: config-volume
           mountPath: /home/golang/.cashbot/config.yaml

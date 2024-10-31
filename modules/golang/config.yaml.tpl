@@ -13,7 +13,7 @@ ai:
       baseURL: ${searchBaseUrl}
       index: ${searchIndex}
       languages:
-      %{ for language in languages ~}
+      %{ for language in jsondecode(languages) ~}
         - ${language}
       %{ endfor ~}
       username: ${searchUser}
@@ -142,6 +142,7 @@ ssp:
 
 summaryServer:
   baseURL: http://${summaryService}.${namespace}.svc.cluster.local
+  maxConcurrent: ${summaryClientThreads}
   port: 8080
 
 upload:

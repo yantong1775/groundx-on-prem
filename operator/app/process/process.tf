@@ -10,7 +10,7 @@ resource "helm_release" "process_service" {
       }
       image = var.process_internal.image
       nodeSelector = {
-        node = var.process_internal.node
+        node = var.cluster_internal.nodes.cpu_only
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

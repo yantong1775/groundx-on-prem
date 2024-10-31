@@ -2,6 +2,81 @@
 
 This repository enables you to deploy the GroundX RAG document ingestion and search capabilities, developed by EyeLevel.ai, to a self-hosted Kubernetes cluster. The code has been tested on OpenShift ROSA on AWS.
 
+# Infrastructure Setup Instructions
+
+## Background
+
+This section describes how to set up a Kubernetes cluster in the following environments:
+
+  - Amazon Elastic Kubernetes Service (EKS)
+
+## Prerequisites
+
+Please ensure you have the following software tools installed before proceeding:
+
+1. Bash shell (version 4.0 or later recommended)
+2. Terraform, installed and available in your system PATH
+3. Environment credentials (e.g. AWS credentials)
+
+## Usage
+
+Deployments are managed using the `environment.sh` script found in the root of this repository.
+
+```
+./environment.sh [component] [options]
+```
+
+Component is the cloud environment or Kubernetes cluster configuration you wish to manage.
+
+### Cloud Environments
+- `aws`
+
+### Cluster Configurations
+- `eks`
+  - This will set up a new EKS cluster + the `cpu-memory` node group
+- `cpu-memory`
+  - A node group that balances CPU and RAM
+- `cpu-only`
+  - A node group that prioritizes CPU resources
+- `gpu-layout`
+  - A node that prioritizes GPU memory
+- `gpu-ranker`
+  - A node that balances CPU, RAM, and GPU memory
+- `gpu-summary`
+  - A node that has a minimum of 22 GB GPU memory
+
+### Options
+
+- `-c`: Clear (destroy) mode. Reverses the order of operations and destroys instead of deploys.
+- `-t`: Test mode. Skips the Terraform apply/destroy step, useful for dry runs.
+
+## Examples
+
+1. Create an EKS cluster and all none groups needed for operator deployment:
+   ```
+   ./environment.sh aws
+   ```
+
+2. Create an EKS cluster and the `cpu-memory` node group (must have at least 1 node group defined):
+   ```
+   ./environment.sh eks
+   ```
+
+3. Deploy the `cpu-only` node group:
+   ```
+   ./environment.sh cpu-only
+   ```
+
+4. Destroy the `cpu-only` node group definition:
+   ```
+   ./operator.sh cpu-only -c
+   ```
+
+5. Test deployment of the `cpu-only` node group definition:
+   ```
+   ./operator.sh cpu-only -t
+   ```
+
 # Helm Operator Instructions
 
 ## Prerequisites

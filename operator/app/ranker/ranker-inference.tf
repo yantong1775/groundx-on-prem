@@ -11,10 +11,9 @@ resource "helm_release" "ranker_inference_service" {
       dependencies    = {
         cache = "${local.cache_settings.addr} ${local.cache_settings.port}"
       }
-      gpuMemory       = var.ranker_resources.inference.gpuMemory
       image           = var.cluster.internet_access ? var.ranker_internal.inference.image : var.ranker_internal.inference.image_op
       nodeSelector = {
-        node = var.ranker_internal.nodes.inference
+        node = var.cluster_internal.nodes.gpu_ranker
       }
       replicas        = var.ranker_resources.replicas
       resources       = var.ranker_resources.resources

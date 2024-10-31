@@ -14,7 +14,7 @@ resource "helm_release" "layout_ocr_service" {
       }
       image = var.layout_internal.process.image
       nodeSelector    = {
-        node          = var.layout_internal.nodes.ocr
+        node          = var.cluster_internal.nodes.cpu_memory
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

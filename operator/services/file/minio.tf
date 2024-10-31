@@ -26,7 +26,7 @@ resource "helm_release" "minio_operator" {
           fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
         }
         nodeSelector = {
-          node = var.file_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
         replicaCount    = var.file_resources.operator.replicas
         securityContext = {
@@ -62,7 +62,7 @@ resource "helm_release" "minio_tenant" {
         }
         name = "${var.file_internal.service}-tenant"
         nodeSelector = {
-          node = var.file_internal.node
+          node = var.cluster_internal.nodes.cpu_memory
         }
         pools = [{
           containerSecurityContext = {
@@ -72,7 +72,7 @@ resource "helm_release" "minio_tenant" {
           }
           name = "${var.file_internal.service}-tenant-pool-0"
           nodeSelector = {
-            node = var.file_internal.node
+            node = var.cluster_internal.nodes.cpu_memory
           }
           securityContext = {
             runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)

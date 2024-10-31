@@ -13,10 +13,9 @@ resource "helm_release" "summary_inference_service" {
       dependencies    = {
         cache         = "${local.cache_settings.addr} ${local.cache_settings.port}"
       }
-      gpuMemory       = var.summary_resources.inference.gpuMemory
       image           = var.cluster.internet_access ? var.summary_internal.inference.image : var.summary_internal.inference.image_op
       nodeSelector    = {
-        node          = var.summary_internal.nodes.inference
+        node          = var.cluster_internal.nodes.gpu_summary
       }
       replicas        = var.summary_resources.inference.replicas
       resources       = var.summary_resources.inference.resources

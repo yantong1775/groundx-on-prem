@@ -10,8 +10,10 @@ resource "helm_release" "summary_client_service" {
       }
       image = var.summary_client_internal.image
       nodeSelector = {
-        node = var.summary_client_internal.node
+        node = var.cluster_internal.nodes.cpu_memory
       }
+      replicas        = var.summary_client_resources.replicas
+      resources       = var.summary_client_resources.resources
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
         runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001

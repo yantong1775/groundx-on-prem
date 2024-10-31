@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+. "${BASH_SOURCE%/*}/shared/util.sh"
 
 # valid_groups order is important:
 # the groups are executed in order for deploy
@@ -8,7 +10,7 @@ recursive_types=("init" "services" "app")
 
 valid_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload" "ranker" "layout" "summary")
 valid_init=("add" "config")
-valid_services=("cache" "db" "file" "search" "stream")
+valid_services=("cache" "db" "file" "graph" "search" "stream")
 
 # for helm release explicit clean up, in case terraform fails to clean up
 golang_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload")
@@ -35,7 +37,7 @@ else
   elif [[ " ${valid_services[@]} " =~ " $IN " ]]; then
     SERVICE=$IN
   else
-    echo "Unknown request type: $IN"
+    echo "Unknown request type: [\"$IN\"]"
     exit 1
   fi
 fi
@@ -62,23 +64,7 @@ while getopts ":ct" opt; do
   esac
 done
 
-deploy() {
-  local dir="$1"
-
-  if [[ -d "$dir" ]]; then
-    echo "Deploying $dir"
-    terraform -chdir="$dir" init
-    terraform -chdir="$dir" plan
-    if [[ "$TFLAG" -eq 1 ]]; then
-      echo "Skipping terraform apply"
-    else
-      terraform -chdir="$dir" apply --auto-approve
-    fi
-  else
-    echo "Error: Directory '$dir' does not exist."
-    exit 1
-  fi
-}
+return
 
 destroy() {
   local dir="$1"
@@ -114,22 +100,6 @@ destroy() {
         fi
       done
     fi
-  else
-    echo "Error: Directory '$dir' does not exist."
-    exit 1
-  fi
-}
-
-recurse_directories() {
-  local do=$1
-  local dir="$2"
-
-  if [[ -d "$dir" ]]; then
-    for sub_dir in "$dir"/*; do
-      if [[ -d "$sub_dir" ]]; then
-        $do "$sub_dir"
-      fi
-    done
   else
     echo "Error: Directory '$dir' does not exist."
     exit 1

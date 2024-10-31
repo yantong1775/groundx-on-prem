@@ -12,7 +12,7 @@ resource "helm_release" "layout_process_service" {
       }
       image = var.layout_internal.process.image
       nodeSelector    = {
-        node          = var.layout_internal.nodes.process
+        node          = var.cluster_internal.nodes.cpu_memory
       }
       queues = (
         var.layout.ocr.type == "google" ?

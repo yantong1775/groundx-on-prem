@@ -10,7 +10,7 @@ resource "helm_release" "redis" {
     yamlencode({
       image = var.cache_internal.image
       nodeSelector = {
-        node = var.cache_internal.node
+        node = var.cluster_internal.nodes.cpu_memory
       }
       persistence = {
         mountPath = var.cache_internal.mount_path

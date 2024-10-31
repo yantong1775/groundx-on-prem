@@ -1,7 +1,6 @@
-data "template_file" "config_yaml" {
-  template = file("${local.module_path}/golang/config.yaml.tpl")
-
-  vars = {
+locals {
+  config_yaml = templatefile(
+    "${local.module_path}/golang/config.yaml.tpl", {
     cacheAddr            = local.cache_settings.addr
     cacheNotCluster      = local.cache_settings.is_instance
     cachePort            = local.cache_settings.port
@@ -21,7 +20,7 @@ data "template_file" "config_yaml" {
     groundxService       = var.groundx_internal.service
     groundxServiceKey    = var.admin.api_key
     groundxUsername      = var.admin.username
-    languages            = var.app.languages
+    languages            = jsonencode(var.app.languages)
     layoutService        = "${var.layout_internal.service}-api"
     layoutWebhookService = var.layout_webhook_internal.service
     namespace            = var.app_internal.namespace
@@ -37,27 +36,14 @@ data "template_file" "config_yaml" {
     streamBaseUrl        = "${local.stream_settings.base_domain}:${local.stream_settings.port}"
     summaryApiKey        = local.summary_credentials.api_key
     summaryBaseUrl       = local.summary_credentials.base_url
+    summaryClientThreads = var.summary_client_resources.threads
     summaryService       = var.summary_internal.service
     uploadBucket         = local.file_settings.bucket
     uploadService        = var.upload_internal.service
-  }
-}
+  })
 
-resource "kubernetes_config_map" "cashbot_config_file" {
-  metadata {
-    name      = "config-yaml-map"
-    namespace = var.app_internal.namespace
-  }
-
-  data = {
-    "config.yaml" = data.template_file.config_yaml.rendered
-  }
-}
-
-data "template_file" "layout_config_py" {
-  template = file("${local.module_path}/layout/config.py.tpl")
-
-  vars = {
+  layout_config = templatefile(
+    "${local.module_path}/layout/config.py.tpl", {
     cacheAddr        = local.cache_settings.addr
     cachePort        = local.cache_settings.port
     deviceType       = var.layout_internal.models.device
@@ -73,6 +59,100 @@ data "template_file" "layout_config_py" {
     uploadBucket     = local.file_settings.bucket
     validAPIKey      = var.admin.api_key
     validUsername    = var.admin.username
+  })
+
+  layout_gunicorn = templatefile(
+    "${local.module_path}/layout/gunicorn_conf.py.tpl", {
+    threads = var.layout_resources.api.threads
+    workers = var.layout_resources.api.workers
+  })
+
+  layout_supervisord = "${
+    file(
+      "${local.module_path}/layout/supervisord.base.conf.tpl"
+    )
+  }\n${
+    join(
+      "\n",
+      [
+        for i in range(var.layout_resources.inference.workers) : templatefile("${local.module_path}/layout/supervisord.conf.tpl", {
+          worker_number = i + 1
+        })
+      ]
+    )
+  }"
+
+  ranker_config = templatefile(
+    "${local.module_path}/ranker/config.py.tpl", {
+    cacheAddr       = local.cache_settings.addr
+    cachePort       = local.cache_settings.port
+    deviceType      = var.ranker_internal.inference.device
+    rankerService   = var.ranker_internal.service
+    validAPIKey     = var.admin.api_key
+    validUsername   = var.admin.username
+  })
+
+  ranker_gunicorn = templatefile(
+    "${local.module_path}/ranker/gunicorn_conf.py.tpl", {
+    threads = var.ranker_resources.api.threads
+    workers = var.ranker_resources.api.workers
+  })
+
+  ranker_supervisord = "${
+    file(
+      "${local.module_path}/ranker/supervisord.base.conf.tpl"
+    )
+  }\n${
+    join(
+      "\n",
+      [
+        for i in range(var.ranker_resources.inference.workers) : templatefile("${local.module_path}/ranker/supervisord.conf.tpl", {
+          worker_number = i + 1
+        })
+      ]
+    )
+  }"
+
+  summary_config = templatefile(
+    "${local.module_path}/summary/config.py.tpl", {
+    cacheAddr        = local.cache_settings.addr
+    cachePort        = local.cache_settings.port
+    deviceType       = var.summary_internal.inference.device
+    summaryService   = var.summary_internal.service
+    validAPIKey      = var.admin.api_key
+    validUsername    = var.admin.username
+  })
+
+  summary_gunicorn = templatefile(
+    "${local.module_path}/summary/gunicorn_conf.py.tpl", {
+    threads = var.summary_resources.api.threads
+    workers = var.summary_resources.api.workers
+  })
+
+  summary_supervisord = "${
+    file(
+      "${local.module_path}/summary/supervisord.base.conf.tpl"
+    )
+  }\n${
+    join(
+      "\n",
+      [
+        for i in range(var.summary_resources.inference.workers) : templatefile("${local.module_path}/summary/supervisord.conf.tpl", {
+          worker_number = i + 1
+        })
+      ]
+    )
+  }"
+}
+
+resource "kubernetes_config_map" "cashbot_config_file" {
+  metadata {
+    name      = "config-yaml-map"
+    namespace = var.app_internal.namespace
+  }
+
+  data = {
+    "config.yaml" = local.config_yaml
   }
 }
 
@@ -83,16 +163,7 @@ resource "kubernetes_config_map" "layout_config_file" {
   }
 
   data = {
-    "config.py" = data.template_file.layout_config_py.rendered
-  }
-}
-
-data "template_file" "layout_gunicorn_conf_py" {
-  template = file("${local.module_path}/layout/gunicorn_conf.py.tpl")
-
-  vars = {
-    threads = var.layout_resources.api.threads
-    workers = var.layout_resources.api.workers
+    "config.py" = local.layout_config
   }
 }
 
@@ -103,7 +174,7 @@ resource "kubernetes_config_map" "layout_gunicorn_conf_file" {
   }
 
   data = {
-    "gunicorn_conf.py" = data.template_file.layout_gunicorn_conf_py.rendered
+    "gunicorn_conf.py" = local.layout_gunicorn
   }
 }
 
@@ -120,20 +191,6 @@ resource "kubernetes_config_map" "layout_ocr_credentials" {
   }
 }
 
-data "template_file" "layout_supervisord_16gb_workers" {
-  count = var.layout_resources.inference.workers
-
-  template = file("${local.module_path}/layout/supervisord.conf.tpl")
-
-  vars = {
-    worker_number = count.index + 1
-  }
-}
-
-data "template_file" "layout_supervisord_16gb_conf_template" {
-  template = "${file("${local.module_path}/layout/supervisord.base.conf.tpl")}\n${join("\n", data.template_file.layout_supervisord_16gb_workers[*].rendered)}"
-}
-
 resource "kubernetes_config_map" "layout_supervisord_16gb_conf" {
   metadata {
     name      = "layout-supervisord-16gb-conf-map"
@@ -141,29 +198,7 @@ resource "kubernetes_config_map" "layout_supervisord_16gb_conf" {
   }
 
   data = {
-    "supervisord.conf" = data.template_file.layout_supervisord_16gb_conf_template.rendered
-  }
-}
-
-data "template_file" "ranker_config_py" {
-  template = file("${local.module_path}/ranker/config.py.tpl")
-
-  vars = {
-    cacheAddr       = local.cache_settings.addr
-    cachePort       = local.cache_settings.port
-    deviceType      = var.ranker_internal.inference.device
-    rankerService   = var.ranker_internal.service
-    validAPIKey     = var.admin.api_key
-    validUsername   = var.admin.username
-  }
-}
-
-data "template_file" "ranker_gunicorn_conf_py" {
-  template = file("${local.module_path}/ranker/gunicorn_conf.py.tpl")
-
-  vars = {
-    threads = var.ranker_resources.api.threads
-    workers = var.ranker_resources.api.workers
+    "supervisord.conf" = local.layout_supervisord
   }
 }
 
@@ -174,7 +209,7 @@ resource "kubernetes_config_map" "ranker_gunicorn_conf_file" {
   }
 
   data = {
-    "gunicorn_conf.py" = data.template_file.ranker_gunicorn_conf_py.rendered
+    "gunicorn_conf.py" = local.ranker_gunicorn
   }
 }
 
@@ -185,22 +220,8 @@ resource "kubernetes_config_map" "ranker_config_file" {
   }
 
   data = {
-    "config.py" = data.template_file.ranker_config_py.rendered
+    "config.py" = local.ranker_config
   }
-}
-
-data "template_file" "ranker_supervisord_16gb_workers" {
-  count = var.ranker_resources.inference.workers
-
-  template = file("${local.module_path}/ranker/supervisord.conf.tpl")
-
-  vars = {
-    worker_number = count.index + 1
-  }
-}
-
-data "template_file" "ranker_supervisord_16gb_conf_template" {
-  template = "${file("${local.module_path}/ranker/supervisord.base.conf.tpl")}\n${join("\n", data.template_file.ranker_supervisord_16gb_workers[*].rendered)}"
 }
 
 resource "kubernetes_config_map" "ranker_supervisord_16gb_conf" {
@@ -210,20 +231,7 @@ resource "kubernetes_config_map" "ranker_supervisord_16gb_conf" {
   }
 
   data = {
-    "supervisord.conf" = data.template_file.ranker_supervisord_16gb_conf_template.rendered
-  }
-}
-
-data "template_file" "summary_config_py" {
-  template = file("${local.module_path}/summary/config.py.tpl")
-
-  vars = {
-    cacheAddr        = local.cache_settings.addr
-    cachePort        = local.cache_settings.port
-    deviceType       = var.summary_internal.inference.device
-    summaryService   = var.summary_internal.service
-    validAPIKey      = var.admin.api_key
-    validUsername    = var.admin.username
+    "supervisord.conf" = local.ranker_supervisord
   }
 }
 
@@ -234,16 +242,7 @@ resource "kubernetes_config_map" "summary_config_file" {
   }
 
   data = {
-    "config.py" = data.template_file.summary_config_py.rendered
-  }
-}
-
-data "template_file" "summary_gunicorn_conf_py" {
-  template = file("${local.module_path}/summary/gunicorn_conf.py.tpl")
-
-  vars = {
-    threads = var.summary_resources.api.threads
-    workers = var.summary_resources.api.workers
+    "config.py" = local.summary_config
   }
 }
 
@@ -254,22 +253,8 @@ resource "kubernetes_config_map" "summary_gunicorn_conf_file" {
   }
 
   data = {
-    "gunicorn_conf.py" = data.template_file.summary_gunicorn_conf_py.rendered
+    "gunicorn_conf.py" = local.summary_gunicorn
   }
-}
-
-data "template_file" "summary_supervisord_24gb_workers" {
-  count = var.summary_resources.inference.workers
-
-  template = file("${local.module_path}/summary/supervisord.conf.tpl")
-
-  vars = {
-    worker_number = count.index + 1
-  }
-}
-
-data "template_file" "summary_supervisord_24gb_conf_template" {
-  template = "${file("${local.module_path}/summary/supervisord.base.conf.tpl")}\n${join("\n", data.template_file.summary_supervisord_24gb_workers[*].rendered)}"
 }
 
 resource "kubernetes_config_map" "summary_supervisord_24gb_conf" {
@@ -279,6 +264,6 @@ resource "kubernetes_config_map" "summary_supervisord_24gb_conf" {
   }
 
   data = {
-    "supervisord.conf" = data.template_file.summary_supervisord_24gb_conf_template.rendered
+    "supervisord.conf" = local.summary_supervisord
   }
 }
