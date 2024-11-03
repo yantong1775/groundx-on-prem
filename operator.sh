@@ -64,8 +64,6 @@ while getopts ":ct" opt; do
   esac
 done
 
-return
-
 destroy() {
   local dir="$1"
 
@@ -94,6 +92,12 @@ destroy() {
         fi
       done
       for app in "${golang_apps[@]}"; do
+        if [[ "$dir" == */"$app" ]]; then
+          helm delete -n eyelevel $app-cluster > /dev/null 2>&1
+          return 0
+        fi
+      done
+      for app in "${helm_apps[@]}"; do
         if [[ "$dir" == */"$app" ]]; then
           helm delete -n eyelevel $app-cluster > /dev/null 2>&1
           return 0

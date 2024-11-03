@@ -56,7 +56,7 @@ must_have git
 
 build_command="buildx build"
 build_flag=true
-container_dirs="."
+container_dirs=$(get_containers)
 push_flag=true
 repo_target=""
 target="linux/amd64,linux/arm64"
@@ -76,11 +76,13 @@ do
         case $2 in
             *)
                 repo_target=$2
+                top="$(git rev-parse --show-toplevel)"
+                container_dirs=("$top/modules/$repo_target/container")
                 shift 2
             ;;
         esac
     ;;
-    -target)
+    -target|-t)
         case $2 in
             arm64|linux/arm64)
                 target="linux/arm64"

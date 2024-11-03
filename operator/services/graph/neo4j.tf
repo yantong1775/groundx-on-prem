@@ -10,6 +10,12 @@ resource "helm_release" "neo4j" {
 
   values = [
     yamlencode({
+      neo4j = {
+        acceptLicenseAgreement = "yes"
+        edition      = "eval"
+        name         = var.graph_internal.service
+        password     = "test"
+      }
       nodeSelector = {
         node = var.cluster_internal.nodes.cpu_memory
       }
@@ -17,11 +23,11 @@ resource "helm_release" "neo4j" {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
         runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
         fsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
-      },
-      service = {
-        name         = var.graph_internal.service
-        namespace    = var.app_internal.namespace
-        replicaCount = var.graph_resources.replicas
+      }
+      volumes      = {
+        data       = {
+          mode     = "defaultStorageClass"
+        }
       }
     })
   ]

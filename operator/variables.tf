@@ -164,9 +164,14 @@ variable "db_internal" {
   type                    = object({
     backup                = bool
     chart                 = object({
-      base                = string
-      db                  = string
-      operator            = string
+      db                  = object({
+        name              = string
+        version           = string
+      })
+      operator            = object({
+        name              = string
+        version           = string
+      })
       repository          = string
     })
     disable_unsafe_checks = bool
@@ -180,9 +185,14 @@ variable "db_internal" {
   default                 = {
     backup                = true
     chart                 = {
-      base                = "percona"
-      db                  = "percona/pxc-db"
-      operator            = "percona/pxc-operator"
+      db                  = {
+        name              = "pxc-db"
+        version           = "1.15.1"
+      }
+      operator            = {
+        name              = "pxc-operator"
+        version           = "1.15.1"
+      }
       repository          = "https://percona.github.io/percona-helm-charts"
     }
     disable_unsafe_checks = false
@@ -399,7 +409,7 @@ variable "graph_internal" {
   })
   default            = {
     chart            = {
-      name           = "neo4j/neo4j"
+      name           = "neo4j"
       url            = "https://helm.neo4j.com/neo4j"
       version        = "5.24.1"
     }

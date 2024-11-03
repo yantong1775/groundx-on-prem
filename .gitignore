@@ -53,6 +53,7 @@ terraform.rc
 docker-compose.override.yml
 
 # Other
+kubeconfig_eks
 .idea/
 .DS_Store
 *.crt

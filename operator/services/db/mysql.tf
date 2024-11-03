@@ -1,20 +1,12 @@
-resource "null_resource" "percona_helm_repo" {
-  count = local.create_database ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "helm repo add ${var.db_internal.chart.base} ${var.db_internal.chart.repository} && helm repo update"
-  }
-}
-
 resource "helm_release" "percona_operator" {
   count = local.create_database ? 1 : 0
-
-  depends_on = [null_resource.percona_helm_repo]
 
   name       = "${var.db_internal.service}-operator"
   namespace  = var.app_internal.namespace
 
-  chart      = var.db_internal.chart.operator
+  chart      = var.db_internal.chart.operator.name
+  repository = var.db_internal.chart.repository
+  version    = var.db_internal.chart.operator.version
 
   values = [
     yamlencode({
@@ -33,7 +25,9 @@ resource "helm_release" "percona_cluster" {
   name       = "${var.db_internal.service}-cluster"
   namespace  = var.app_internal.namespace
 
-  chart      = var.db_internal.chart.db
+  chart      = var.db_internal.chart.db.name
+  repository = var.db_internal.chart.repository
+  version    = var.db_internal.chart.db.version
 
   values = [
     yamlencode({
