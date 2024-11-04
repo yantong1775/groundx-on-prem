@@ -3,13 +3,15 @@
 variable "environment" {
   description              = "Environment information for the Kubernetes cluster"
   type                     = object({
-    cluster_role_arns      = list(string)
+    cluster_role_arns      = list(object({
+      arn                  = string
+      name                 = string
+    }))
     environment            = string
     region                 = string
-    ssh_key_name           = string
     subnets                = list(string)
+    ssh_key_name           = string
     vpc_id                 = string
-    vpc_security_group_ids = list(string)
   })
 }
 

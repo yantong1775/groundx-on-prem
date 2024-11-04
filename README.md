@@ -28,22 +28,13 @@ Deployments are managed using the `environment.sh` script found in the root of t
 
 Component is the cloud environment or Kubernetes cluster configuration you wish to manage.
 
-### Cloud Environments
-- `aws`
-
-### Cluster Configurations
+### Components
+- `aws-vpc`
+  - This will create a VPC and subnets for an EKS cluster
+  - The resulting VPC ID and subnet IDs are required parameters for EKS cluster setup
 - `eks`
-  - This will set up a new EKS cluster + the `cpu-memory` node group
-- `cpu-memory`
-  - A node group that balances CPU and RAM
-- `cpu-only`
-  - A node group that prioritizes CPU resources
-- `gpu-layout`
-  - A node that prioritizes GPU memory
-- `gpu-ranker`
-  - A node that balances CPU, RAM, and GPU memory
-- `gpu-summary`
-  - A node that has a minimum of 22 GB GPU memory
+  - This will set up a new EKS cluster
+  - You must configure the `environment` parameters in env.tfvars, including VPC and subnet IDs
 
 ### Options
 
@@ -52,29 +43,24 @@ Component is the cloud environment or Kubernetes cluster configuration you wish 
 
 ## Examples
 
-1. Create an EKS cluster and all none groups needed for operator deployment:
+1. Create a new VPC for EKS cluster setup:
    ```
-   ./environment.sh aws
+   ./environment.sh aws-vpc
    ```
 
-2. Create an EKS cluster and the `cpu-memory` node group (must have at least 1 node group defined):
+2. Create a new EKS cluster:
    ```
    ./environment.sh eks
    ```
 
-3. Deploy the `cpu-only` node group:
+3. Destroy the EKS cluster:
    ```
-   ./environment.sh cpu-only
-   ```
-
-4. Destroy the `cpu-only` node group definition:
-   ```
-   ./operator.sh cpu-only -c
+   ./operator.sh eks -c
    ```
 
-5. Test deployment of the `cpu-only` node group definition:
+4. Test deployment of the EKS cluster without making any changes to the AWS account:
    ```
-   ./operator.sh cpu-only -t
+   ./operator.sh eks -t
    ```
 
 # Helm Operator Instructions

@@ -5,13 +5,14 @@
 must_have aws
 must_have terraform
 
-valid_envs=("aws")
-recursive_types=("aws")
+valid_envs=()
+recursive_types=()
 
-valid_aws=("eks" "cpu-memory" "cpu-only" "gpu-layout" "gpu-ranker" "gpu-summary")
+valid_aws=("eks" "aws-vpc")
 
 ENV=""
 AWS=""
+BASE="environment"
 
 if [[ "$1" =~ ^- ]]; then
   IN=""
@@ -21,10 +22,6 @@ else
 
   if [[ " ${valid_envs[@]} " =~ " $IN " ]]; then
     ENV=$IN
-
-    if [[ "$ENV" == "aws" ]]; then
-      test_aws || { error "aws command isn't working (are you authorized?)"; exit 2; }
-    fi
   elif [[ " ${valid_aws[@]} " =~ " $IN " ]]; then
     AWS=$IN
 
@@ -87,34 +84,25 @@ if [[ -n "$ENV" ]]; then
     if [[ " ${recursive_types[@]} " =~ " $ENV " ]]; then
       if [[ "$CLEAR" -ne 1 ]]; then
         if [[ "$ENV" == "aws" ]]; then
-          $do "environment/$ENV"
+          $do "$BASE/$ENV"
         fi
       fi
-      recurse_directories $do "environment/$ENV"
+      recurse_directories $do "$BASE/$ENV"
       if [[ "$CLEAR" -eq 1 ]]; then
         if [[ "$ENV" == "aws" ]]; then
-          $do "environment/$ENV"
+          $do "$BASE/$ENV"
         fi
       fi
     else
-      $do "environment/$ENV"
+      $do "$BASE/$ENV"
     fi
   else
     { error "Unknown request type: [$ENV]"; exit 1; }
   fi
 elif [[ -n "$AWS" ]]; then
   if [[ "$AWS" == "eks" ]]; then
-    $do "environment/aws"
-  else
-    $do "environment/aws/$AWS"
+    $do "$BASE/aws/eks"
+  elif [[ "$AWS" == "aws-vpc" ]]; then
+    $do "$BASE/aws/vpc"
   fi
-else
-  #for dir in "${valid_envs[@]}"; do
-  #  if [[ " ${recursive_types[@]} " =~ " $dir " ]]; then
-  #    recurse_directories $do "environment/$dir"
-  #  else
-  #    $do "environment/$dir"
-  #  fi
-  #done
-  echo 'all'
 fi

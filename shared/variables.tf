@@ -27,23 +27,31 @@ variable "cluster" {
 }
 
 variable "cluster_internal" {
-  description = "Kubernetes cluster internal settings"
-  type        = object({
-    nodes     = object({
+  description     = "Kubernetes cluster internal settings"
+  type            = object({
+    nodes         = object({
       cpu_only    = string
       cpu_memory  = string
       gpu_layout  = string
       gpu_ranker  = string
       gpu_summary = string
     })
+    pv            = object({
+      name        = string
+      type        = string
+    })
   })
-  default = {
-    nodes = {
+  default         = {
+    nodes         = {
       cpu_only    = "cpu-only"
       cpu_memory  = "cpu-memory"
       gpu_layout  = "gpu-layout"
       gpu_ranker  = "gpu-ranker"
       gpu_summary = "gpu-summary"
+    }
+    pv            = {
+      name        = "ebs-gp2"
+      type        = "gp2"
     }
   }
 }
