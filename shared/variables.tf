@@ -3,6 +3,9 @@
 variable "cluster" {
   description = "Information about the Kubernetes cluster"
   type        = object({
+    # hosting environment
+    # valid values: aws, self
+    environment      = string
     # has external internet access
     internet_access  = bool
 
@@ -11,9 +14,13 @@ variable "cluster" {
 
     # admin or developer
     role             = string
+
+    # type of Kubernetes cluster
+    # valid values: eks, openshift
     type             = string
   })
   default = {
+    environment      = "aws"
     internet_access  = true
     kube_config_path = "~/.kube/config"
     name             = "eyelevel"

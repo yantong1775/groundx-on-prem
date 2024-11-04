@@ -52,7 +52,7 @@ module "eyelevel_eks" {
       labels                               = var.nodes.node_groups.cpu_memory_nodes.labels
 
       tags                                 = {
-        Environment                        = var.environment.environment
+        Environment                        = var.environment.stage
         Name                               = var.nodes.node_groups.cpu_memory_nodes.name
         Terraform                          = "true"
       }
@@ -73,7 +73,7 @@ module "eyelevel_eks" {
       labels                               = var.nodes.node_groups.cpu_only_nodes.labels
 
       tags                                 = {
-        Environment                        = var.environment.environment
+        Environment                        = var.environment.stage
         Name                               = var.nodes.node_groups.cpu_only_nodes.name
         Terraform                          = "true"
       }
@@ -94,7 +94,7 @@ module "eyelevel_eks" {
       labels                               = var.nodes.node_groups.layout_nodes.labels
 
       tags                                 = {
-        Environment                        = var.environment.environment
+        Environment                        = var.environment.stage
         Name                               = var.nodes.node_groups.layout_nodes.name
         Terraform                          = "true"
       }
@@ -115,7 +115,7 @@ module "eyelevel_eks" {
       labels                               = var.nodes.node_groups.ranker_nodes.labels
 
       tags                                 = {
-        Environment                        = var.environment.environment
+        Environment                        = var.environment.stage
         Name                               = var.nodes.node_groups.ranker_nodes.name
         Terraform                          = "true"
       }
@@ -136,7 +136,7 @@ module "eyelevel_eks" {
       labels                               = var.nodes.node_groups.summary_nodes.labels
 
       tags                                 = {
-        Environment                        = var.environment.environment
+        Environment                        = var.environment.stage
         Name                               = var.nodes.node_groups.summary_nodes.name
         Terraform                          = "true"
       }

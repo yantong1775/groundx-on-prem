@@ -1,5 +1,5 @@
 resource "kubernetes_storage_class" "eyelevel_ebs_pv" {
-  depends_on = [module.eyelevel_eks]
+  count = var.cluster.environment == "aws" ? 1 : 0
 
   metadata {
     name = "${var.cluster.name}-${var.cluster_internal.pv.name}"

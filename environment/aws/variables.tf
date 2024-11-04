@@ -7,10 +7,10 @@ variable "environment" {
       arn                  = string
       name                 = string
     }))
-    environment            = string
     region                 = string
-    subnets                = list(string)
     ssh_key_name           = string
+    stage                  = string
+    subnets                = list(string)
     vpc_id                 = string
   })
 }
