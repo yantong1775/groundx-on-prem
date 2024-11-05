@@ -13,6 +13,8 @@ resource "helm_release" "ranker_api_service" {
       nodeSelector = {
         node = var.cluster_internal.nodes.cpu_only
       }
+      replicas        = var.ranker_resources.api.replicas
+      resources       = var.ranker_resources.api.resources
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

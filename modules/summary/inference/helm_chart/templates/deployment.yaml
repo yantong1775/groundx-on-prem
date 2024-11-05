@@ -73,6 +73,9 @@ spec:
             memory: "{{ .Values.resources.requests.memory }}"
             nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
         volumeMounts:
+        - name: config-models
+          mountPath: /workspace/config_models.py
+          subPath: config_models.py
         - name: config-volume
           mountPath: /workspace/config.py
           subPath: config.py
@@ -80,6 +83,9 @@ spec:
           mountPath: /workspace/supervisord.conf
           subPath: supervisord.conf
       volumes:
+      - name: config-models
+        configMap:
+          name: config-models-map
       - name: config-volume
         configMap:
           name: summary-config-py-map

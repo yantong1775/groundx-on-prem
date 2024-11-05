@@ -8,6 +8,7 @@ resource "helm_release" "ranker_inference_service" {
 
   values = [
     yamlencode({
+      createSymlink   = local.is_openshift ? false : true
       dependencies    = {
         cache = "${local.cache_settings.addr} ${local.cache_settings.port}"
       }
@@ -15,8 +16,8 @@ resource "helm_release" "ranker_inference_service" {
       nodeSelector = {
         node = var.cluster_internal.nodes.gpu_ranker
       }
-      replicas        = var.ranker_resources.replicas
-      resources       = var.ranker_resources.resources
+      replicas        = var.ranker_resources.inference.replicas
+      resources       = var.ranker_resources.inference.resources
       securityContext = {
         runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

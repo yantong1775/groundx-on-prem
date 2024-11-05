@@ -3,7 +3,7 @@ _mysql: &mysql
   rw_addr: ${dbRW}
   user: ${dbUser}
   password: ${dbPassword}
-  database: ${dbName}
+  database: ${dbName} 
   maxIdle: 5
   maxOpen: 10
 
@@ -14,8 +14,9 @@ ai:
       index: ${searchIndex}
       languages:
       %{ for language in jsondecode(languages) ~}
-        - ${language}
+  - ${language}
       %{ endfor ~}
+# formating in for loop is weird, this comment is needed
       username: ${searchUser}
       password: ${searchPassword}
   eyelevelSearch:

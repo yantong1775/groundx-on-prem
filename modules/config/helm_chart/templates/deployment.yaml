@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: create-ldconfig-symlink
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: create-ldconfig-symlink
+  template:
+    metadata:
+      labels:
+        app: create-ldconfig-symlink
+    spec:
+      containers:
+      - name: create-symlink
+        image: amazonlinux:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            # Ensure /sbin/ldconfig.real points to /sbin/ldconfig
+            if [ ! -L /sbin/ldconfig.real ]; then
+              ln -s /sbin/ldconfig /sbin/ldconfig.real
+            fi
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - mountPath: /sbin
+            name: sbin
+      hostNetwork: true
+      hostPID: true
+      tolerations:
+        - operator: "Exists"
+      volumes:
+        - name: sbin
+          hostPath:
+            path: /sbin

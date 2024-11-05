@@ -17,6 +17,7 @@ golang_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary
 inference_apps=("ranker" "summary")
 inference_process_apps=("layout")
 
+ALL=false
 GROUP=""
 APP=""
 INIT=""
@@ -36,6 +37,8 @@ else
     INIT=$IN
   elif [[ " ${valid_services[@]} " =~ " $IN " ]]; then
     SERVICE=$IN
+  elif [[ $IN == "" ]]; then
+    ALL=true
   else
     echo "Unknown request type: [\"$IN\"]"
     exit 1
@@ -88,6 +91,7 @@ destroy() {
           helm delete -n eyelevel $app-api-cluster > /dev/null 2>&1
           helm delete -n eyelevel $app-inference-cluster > /dev/null 2>&1
           helm delete -n eyelevel $app-process > /dev/null 2>&1
+          helm delete -n eyelevel $app-ocr > /dev/null 2>&1
           return 0
         fi
       done

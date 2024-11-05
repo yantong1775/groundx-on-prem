@@ -1,6 +1,8 @@
 locals {
+  config_models = templatefile("${local.module_path}/config/config_models.py.tpl", {})
+
   config_yaml = templatefile(
-    "${local.module_path}/golang/config.yaml.tpl", {
+    "${local.module_path}/config/config.yaml.tpl", {
     cacheAddr            = local.cache_settings.addr
     cacheNotCluster      = local.cache_settings.is_instance
     cachePort            = local.cache_settings.port
@@ -66,6 +68,8 @@ locals {
     threads = var.layout_resources.api.threads
     workers = var.layout_resources.api.workers
   })
+
+  layout_ocr_data = var.layout.ocr.credentials != "" ? file("${path.module}/../../../${var.layout.ocr.credentials}") : ""
 
   layout_supervisord = "${
     file(
@@ -156,6 +160,17 @@ resource "kubernetes_config_map" "cashbot_config_file" {
   }
 }
 
+resource "kubernetes_config_map" "config_models" {
+  metadata {
+    name      = "config-models-map"
+    namespace = var.app_internal.namespace
+  }
+
+  data = {
+    "config_models.py" = local.config_models
+  }
+}
+
 resource "kubernetes_config_map" "layout_config_file" {
   metadata {
     name      = "layout-config-py-map"
@@ -179,15 +194,13 @@ resource "kubernetes_config_map" "layout_gunicorn_conf_file" {
 }
 
 resource "kubernetes_config_map" "layout_ocr_credentials" {
-  count = var.layout.ocr.credentials == "" || var.layout.ocr.type != "google" ? 0 : 1
-
   metadata {
     name      = "layout-ocr-credentials-map"
     namespace = var.app_internal.namespace
   }
 
   data = {
-    "credentials.json" = file("${path.module}/../../../${var.layout.ocr.credentials}")
+    "credentials.json" = local.layout_ocr_data
   }
 }
 

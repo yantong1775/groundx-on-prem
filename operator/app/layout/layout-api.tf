@@ -13,6 +13,8 @@ resource "helm_release" "layout_api_service" {
       nodeSelector    = {
         node          = var.cluster_internal.nodes.cpu_only
       }
+      replicas        = var.layout_resources.api.replicas
+      resources       = var.layout_resources.api.resources
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

@@ -1,21 +1,12 @@
-resource "null_resource" "minio_helm_repo" {
-  count = local.create_file ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "helm repo add ${var.file_internal.chart_base} ${var.file_internal.chart_repository} && helm repo update"
-  }
-}
-
 resource "helm_release" "minio_operator" {
   count = local.create_file ? 1 : 0
-
-  depends_on = [null_resource.minio_helm_repo]
 
   name       = "${var.file_internal.service}-operator"
   namespace  = var.app_internal.namespace
 
-  chart      = var.file_internal.operator.chart
-  version    = var.file_internal.operator.chart_version
+  chart      = var.file_internal.chart.operator.name
+  repository = var.file_internal.chart.repository
+  version    = var.file_internal.chart.operator.version
 
   values = [
     yamlencode({
@@ -47,8 +38,9 @@ resource "helm_release" "minio_tenant" {
   name       = "${var.file_internal.service}-tenant"
   namespace  = var.app_internal.namespace
 
-  chart      = var.file_internal.tenant.chart
-  version    = var.file_internal.tenant.chart_version
+  chart      = var.file_internal.chart.tenant.name
+  repository = var.file_internal.chart.repository
+  version    = var.file_internal.chart.tenant.version
 
   values = [
     yamlencode({

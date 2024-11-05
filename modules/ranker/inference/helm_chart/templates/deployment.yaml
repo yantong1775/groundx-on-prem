@@ -26,7 +26,28 @@ spec:
       - name: wait-for-cache
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
-        command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"] 
+        command: ["sh", "-c", "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"] 
+      {{- if .Values.createSymlink }}
+      - name: setup-symlink
+        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
+        imagePullPolicy: "Always"
+        command: ['sh', '-c', "
+          if [ -f /sbin/ldconfig ]; then
+            echo 'ldconfig already exists in /sbin';
+          elif [ -f /usr/sbin/ldconfig ]; then
+            ln -s /usr/sbin/ldconfig /sbin/ldconfig.real;
+          elif [ -f /bin/ldconfig ]; then
+            ln -s /bin/ldconfig /sbin/ldconfig.real;
+          elif [ -f /usr/bin/ldconfig ]; then
+            ln -s /usr/bin/ldconfig /sbin/ldconfig.real;
+          else
+            echo 'ldconfig not found in expected locations';
+            exit 31;
+          fi
+        "]
+        securityContext:
+          privileged: true
+      {{- end }}
       containers:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -70,6 +91,9 @@ spec:
             memory: "{{ .Values.resources.requests.memory }}"
             nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
         volumeMounts:
+        - name: config-models
+          mountPath: /workspace/config_models.py
+          subPath: config_models.py
         - name: config-volume
           mountPath: /workspace/config.py
           subPath: config.py
@@ -77,6 +101,9 @@ spec:
           mountPath: /workspace/supervisord.conf
           subPath: supervisord.conf
       volumes:
+      - name: config-models
+        configMap:
+          name: config-models-map
       - name: config-volume
         configMap:
           name: ranker-config-py-map

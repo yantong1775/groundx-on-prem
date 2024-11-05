@@ -15,12 +15,16 @@ variable "admin" {
 }
 
 variable "app" {
-  description = "EyeLevel application information"
-  type        = object({
-    languages = list(string)
+  description       = "EyeLevel application information"
+  type              = object({
+    graph           = bool
+    languages       = list(string)
+    search          = bool
   })
-  default = {
-    languages = ["en"]
+  default           = {
+    graph           = false
+    languages       = ["en"]
+    search          = true
   }
 }
 
@@ -30,7 +34,7 @@ variable "app_internal" {
     namespace = string
     pv_class  = string
   })
-  default = {
+  default     = {
     namespace = "eyelevel"
     pv_class  = "empty"
   }
@@ -99,15 +103,15 @@ variable "cache_resources" {
     })
   })
   default      = {
-    replicas   = 3
+    replicas   = 1
     resources  = {
       limits   = {
         cpu    = "2"
-        memory = "16Gi"
+        memory = "4Gi"
       }
       requests = {
         cpu    = "2"
-        memory = "16Gi"
+        memory = "4Gi"
       }
     }
   }
@@ -183,7 +187,7 @@ variable "db_internal" {
     version               = string
   })
   default                 = {
-    backup                = true
+    backup                = false
     chart                 = {
       db                  = {
         name              = "pxc-db"
@@ -195,9 +199,9 @@ variable "db_internal" {
       }
       repository          = "https://percona.github.io/percona-helm-charts"
     }
-    disable_unsafe_checks = false
+    disable_unsafe_checks = true
     ip_type               = "ClusterIP"
-    logcollector_enable   = true
+    logcollector_enable   = false
     pmm_enable            = false
     port                  = 3306
     service               = "mysql"
@@ -236,7 +240,7 @@ variable "db_resources" {
   })
   default        = {
     proxy        = {
-      replicas   = 3
+      replicas   = 1
       resources  = {
         limits   = {
           cpu    = "600m"
@@ -249,7 +253,7 @@ variable "db_resources" {
       }
     }
     pv_size      = "20Gi"
-    replicas     = 3
+    replicas     = 1
     resources    = {
       limits     = {
         cpu      = "600m"
@@ -305,35 +309,37 @@ variable "file_existing" {
 variable "file_internal" {
   description        = "Database internal settings"
   type               = object({
-    chart_base       = string
-    chart_repository = string
-    operator         = object({
-      chart          = string
-      chart_version  = string
+    chart            = object({
+      operator       = object({
+        name         = string
+        version      = string
+      })
+      repository     = string
+      tenant         = object({
+        name         = string
+        version      = string
+      })
     })
     port             = number
     pv_access        = string
     service          = string
-    tenant           = object({
-      chart          = string
-      chart_version  = string
-    })
     version          = string
   })
   default            = {
-    chart_base       = "minio-operator"
-    chart_repository = "https://operator.min.io"
-    operator         = {
-      chart          = "minio-operator/operator"
-      chart_version  = "6.0.3"
+    chart            = {
+      operator       = {
+        name         = "operator"
+        version      = "6.0.3"
+      }
+      repository     = "https://operator.min.io"
+      tenant         = {
+        name         = "tenant"
+        version      = "6.0.3"
+      }
     }
     port             = 9000
     pv_access        = "ReadWriteMany"
     service          = "minio"
-    tenant           = {
-      chart          = "minio-operator/tenant"
-      chart_version  = "6.0.3"
-    }
     version          = "6.0.3"
   }
 }
@@ -362,11 +368,11 @@ variable "file_resources" {
   })
   default               = {
     operator            = {
-      replicas          = 2
+      replicas          = 1
     }
-    pool_size           = "1Ti"
-    pool_servers        = 4
-    pool_server_volumes = 4
+    pool_size           = "50Gi"
+    pool_servers        = 1
+    pool_server_volumes = 1
     pv_path             = "/Users/USER/mnt/minio"
     resources           = {
       limits            = {
@@ -433,15 +439,15 @@ variable "graph_resources" {
     })
   })
   default      = {
-    replicas   = 3
+    replicas   = 1
     resources  = {
       limits   = {
-        cpu    = "2"
-        memory = "16Gi"
+        cpu    = "1"
+        memory = "4Gi"
       }
       requests = {
-        cpu    = "2"
-        memory = "16Gi"
+        cpu    = "0.5"
+        memory = "2Gi"
       }
     }
   }
@@ -971,7 +977,7 @@ variable "search_resources" {
   })
   default         = {
     pv_size       = "20Gi"
-    replicas      = 3
+    replicas      = 1
     resources     = {
       requests    = {
         cpu       = "1"
@@ -1013,15 +1019,18 @@ variable "stream_internal" {
   description = "Stream internal settings"
   type        = object({
     chart     = object({
+      name    = string
       url     = string
       version = string
     })
+    
     port      = number
     service   = string
     version   = string
   })
   default     = {
     chart     = {
+      name    = ""
       url     = "oci://quay.io/strimzi-helm/strimzi-kafka-operator"
       version = "0.35.0"
     }
@@ -1061,28 +1070,28 @@ variable "stream_resources" {
   })
   default           = {
     operator        = {
-      replicas      = 3
+      replicas      = 1
     }
     partitions      = 3
     resources       = {
       limits        = {
-        cpu         = "4"
-        memory      = "8Gi"
-      }
-      requests      = {
         cpu         = "2"
         memory      = "4Gi"
+      }
+      requests      = {
+        cpu         = "1"
+        memory      = "2Gi"
       }
     }
     retention_bytes = 1073741824
     segment_bytes   = 1073741824
     service         = {
-      replicas      = 3
-      storage       = "20Gi"
+      replicas      = 2
+      storage       = "10Gi"
     }
     zookeeper       = {
-      replicas      = 3
-      storage       = "10Gi"
+      replicas      = 1
+      storage       = "5Gi"
     }
   }
 }

@@ -6,6 +6,10 @@ variable "cluster" {
     # hosting environment
     # valid values: aws, self
     environment      = string
+
+    # set to true if the NVIDIA operator is already installed
+    has_nvidia       = bool
+
     # has external internet access
     internet_access  = bool
 
@@ -21,6 +25,7 @@ variable "cluster" {
   })
   default = {
     environment      = "aws"
+    has_nvidia       = false
     internet_access  = true
     kube_config_path = "~/.kube/config"
     name             = "eyelevel"
@@ -34,31 +39,51 @@ variable "cluster" {
 }
 
 variable "cluster_internal" {
-  description     = "Kubernetes cluster internal settings"
-  type            = object({
-    nodes         = object({
-      cpu_only    = string
-      cpu_memory  = string
-      gpu_layout  = string
-      gpu_ranker  = string
-      gpu_summary = string
+  description      = "Kubernetes cluster internal settings"
+  type             = object({
+    nodes          = object({
+      cpu_memory   = string
+      cpu_only     = string
+      gpu_layout   = string
+      gpu_ranker   = string
+      gpu_summary  = string
     })
-    pv            = object({
-      name        = string
-      type        = string
+    nvidia         = object({
+      driver       = string
+      name         = string
+      namespace    = string
+      chart        = object({
+        name       = string
+        repository = string
+        version    = string
+      })
+    })
+    pv             = object({
+      name         = string
+      type         = string
     })
   })
-  default         = {
-    nodes         = {
-      cpu_only    = "cpu-only"
-      cpu_memory  = "cpu-memory"
-      gpu_layout  = "gpu-layout"
-      gpu_ranker  = "gpu-ranker"
-      gpu_summary = "gpu-summary"
+  default          = {
+    nodes          = {
+      cpu_memory   = "eyelevel-cpu-memory"
+      cpu_only     = "eyelevel-cpu-only"
+      gpu_layout   = "eyelevel-gpu-layout"
+      gpu_ranker   = "eyelevel-gpu-ranker"
+      gpu_summary  = "eyelevel-gpu-summary"
     }
-    pv            = {
-      name        = "ebs-gp2"
-      type        = "gp2"
+    nvidia         = {
+      driver       = "550.54.15"
+      name         = "nvidia-gpu-operator"
+      namespace    = "nvidia-gpu-operator"
+      chart        = {
+        name       = "gpu-operator"
+        repository = "https://helm.ngc.nvidia.com/nvidia"
+        version    = "v23.9.2"
+      }
+    }
+    pv             = {
+      name         = "eyelevel-ebs-gp3"
+      type         = "gp3"
     }
   }
 }

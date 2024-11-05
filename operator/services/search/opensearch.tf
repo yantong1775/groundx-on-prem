@@ -35,15 +35,15 @@ resource "helm_release" "opensearch_operator" {
         size = var.search_resources.pv_size
       }
       podSecurityContext = {
-        runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
+        runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
       }
       plugins = var.search.plugins
       replicas = var.search_resources.replicas
       resources = var.search_resources.resources
       securityContext = {
-        runAsUser    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
         runAsNonRoot = true
+        runAsUser    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
       }
       singleNode = var.search_resources.replicas == 1
     })

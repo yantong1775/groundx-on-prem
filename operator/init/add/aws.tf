@@ -2,7 +2,10 @@ resource "kubernetes_storage_class" "eyelevel_ebs_pv" {
   count = var.cluster.environment == "aws" ? 1 : 0
 
   metadata {
-    name = "${var.cluster.name}-${var.cluster_internal.pv.name}"
+    name = "${var.cluster_internal.pv.name}"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
   }
 
   storage_provisioner  = "ebs.csi.aws.com"

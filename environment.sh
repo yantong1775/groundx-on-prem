@@ -5,10 +5,10 @@
 must_have aws
 must_have terraform
 
-valid_envs=()
-recursive_types=()
+valid_envs=("aws")
+recursive_types=("aws")
 
-valid_aws=("eks" "aws-vpc")
+valid_aws=("aws-vpc" "eks")
 
 ENV=""
 AWS=""
@@ -22,6 +22,9 @@ else
 
   if [[ " ${valid_envs[@]} " =~ " $IN " ]]; then
     ENV=$IN
+    if [[ "$ENV" == "aws" ]]; then
+      test_aws || { error "aws command isn't working (are you authorized?)"; exit 2; }
+    fi
   elif [[ " ${valid_aws[@]} " =~ " $IN " ]]; then
     AWS=$IN
 
@@ -70,28 +73,31 @@ destroy() {
 do=deploy
 if [[ "$CLEAR" -eq 1 ]]; then
   do=destroy
-  reversed_envs=()
 
+  reversed_envs=()
   for (( idx=${#valid_envs[@]}-1 ; idx>=0 ; idx-- )) ; do
       reversed_envs+=("${valid_envs[$idx]}")
   done
-
   valid_envs=("${reversed_envs[@]}")
+
+  reversed_aws=()
+  for (( idx=${#valid_aws[@]}-1 ; idx>=0 ; idx-- )) ; do
+      reversed_aws+=("${valid_aws[$idx]}")
+  done
+  valid_aws=("${reversed_aws[@]}")
 fi
 
 if [[ -n "$ENV" ]]; then
   if [[ " ${valid_envs[@]} " =~ " $ENV " ]]; then
+    if [[ "$CLEAR" -eq 1 ]]; then
+      ./operator.sh -c
+    fi
+
     if [[ " ${recursive_types[@]} " =~ " $ENV " ]]; then
-      if [[ "$CLEAR" -ne 1 ]]; then
-        if [[ "$ENV" == "aws" ]]; then
-          $do "$BASE/$ENV"
-        fi
-      fi
-      recurse_directories $do "$BASE/$ENV"
-      if [[ "$CLEAR" -eq 1 ]]; then
-        if [[ "$ENV" == "aws" ]]; then
-          $do "$BASE/$ENV"
-        fi
+      if [[ "$ENV" == "aws" ]]; then
+        recurse_ordered $do "$BASE" "$ENV" "${valid_aws[@]}"
+      else
+        recurse_directories $do "$BASE/$ENV"
       fi
     else
       $do "$BASE/$ENV"

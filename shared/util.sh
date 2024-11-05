@@ -47,6 +47,26 @@ recurse_directories() {
   fi
 }
 
+recurse_ordered() {
+  local do=$1
+  shift
+  local base="$1"
+  shift
+  local env="$1"
+  shift
+  local dirs=("$@")
+
+  for i in "${!dirs[@]}"; do
+    dirs[$i]="$base/$env/${dirs[$i]#${env}-}"
+  done
+
+  for sub_dir in "${dirs[@]}"; do
+    if [[ -d "$sub_dir" ]]; then
+      $do "$sub_dir"
+    fi
+  done
+}
+
 status() { echo -ne "\e[37;1m$@: \e[0m"; }
 
 test_aws() {

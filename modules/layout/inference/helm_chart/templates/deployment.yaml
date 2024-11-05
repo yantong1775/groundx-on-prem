@@ -70,6 +70,9 @@ spec:
           requests:
             nvidia.com/gpu: {{ .Values.replicas }}
         volumeMounts:
+        - name: config-models
+          mountPath: /app/config_models.py
+          subPath: config_models.py
         - name: config-volume
           mountPath: /app/config.py
           subPath: config.py
@@ -77,6 +80,9 @@ spec:
           mountPath: /app/supervisord.conf
           subPath: supervisord.conf
       volumes:
+      - name: config-models
+        configMap:
+          name: config-models-map
       - name: config-volume
         configMap:
           name: layout-config-py-map

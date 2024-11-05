@@ -1,1 +1,1 @@
-../../../shared/common.tf
+../../common.tf

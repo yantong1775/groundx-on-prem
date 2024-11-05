@@ -32,9 +32,6 @@ resource "helm_release" "kafka_cluster" {
       }
       resources = var.stream_resources.resources
       service = {
-        nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
-        }
         partitions      = var.stream_resources.partitions
         port            = var.stream_internal.port
         replicas        = var.stream_resources.service.replicas
@@ -46,9 +43,6 @@ resource "helm_release" "kafka_cluster" {
         version = var.stream_internal.version
       }
       zookeeper = {
-        nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
-        }
         replicas = var.stream_resources.zookeeper.replicas
         storage  = {
           size = var.stream_resources.zookeeper.storage
