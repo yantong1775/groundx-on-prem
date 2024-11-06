@@ -866,7 +866,7 @@ variable "ranker_resources" {
       workers    = 2
     }
     inference    = {
-      replicas   = 1
+      replicas   = 3
       resources  = {
         limits   = {
           cpu    = "4"
@@ -879,7 +879,7 @@ variable "ranker_resources" {
           gpu    = 1
         }
       }
-      workers    = 10
+      workers    = 14
     }
   }
 }
@@ -1216,7 +1216,7 @@ variable "summary_resources" {
       workers    = 2
     }
     inference    = {
-      replicas   = 1
+      replicas   = 2
       resources  = {
         limits   = {
           cpu    = "3"

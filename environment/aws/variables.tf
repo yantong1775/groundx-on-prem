@@ -138,7 +138,7 @@ variable "nodes" {
       }
       cpu_only_nodes            = {
         ami_type                = "AL2023_x86_64_STANDARD"
-        desired_size            = 2
+        desired_size            = 3
         ebs                     = {
           delete_on_termination = true
           encrypted             = true

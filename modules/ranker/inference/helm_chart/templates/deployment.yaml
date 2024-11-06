@@ -23,90 +23,112 @@ spec:
           value: "{{ .Values.nodeSelector.node }}"
           effect: "NoSchedule"
       initContainers:
-      - name: wait-for-cache
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ["sh", "-c", "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"] 
-      {{- if .Values.createSymlink }}
-      - name: setup-symlink
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
-        command: ['sh', '-c', "
-          if [ -f /sbin/ldconfig ]; then
-            echo 'ldconfig already exists in /sbin';
-          elif [ -f /usr/sbin/ldconfig ]; then
-            ln -s /usr/sbin/ldconfig /sbin/ldconfig.real;
-          elif [ -f /bin/ldconfig ]; then
-            ln -s /bin/ldconfig /sbin/ldconfig.real;
-          elif [ -f /usr/bin/ldconfig ]; then
-            ln -s /usr/bin/ldconfig /sbin/ldconfig.real;
-          else
-            echo 'ldconfig not found in expected locations';
-            exit 31;
-          fi
-        "]
-        securityContext:
-          privileged: true
-      {{- end }}
+        - name: wait-for-cache
+          image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
+          imagePullPolicy: "Always"
+          command: ["sh", "-c", "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"]
+        - name: create-symlink
+          image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
+          imagePullPolicy: "Always"
+          command: ["/bin/sh", "-c", "--"]
+          args: ["echo 'Running ldconfig_symlink.sh on this node'; /scripts/ldconfig_symlink.sh"]
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          volumeMounts:
+            - name: {{ .Values.service.name }}
+              mountPath: /scripts/ldconfig_symlink.sh
+              subPath: ldconfig_symlink.sh
+            - name: host-sbin
+              mountPath: /host-sbin
+            - name: host-usr-sbin
+              mountPath: /host-usr-sbin
+            - name: host-bin
+              mountPath: /host-bin
+            - name: host-usr-bin
+              mountPath: /host-usr-bin
       containers:
-      - name: {{ .Values.service.name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: "{{ .Values.image.pull }}"
-        env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-        workingDir: /workspace
-        command:
-          - /bin/sh
-          - -c
-          - |
-            export PYTHONPATH=/workspace && python /workspace/init-ranker.py && supervisord -c /workspace/supervisord.conf
-        securityContext:
-          runAsUser: {{ .Values.securityContext.runAsUser }}
-        livenessProbe:
-          exec:
-            command:
+        - name: {{ .Values.service.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: "{{ .Values.image.pull }}"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          workingDir: /workspace
+          command:
             - /bin/sh
             - -c
-            - ps aux | grep 'search.celery.appSearch' || exit 1
-          initialDelaySeconds: 30
-          periodSeconds: 30
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - ps aux | grep 'search.celery.appSearch' || exit 1
-          initialDelaySeconds: 10
-          periodSeconds: 30
-        resources:
-          limits:
-            cpu: "{{ .Values.resources.limits.cpu }}"
-            memory: "{{ .Values.resources.limits.memory }}"
-            nvidia.com/gpu: {{ .Values.resources.limits.gpu }}
-          requests:
-            cpu: "{{ .Values.resources.requests.cpu }}"
-            memory: "{{ .Values.resources.requests.memory }}"
-            nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
-        volumeMounts:
-        - name: config-models
-          mountPath: /workspace/config_models.py
-          subPath: config_models.py
-        - name: config-volume
-          mountPath: /workspace/config.py
-          subPath: config.py
-        - name: supervisord-volume
-          mountPath: /workspace/supervisord.conf
-          subPath: supervisord.conf
+            - |
+              export PYTHONPATH=/workspace && python /workspace/init-ranker.py && supervisord -c /workspace/supervisord.conf
+          securityContext:
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - ps aux | grep 'search.celery.appSearch' || exit 1
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - ps aux | grep 'search.celery.appSearch' || exit 1
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            limits:
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: "{{ .Values.resources.limits.memory }}"
+              nvidia.com/gpu: {{ .Values.resources.limits.gpu }}
+            requests:
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: "{{ .Values.resources.requests.memory }}"
+              nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
+          volumeMounts:
+            - name: config-models
+              mountPath: /workspace/config_models.py
+              subPath: config_models.py
+            - name: config-volume
+              mountPath: /workspace/config.py
+              subPath: config.py
+            - name: supervisord-volume
+              mountPath: /workspace/supervisord.conf
+              subPath: supervisord.conf
       volumes:
-      - name: config-models
-        configMap:
-          name: config-models-map
-      - name: config-volume
-        configMap:
-          name: ranker-config-py-map
-      - name: supervisord-volume
-        configMap:
-          name: ranker-supervisord-16gb-conf-map
+        - name: config-models
+          configMap:
+            name: config-models-map
+        - name: config-volume
+          configMap:
+            name: ranker-config-py-map
+        - name: supervisord-volume
+          configMap:
+            name: ranker-supervisord-16gb-conf-map
+        - name: {{ .Values.service.name }}
+          configMap:
+            name: ldconfig-symlink-map
+            defaultMode: 0555
+        - name: host-sbin
+          hostPath:
+            path: /sbin
+            type: Directory
+        - name: host-usr-sbin
+          hostPath:
+            path: /usr/sbin
+            type: Directory
+        - name: host-bin
+          hostPath:
+            path: /bin
+            type: Directory
+        - name: host-usr-bin
+          hostPath:
+            path: /usr/bin
+            type: Directory

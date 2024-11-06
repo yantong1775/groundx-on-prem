@@ -24,18 +24,18 @@ spec:
           effect: "NoSchedule"
       serviceAccountName: "{{ .Values.service.name }}-sa"
       containers:
-      - name: "{{ .Values.service.name }}"
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: "{{ .Values.image.pull }}"
-        ports:
-        - containerPort: {{ .Values.service.port }}
-        securityContext:
-          runAsUser: {{ .Values.securityContext.runAsUser }}
-          runAsGroup: {{ .Values.securityContext.runAsGroup }}
-          fsGroup: {{ .Values.securityContext.fsGroup }}
-        volumeMounts:
-        - name: "{{ .Values.service.name }}-persistent-storage"
-          mountPath: "{{ .Values.persistence.mountPath }}"
+        - name: "{{ .Values.service.name }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: "{{ .Values.image.pull }}"
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          securityContext:
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.securityContext.runAsGroup }}
+            fsGroup: {{ .Values.securityContext.fsGroup }}
+          volumeMounts:
+            - name: "{{ .Values.service.name }}-persistent-storage"
+              mountPath: "{{ .Values.persistence.mountPath }}"
       volumes:
-      - name: "{{ .Values.service.name }}-persistent-storage"
-        emptyDir: {}
+        - name: "{{ .Values.service.name }}-persistent-storage"
+          emptyDir: {}

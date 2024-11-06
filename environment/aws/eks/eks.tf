@@ -16,8 +16,6 @@ locals {
       }
     }
   })
-
-  ldconfig_script = templatefile("${path.module}/create_ldconfig_symlink.sh", {})
 }
 
 module "eyelevel_eks" {
@@ -105,7 +103,7 @@ module "eyelevel_eks" {
       }
     }
 
-    /*gpu_layout_nodes                       = {
+    gpu_layout_nodes                       = {
       name                                 = var.cluster_internal.nodes.gpu_layout
 
       ami_type                             = var.nodes.node_groups.layout_nodes.ami_type
@@ -125,11 +123,6 @@ module "eyelevel_eks" {
         }
       }
 
-      enable_bootstrap_user_data           = true
-      pre_bootstrap_user_data              = <<-EOF
-        ${local.ldconfig_script}
-      EOF
-
       labels                               = {
         "node"                             = var.cluster_internal.nodes.gpu_layout
       }
@@ -139,7 +132,7 @@ module "eyelevel_eks" {
         Name                               = var.cluster_internal.nodes.gpu_layout
         Terraform                          = "true"
       }
-    }*/
+    }
 
     gpu_ranker_nodes                       = {
       name                                 = var.cluster_internal.nodes.gpu_ranker

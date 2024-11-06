@@ -6,7 +6,7 @@ resource "helm_release" "summary_inference_service" {
 
   chart      = "${local.module_path}/summary/inference/helm_chart"
 
-  timeout    = 600
+  timeout    = 1200
 
   values = [
     yamlencode({
