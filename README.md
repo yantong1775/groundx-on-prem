@@ -8,6 +8,12 @@ The information outlined in this README was tested in the following environments
   - Amazon Elastic Kubernetes Service (EKS)
   - Amazon OpenShift ROSA
 
+The code in this repository will deploy the EyeLevel.ai GroundX Ingest and Search services to a Kubernetes cluster. The basic architecture of each service are as follows:
+
+![GroundX Ingest Service](doc/groundx-ingest.png)
+
+![GroundX Search Service](doc/groundx-search.png)
+
 ## Prerequisites
 
 Please ensure you have the following software tools installed before proceeding:
@@ -46,10 +52,10 @@ To deploy the EyeLevel application into your cluster:
 2. Run the following command:
 
 ```
-./setup-aws-operator
+./setup-eyelevel
 ```
 
-Once the setup is complete, run `kubectl -n eyelevel get svc` to get the API endpoint. It will be associated with the GroundX load balancer.
+Once the setup is complete, run `kubectl -n eyelevel get svc` to get the API endpoint. It will be the external IP associated with the GroundX load balancer.
 
 
 ## (Moderately) Advanced Setup
@@ -80,7 +86,7 @@ To get EyeLevel running in AWS, follow these steps:
   5. The EKS cluster setup process should take ~10 minutes
 
 - Set up EyeLevel services
-  1. Run `./uuid.sh` twice to generate **TWO** random UUIDs. Make note of these for later.
+  1. Run `./uuid.sh` to generate **TWO** random UUIDs. Make note of these for later.
   2. Copy `operator/env.tfvars.example` to `operator/env.tfvars`
   3. Modify values in `environment/env.tfvars`
     - The ones you **MUST** modify include:
@@ -91,8 +97,8 @@ To get EyeLevel running in AWS, follow these steps:
   5. Assuming the test dry run executed successfully, run `./environment.sh init`. This should take ~1 minute.
   6. Run `./operator.sh services -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
   7. Assuming the test dry run executed successfully, run `./environment.sh services`. This should take ~5 minutes.
-  6. Run `./operator.sh app -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
-  7. Assuming the test dry run executed successfully, run `./environment.sh app`. This should take ~10 minutes.
+  8. Run `./operator.sh app -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
+  9. Assuming the test dry run executed successfully, run `./environment.sh app`. This should take ~10 minutes.
 
 - Using EyeLevel services
   1. Go to **Interacting with the Deployed GroundX Services** for instructions on how to leverage your deployment

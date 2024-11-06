@@ -2,8 +2,6 @@
 
 . "${BASH_SOURCE%/*}/shared/util.sh"
 
-test_aws || { error "aws command isn't working (are you logged in and authorized?)"; exit 2; }
-
 confirm_setup() {
     echo "" && echo "Have you copied operator/env.tfvars.example to operator/env.tfvars and configured the settings?" && echo ""
 }
@@ -160,4 +158,4 @@ if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
 fi
 
 ok && echo "" && ok "EyeLevel application setup complete."
-echo "" && echo "Run \"kubectl -n eyelevel get svc\" to get the API endpoint. It will be associated with the GroundX load balancer." && echo "" && echo ""
+echo "" && echo "Run \"kubectl -n eyelevel get svc\" to get the API endpoint. It will be the external IP associated with the GroundX load balancer." && echo "" && echo ""
