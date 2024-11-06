@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+ENV_BASE="environment"
+
 deploy() {
   local dir="$1"
 
@@ -18,7 +20,10 @@ deploy() {
   fi
 }
 
-error() { echo -e >&2 "$@ \e[31;1m\u2717\e[0m"; }
+error() {
+  [[ "$@" != "" ]] && echo -n "$@ "
+  echo -e >&2 "\e[31;1m\u2717\e[0m";
+}
 
 must_have() {
     for cmd in $*; do

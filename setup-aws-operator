@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+
+. "${BASH_SOURCE%/*}/shared/util.sh"
+
+test_aws || { error "aws command isn't working (are you logged in and authorized?)"; exit 2; }
+
+confirm_setup() {
+    echo "" && echo "Have you copied operator/env.tfvars.example to operator/env.tfvars and configured the settings?" && echo ""
+}
+
+init=false
+msg=$(status "Enter 'y' or 'n'")
+while true; do
+
+    if ! $init; then
+        confirm_setup
+        read -p "$msg" choice
+        init=true
+    else
+        read -p "$msg" choice
+    fi
+    choice=${choice,,}
+
+    if [[ "$choice" == "y" ]]; then
+        VPC=true
+        ok
+        break
+    elif [[ "$choice" == "n" ]]; then
+        echo "Do that before running this setup script." && echo ""
+        error "Deployment aborted." && echo ""
+        exit 1
+    else
+        error && echo ""
+    fi
+
+done
+
+
+status "testing namespace initialization"
+./operator.sh init -t > tf_output.log 2>&1
+
+if [[ $? -ne 0 ]]; then
+    error "Terraform apply failed. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+    error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+    error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+ok && echo ""
+status "testing services setup"
+./operator.sh services -t > tf_output.log 2>&1
+
+if [[ $? -ne 0 ]]; then
+    error "Terraform apply failed. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+    error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+    error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+ok && echo ""
+status "testing application setup"
+./operator.sh app -t > tf_output.log 2>&1
+
+if [[ $? -ne 0 ]]; then
+    error "Terraform apply failed. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+    error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+    error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+
+ok && echo ""
+status "initializing namespace" && echo ""
+
+./operator.sh init 2>&1 | tee tf_output.log
+
+if [[ $? -ne 0 ]]; then
+    error "Terraform apply failed. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+    error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+    error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+ok && echo ""
+status "setting up services" && echo ""
+
+./operator.sh services 2>&1 | tee tf_output.log
+
+if [[ $? -ne 0 ]]; then
+    error "Terraform apply failed. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+    error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+    error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+ok && echo ""
+status "setting up application" && echo ""
+
+./operator.sh app 2>&1 | tee tf_output.log
+
+if [[ $? -ne 0 ]]; then
+    error "Terraform apply failed. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+    error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+    error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+    exit 1
+fi
+
+ok && echo "" && ok "EyeLevel application setup complete."
+echo "" && echo "Run \"kubectl -n eyelevel get svc\" to get the API endpoint. It will be associated with the GroundX load balancer." && echo "" && echo ""

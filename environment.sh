@@ -12,7 +12,6 @@ valid_aws=("aws-vpc" "eks")
 
 ENV=""
 AWS=""
-BASE="environment"
 
 if [[ "$1" =~ ^- ]]; then
   IN=""
@@ -95,20 +94,20 @@ if [[ -n "$ENV" ]]; then
 
     if [[ " ${recursive_types[@]} " =~ " $ENV " ]]; then
       if [[ "$ENV" == "aws" ]]; then
-        recurse_ordered $do "$BASE" "$ENV" "${valid_aws[@]}"
+        recurse_ordered $do "$ENV_BASE" "$ENV" "${valid_aws[@]}"
       else
-        recurse_directories $do "$BASE/$ENV"
+        recurse_directories $do "$ENV_BASE/$ENV"
       fi
     else
-      $do "$BASE/$ENV"
+      $do "$ENV_BASE/$ENV"
     fi
   else
     { error "Unknown request type: [$ENV]"; exit 1; }
   fi
 elif [[ -n "$AWS" ]]; then
   if [[ "$AWS" == "eks" ]]; then
-    $do "$BASE/aws/eks"
+    $do "$ENV_BASE/aws/eks"
   elif [[ "$AWS" == "aws-vpc" ]]; then
-    $do "$BASE/aws/vpc"
+    $do "$ENV_BASE/aws/vpc"
   fi
 fi

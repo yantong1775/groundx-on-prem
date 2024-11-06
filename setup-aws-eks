@@ -1,0 +1,397 @@
+#!/usr/bin/env bash
+
+environments=("aws")
+aws_clusters=("eks")
+
+check_env=false
+check_vpc=false
+check_kc=false
+check_kct=false
+
+. "${BASH_SOURCE%/*}/shared/util.sh"
+
+choose_environment() {
+    echo "" && echo "What hosting environment do you want to deploy to?" && echo ""
+    for i in "${!environments[@]}"; do
+        echo "$((i+1)). ${environments[$i]}"
+    done
+    echo ""
+}
+
+choose_vpc() {
+    echo "" && echo "Do you want to set up a dedicated VPC for this deployment?" && echo ""
+}
+
+choose_kc() {
+    echo "" && echo "Do you want to set up a dedicated Kubernetes cluster for this deployment?" && echo ""
+}
+
+choose_aws_kct() {
+    ty=$1
+
+    if $ty; then
+        echo "" && echo "What type of Kubernetes cluster do you want to set up?" && echo ""
+    else
+        echo "" && echo "What type of Kubernetes cluster do you have?" && echo ""
+    fi
+
+    for i in "${!aws_clusters[@]}"; do
+        echo "$((i+1)). ${aws_clusters[$i]}"
+    done
+    echo ""
+}
+
+confirm_choices() {
+    echo "" && echo "Proceed with deployment?" && echo ""
+}
+
+enter_region() {
+    echo "" && echo "What AWS region do you want to deploy to?" && echo ""
+}
+
+ENV="aws"
+VPC=true
+KC=true
+KCT="eks"
+DEPLOY=false
+REGION=""
+
+if $check_env; then
+    init=false
+    msg=$(status "Enter your choice")
+    while true; do
+
+        if ! $init; then
+            choose_environment
+            read -p "$msg" choice
+            init=true
+        else
+            read -p "$msg" choice
+        fi
+
+        if [[ $choice -ge 1 && $choice -le ${#environments[@]} ]]; then
+            ENV="${environments[$((choice-1))]}"
+            ok
+            break
+        elif [[ ${#environments[@]} -gt 1 ]]; then
+            error && echo ""
+            msg=$(status "Enter a number between 1 and ${#environments[@]}")
+        else
+            error && echo ""
+            msg=$(status "Enter 1. It's your only choice right now")
+        fi
+
+    done
+fi
+
+if [[ "$ENV" == "aws" ]]; then
+    test_aws || { error "aws command isn't working (are you logged in and authorized?)"; exit 2; }
+fi
+
+if $check_vpc; then
+    init=false
+    msg=$(status "Enter 'y' or 'n'")
+    while true; do
+
+        if ! $init; then
+            choose_vpc
+            read -p "$msg" choice
+            init=true
+        else
+            read -p "$msg" choice
+        fi
+        choice=${choice,,}
+
+        if [[ "$choice" == "y" ]]; then
+            VPC=true
+            ok
+            break
+        elif [[ "$choice" == "n" ]]; then
+            VPC=false
+            ok
+            break
+        else
+            error && echo ""
+        fi
+
+    done
+fi
+
+if $check_kc; then
+    if ! $VPC; then
+        init=false
+        msg=$(status "Enter 'y' or 'n'")
+        while true; do
+
+            if ! $init; then
+                choose_kc
+                read -p "$msg" choice
+                init=true
+            else
+                read -p "$msg" choice
+            fi
+            choice=${choice,,}
+
+            if [[ "$choice" == "y" ]]; then
+                KC=true
+                ok
+                break
+            elif [[ "$choice" == "n" ]]; then
+                KC=false
+                ok
+                break
+            else
+                error && echo ""
+            fi
+
+        done
+    else
+        KC=true
+    fi
+fi
+
+if $check_kct; then
+    init=false
+    msg=$(status "Enter your choice")
+    while true; do
+
+        if ! $init; then
+            choose_aws_kct $KC
+            read -p "$msg" choice
+            init=true
+        else
+            read -p "$msg" choice
+        fi
+
+        if [[ $choice -ge 1 && $choice -le ${#environments[@]} ]]; then
+            KCT="${environments[$((choice-1))]}"
+            ok
+            break
+        elif [[ ${#environments[@]} -gt 1 ]]; then
+            error && echo ""
+            msg=$(status "Enter a number between 1 and ${#environments[@]}")
+        else
+            error && echo ""
+            msg=$(status "Enter 1. It's your only choice right now")
+        fi
+
+    done
+fi
+
+if [[ "$ENV" == "aws" ]]; then
+    msg=$(status "Enter your region (e.g. us-east-2)")
+    while true; do
+
+        enter_region
+        read -p "$msg" REGION
+        ok
+        break
+
+    done
+fi
+
+
+echo "" && echo ""
+echo "Please confirm your deployment settings:" && echo ""
+echo -e   "deploying to:        $ENV"
+if [[ "$REGION" != "" ]]; then
+  echo -e "  region:            $REGION"
+fi
+if $VPC; then
+    ok    "creating a VPC:      "
+else
+    error "creating a VPC:      "
+fi
+if $KC; then
+    ok    "creating a cluster:  "
+else
+    error "creating a cluster:  "
+fi
+echo -e   "cluster type:        $KCT"
+
+init=false
+msg=$(status "Enter 'y' or 'n'")
+while true; do
+
+    if ! $init; then
+        confirm_choices
+        read -p "$msg" choice
+        init=true
+    else
+        read -p "$msg" choice
+    fi
+    choice=${choice,,}
+
+    if [[ "$choice" == "y" ]]; then
+        DEPLOY=true
+        ok
+        break
+    elif [[ "$choice" == "n" ]]; then
+        error "Deployment aborted." && echo ""
+        exit 1
+    else
+        error && echo ""
+    fi
+
+done
+
+vpc_id=""
+subnets="[]"
+ssh_security_group=""
+role_arns="[$ARN]"
+ssh_key="$SSH_KEY"
+
+if $VPC; then
+    status "testing VPC configuration"
+    ./environment.sh $ENV-vpc -t > tf_output.log 2>&1
+
+    if [[ $? -ne 0 ]]; then
+        error "Terraform apply failed. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+    if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+        error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+    if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+        error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    ok && echo ""
+    status "creating VPC" && echo ""
+
+    ./environment.sh $ENV-vpc 2>&1 | tee tf_output.log
+
+    if [[ $? -ne 0 ]]; then
+        ./environment.sh $ENV-vpc -c
+        error "Terraform apply failed. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+    if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+        ./environment.sh $ENV-vpc -c
+        error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+    if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+        ./environment.sh $ENV-vpc -c
+        error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    vpc_id=$(terraform -chdir="$ENV_BASE/$ENV/vpc" output -raw vpc_id 2>/dev/null)
+    if [[ -z "$vpc_id" ]]; then
+        ./environment.sh $ENV-vpc -c
+        error "vpc_id is empty or not defined." && echo ""
+        exit 1
+    fi
+    if [[ "$vpc_id" == *"Warning"* || "$vpc_id" == *"Error"* ]]; then
+        ./environment.sh $ENV-vpc -c
+        error "$vpc_id"
+        exit 1
+    fi
+
+    subnets=$(terraform -chdir="$ENV_BASE/$ENV/vpc" output -json subnets 2>/dev/null)
+    if [[ -z "$subnets" ]]; then
+        ./environment.sh $ENV-vpc -c
+        error "subnets is empty or not defined." && echo ""
+        exit 1
+    fi
+    if [[ "$subnets" == *"Warning"* || "$subnets" == *"Error"* ]]; then
+        ./environment.sh $ENV-vpc -c
+        error "$subnets"
+        exit 1
+    fi
+
+    sg=$(terraform -chdir="$ENV_BASE/$ENV/vpc" output -raw ssh_security_group 2>/dev/null)
+    if [[ -z "$sg" ]]; then
+        ./environment.sh $ENV-vpc -c
+        error "ssh_security_group is empty or not defined." && echo ""
+        exit 1
+    fi
+    if [[ "$sg" == *"Warning"* || "$sg" == *"Error"* ]]; then
+        ./environment.sh $ENV-vpc -c
+        error "$sg"
+        exit 1
+    fi
+
+    ssh_security_group="\"$sg\""
+
+    ok && echo ""
+fi
+
+if $KC; then
+    status "testing EKS cluster configuration"
+
+    cat <<EOF > "$ENV_BASE/$ENV/env.tfvars"
+environment = {
+  cluster_role_arns = $role_arns
+  region = "$REGION"
+  security_groups = [$ssh_security_group]
+  ssh_key_name = "$ssh_key"
+  stage = "prod"
+  subnets = $subnets
+  vpc_id = "$vpc_id"
+}
+
+cluster = {
+  environment = "aws"
+  has_nvidia = false
+  internet_access = true
+  kube_config_path = "~/.kube/config"
+  name = "eyelevel"
+  role = "admin"
+  type = "eks"
+}
+EOF
+
+    ./environment.sh eks -t > tf_output.log 2>&1
+
+    if [[ $? -ne 0 ]]; then
+        error "Terraform apply failed. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+    if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+        error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+    if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+        error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    ok && echo ""
+    status "creating EKS cluster" && echo ""
+
+    ./environment.sh eks 2>&1 | tee tf_output.log
+
+    if [[ $? -ne 0 ]]; then
+        ./environment.sh eks -c
+        error "Terraform apply failed. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    cleaned_log=$(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log)
+
+    if echo "$cleaned_log" | grep -Eq "Warning|Error"; then
+        ./environment.sh eks -c
+        error "Terraform apply encountered warnings and/or errors. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+    if grep -q "Warning" <(sed -r "s/\x1B\[[0-9;]*[mK]//g" tf_output.log); then
+        ./environment.sh eks -c
+        error "Terraform apply encountered warnings. Check tf_output.log for details." && echo ""
+        exit 1
+    fi
+
+    ok && echo "" && ok "VPC and Cluster setup complete. You can now set up the EyeLevel operator" && echo "" && echo ""
+fi

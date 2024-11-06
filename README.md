@@ -21,6 +21,39 @@ Please ensure you have the following software tools installed before proceeding:
 
 # Quick Start Guide
 
+## Simple Setup
+
+### Setup Kubernetes
+
+To setup a VPC and Kubernetes cluster in AWS:
+
+1. Run the following command:
+
+```
+./setup-aws-eks
+```
+
+You will be prompted for an AWS region to set up your cluster.
+
+### Deploy EyeLevel
+
+To deploy the EyeLevel application into your cluster:
+1. Copy `operator/env.tfvars.example` and update the configurations:
+  - The ones you **MUST** modify include:
+    - `admin.api_key`: Set this to a random UUID. You can generate one by running `./uuid.sh`. This will be the API key associated with the admin account and will be used for inter-service communications.
+    - `admin.username`: Set this to a random UUID. You can generate one by running `./uuid.sh`. This will be the user ID associated with the admin account and will be used for inter-service communications.
+    - `admin.email`: Set this to the email address you want associated with the admin account.
+2. Run the following command:
+
+```
+./setup-aws-operator
+```
+
+Once the setup is complete, run `kubectl -n eyelevel get svc` to get the API endpoint. It will be associated with the GroundX load balancer.
+
+
+## (Moderately) Advanced Setup
+
 To get EyeLevel running in AWS, follow these steps:
 
 - (optional) Set up a VPC, skip to the next step if you would like to use an existing VPC
