@@ -10,9 +10,9 @@ The information outlined in this README was tested in the following environments
 
 The code in this repository will deploy the EyeLevel.ai GroundX Ingest and Search services to a Kubernetes cluster. The basic architecture of each service are as follows:
 
-![GroundX Ingest Service](doc/groundx-ingest.png)
+![GroundX Ingest Service](doc/groundx-ingest.jpg)
 
-![GroundX Search Service](doc/groundx-search.png)
+![GroundX Search Service](doc/groundx-search.jpg)
 
 ## Prerequisites
 
