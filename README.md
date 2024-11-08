@@ -40,7 +40,7 @@ To setup a VPC and Kubernetes cluster in AWS:
 1. Run the following command:
 
 ```
-./setup-aws-eks
+environment/aws/setup-eks
 ```
 
 You will be prompted for an AWS region to set up your cluster.
@@ -50,13 +50,13 @@ You will be prompted for an AWS region to set up your cluster.
 To deploy the EyeLevel application into your cluster:
 1. Copy `operator/env.tfvars.example` and update the configurations:
   - The ones you **MUST** modify include:
-    - `admin.api_key`: Set this to a random UUID. You can generate one by running `./uuid.sh`. This will be the API key associated with the admin account and will be used for inter-service communications.
-    - `admin.username`: Set this to a random UUID. You can generate one by running `./uuid.sh`. This will be the user ID associated with the admin account and will be used for inter-service communications.
+    - `admin.api_key`: Set this to a random UUID. You can generate one by running `bin/uuid`. This will be the API key associated with the admin account and will be used for inter-service communications.
+    - `admin.username`: Set this to a random UUID. You can generate one by running `bin/uuid`. This will be the user ID associated with the admin account and will be used for inter-service communications.
     - `admin.email`: Set this to the email address you want associated with the admin account.
 2. Run the following command:
 
 ```
-./setup-eyelevel
+operator/setup
 ```
 
 Once the setup is complete, run `kubectl -n eyelevel get svc` to get the API endpoint. It will be the external IP associated with the GroundX load balancer.
@@ -71,8 +71,8 @@ To get EyeLevel running in AWS, follow these steps:
   2. Modify values in `environment/env.tfvars`. The ones we recommend you consider modifying include:
     - (optional) `environment.ssh_key_name`: add the name of an SSH key if you would like to have it added to your Kubernetes nodes
     - (optional) `environment.cluster_role_arns`: add ARNs for roles you would like to grant admin access over the Kubernetes cluster to
-  3. From the base folder, run `./environment.sh vpc -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
-  4. Assuming the test dry run executed successfully, run `./environment.sh vpc`
+  3. Run `bin/environment vpc -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
+  4. Assuming the test dry run executed successfully, run `bin/environment vpc`
   5. The VPC setup process should take ~10 minutes and, at the end, your VPC ID, subnets, and an SSH security group ID should be printed to your terminal window
 
 - (optional) Set up Amazon Elastic Kubernetes Service (EKS) Cluster, skip to the next step if you would like to use an existing Kubernetes cluster
@@ -85,24 +85,24 @@ To get EyeLevel running in AWS, follow these steps:
       - (optional) `environment.security_groups`: add 1 or more security group IDs to this array if you would like them to be applied to your nodes
       - (optional) `environment.ssh_key_name`: add the name of an SSH key if you would like to have it added to your Kubernetes nodes (note: you will also need to add a security group with SSH access rules to `environment.security_groups`)
       - (optional) `environment.cluster_role_arns`: add ARNs for roles you would like to grant admin access over the Kubernetes cluster to
-  3. From the base folder, run `./environment.sh eks -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
-  4. Assuming the test dry run executed successfully, run `./environment.sh eks`
+  3. From the base folder, run `bin/environment eks -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
+  4. Assuming the test dry run executed successfully, run `bin/environment eks`
   5. The EKS cluster setup process should take ~10 minutes
 
 - Set up EyeLevel services
-  1. Run `./uuid.sh` to generate **TWO** random UUIDs. Make note of these for later.
+  1. Run `bin/uuid` to generate **TWO** random UUIDs. Make note of these for later.
   2. Copy `operator/env.tfvars.example` to `operator/env.tfvars`
   3. Modify values in `environment/env.tfvars`
     - The ones you **MUST** modify include:
       - `admin.api_key`: Set this to one of the random UUIDs you generated in step 1. This will be the API key associated with the admin account and will be used for inter-service communications.
       - `admin.username`: Set this to one of the random UUIDs you generated in step 1. This will be the user ID associated with the admin account and will be used for inter-service communications.
       - `admin.email`: Set this to the email address you want associated with the admin account.
-  4. From the base folder, run `./operator.sh init -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
-  5. Assuming the test dry run executed successfully, run `./environment.sh init`. This should take ~1 minute.
-  6. Run `./operator.sh services -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
-  7. Assuming the test dry run executed successfully, run `./environment.sh services`. This should take ~5 minutes.
-  8. Run `./operator.sh app -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
-  9. Assuming the test dry run executed successfully, run `./environment.sh app`. This should take ~10 minutes.
+  4. From the base folder, run `bin/operator init -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
+  5. Assuming the test dry run executed successfully, run `bin/environment init`. This should take ~1 minute.
+  6. Run `bin/operator services -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
+  7. Assuming the test dry run executed successfully, run `bin/environment services`. This should take ~5 minutes.
+  8. Run `bin/operator app -t` to do a test dry run to confirm you have configured your `env.tfvars correctly`
+  9. Assuming the test dry run executed successfully, run `bin/environment app`. This should take ~10 minutes.
 
 - Using EyeLevel services
   1. Go to **Interacting with the Deployed GroundX Services** for instructions on how to leverage your deployment
@@ -112,12 +112,12 @@ To get EyeLevel running in AWS, follow these steps:
 
 ## VPC and Kubernetes Cluster
 
-`environment.sh` is a script that helps you set up a VPC and Kubernetes cluster. Hosting environments that the script currently supports can be found below.
+`bin/environment` is a script that helps you set up a VPC and Kubernetes cluster. Hosting environments that the script currently supports can be found below.
 
 ### Usage
 
 ```
-./environment.sh [component] [options]
+bin/environment [component] [options]
 ```
 
 Component is the cloud environment or Kubernetes cluster configuration you wish to manage.
@@ -139,32 +139,32 @@ Component is the cloud environment or Kubernetes cluster configuration you wish 
 
 1. Create a new VPC for EKS cluster setup:
    ```
-   ./environment.sh aws-vpc
+   bin/environment aws-vpc
    ```
 
 2. Create a new EKS cluster:
    ```
-   ./environment.sh eks
+   bin/environment eks
    ```
 
 3. Destroy the EKS cluster:
    ```
-   ./operator.sh eks -c
+   bin/operator eks -c
    ```
 
 4. Test deployment of the EKS cluster without making any changes to the AWS account:
    ```
-   ./operator.sh eks -t
+   bin/operator eks -t
    ```
 
 ## EyeLevel Helm Operator
 
-Deployments are managed using the `operator.sh` script found in the root of this repository.
+Deployments are managed using the `bin/operator` script found in the root of this repository.
 
 ### Usage
 
 ```
-./operator.sh [component] [options]
+bin/operator [component] [options]
 ```
 
 Component is the service, pod, configuration, or functional group you wish to manage.
@@ -206,27 +206,27 @@ Component is the service, pod, configuration, or functional group you wish to ma
 
 1. Deploy all components:
    ```
-   ./operator.sh
+   bin/operator
    ```
 
 2. Deploy a specific group:
    ```
-   ./operator.sh services
+   bin/operator services
    ```
 
 3. Deploy a specific app:
    ```
-   ./operator.sh groundx
+   bin/operator groundx
    ```
 
 4. Destroy a specific service:
    ```
-   ./operator.sh db -c
+   bin/operator db -c
    ```
 
 5. Test deployment of an init task:
    ```
-   ./operator.sh add -t
+   bin/operator add -t
    ```
 
 ### Customization
@@ -249,7 +249,7 @@ Ensure that the directory structure under the `operator/` folder matches these c
 
 3. **Terraform errors**: Check your Terraform configurations and AWS credentials if you encounter Terraform-specific errors.
 
-4. **Permission issues**: Ensure the script has execute permissions (`chmod +x script_name.sh`).
+4. **Permission issues**: Ensure the script has execute permissions (`chmod +x script_name`).
 
 For any other issues, check the Terraform output for specific error messages and consult the Terraform documentation.
 

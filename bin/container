@@ -1,31 +1,9 @@
 #!/usr/bin/env bash
 
-must_have() {
-    for cmd in $*; do
-        command -v $cmd >/dev/null 2>&1 || { error "$cmd command is required but not installed"; exit 1; }
-    done
-}
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$BIN_DIR/shared/util"
 
-error() { echo -e >&2 "$@ \e[31;1m\u2717\e[0m"; }
-
-status() { echo -ne "\e[37;1m$@: \e[0m"; }
-
-ok() {
-    [[ "$@" != "" ]] && echo -n "$@ "
-    echo -e "\e[32;1m\u2713\e[0m"
-}
-
-warn() { echo -e "$@ \e[33;1m\u26a0\e[0m"; }
-
-test_aws() {
-    aws lambda list-functions > /dev/null 2>&1
-
-    return $?
-}
-
-pre_check() {
-    test_aws || { error "aws command isn't working (are you authorized?)"; return 2; }
-}
+must_have git
 
 create_container_bundle() {
     local container_name=$1
@@ -52,7 +30,6 @@ get_containers() {
     echo "$top "
 }
 
-must_have git
 
 build_command="buildx build"
 build_flag=true
@@ -123,7 +100,7 @@ if [ -n "$repo_target" ]; then
 fi
 
 status "\u00b7 System pre-flight check"
-pre_check && { ok; } || exit 2
+test_aws || { error "aws command isn't working (are you authorized?)"; exit 2; }
 
 status "\u00b7 Login to public.ecr.aws"
 aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws

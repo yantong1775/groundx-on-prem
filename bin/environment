@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-. "${BASH_SOURCE%/*}/shared/util.sh"
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$BIN_DIR/shared/util"
+
+ENV_BASE="$BIN_DIR/../environment"
 
 must_have aws
 must_have terraform
@@ -89,7 +92,7 @@ fi
 if [[ -n "$ENV" ]]; then
   if [[ " ${valid_envs[@]} " =~ " $ENV " ]]; then
     if [[ "$CLEAR" -eq 1 ]]; then
-      ./operator.sh -c
+      "$BIN_DIR/operator" "-c"
     fi
 
     if [[ " ${recursive_types[@]} " =~ " $ENV " ]]; then

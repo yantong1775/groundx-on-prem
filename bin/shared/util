@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-ENV_BASE="environment"
-
 deploy() {
   local dir="$1"
 

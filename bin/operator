@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-. "${BASH_SOURCE%/*}/shared/util.sh"
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$BIN_DIR/shared/util"
 
 # valid_groups order is important:
 # the groups are executed in order for deploy
@@ -129,26 +130,26 @@ fi
 if [[ -n "$GROUP" ]]; then
   if [[ " ${valid_groups[@]} " =~ " $GROUP " ]]; then
     if [[ " ${recursive_types[@]} " =~ " $GROUP " ]]; then
-      recurse_directories $do "operator/$GROUP"
+      recurse_directories $do "$BIN_DIR/../operator/$GROUP"
     else
-      $do "operator/$GROUP"
+      $do "$BIN_DIR/../operator/$GROUP"
     fi
   else
     echo "Unknown request type: $GROUP"
     exit 1
   fi
 elif [[ -n "$APP" ]]; then
-  $do "operator/app/$APP"
+  $do "$BIN_DIR/../operator/app/$APP"
 elif [[ -n "$INIT" ]]; then
-  $do "operator/init/$INIT"
+  $do "$BIN_DIR/../operator/init/$INIT"
 elif [[ -n "$SERVICE" ]]; then
-  $do "operator/services/$SERVICE"
+  $do "$BIN_DIR/../operator/services/$SERVICE"
 else
   for dir in "${valid_groups[@]}"; do
     if [[ " ${recursive_types[@]} " =~ " $dir " ]]; then
-      recurse_directories $do "operator/$dir"
+      recurse_directories $do "$BIN_DIR/../operator/$dir"
     else
-      $do "operator/$dir"
+      $do "$BIN_DIR/../operator/$dir"
     fi
   done
 fi
