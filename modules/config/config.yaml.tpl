@@ -114,7 +114,10 @@ processFileServer:
   baseURL: http://${processService}.${namespace}.svc.cluster.local
   port: 8080
 
-processors:
+processors:%{ if ingestOnly }
+  extraDefaults:
+    - processorID: 1
+      type: skip-generate%{ endif }
   layout: [3]
   map: [4]
   saveFile: [2]

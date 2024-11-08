@@ -629,11 +629,11 @@ variable "layout_resources" {
       replicas   = 1
       resources  = {
         limits   = {
-          cpu    = "2"
+          cpu    = "1"
           memory = "1Gi"
         }
         requests = {
-          cpu    = "1.5"
+          cpu    = "0.5"
           memory = "500Mi"
         }
       }
@@ -854,11 +854,11 @@ variable "ranker_resources" {
       replicas   = 1
       resources  = {
         limits   = {
-          cpu    = "2"
+          cpu    = "1"
           memory = "1Gi"
         }
         requests = {
-          cpu    = "1.5"
+          cpu    = "0.5"
           memory = "500Mi"
         }
       }
@@ -1204,11 +1204,11 @@ variable "summary_resources" {
       replicas   = 1
       resources  = {
         limits   = {
-          cpu    = "2"
+          cpu    = "1"
           memory = "1Gi"
         }
         requests = {
-          cpu    = "1.5"
+          cpu    = "0.5"
           memory = "500Mi"
         }
       }
@@ -1229,7 +1229,7 @@ variable "summary_resources" {
           gpu    = 1
         }
       }
-      workers    = 1
+      workers    = 2
     }
   }
 }
@@ -1279,11 +1279,11 @@ variable "summary_client_resources" {
     replicas   = 1
     resources  = {
       limits   = {
-        cpu    = "0.25"
-        memory = "500Mi"
+        cpu    = "1"
+        memory = "2Gi"
       }
       requests = {
-        cpu    = "0.25"
+        cpu    = "0.5"
         memory = "500Mi"
       }
     }
