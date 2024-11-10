@@ -40,6 +40,7 @@ groundxServer:
   port: 8080
 
 init:
+  ingestOnly: ${ingestOnly}
   mysql:
     user: root
     password: ${dbRootPassword}
@@ -115,7 +116,7 @@ processFileServer:
   port: 8080
 
 processors:%{ if ingestOnly }
-  extraDefaults:
+  extraPostDefaults:
     - processorID: 1
       type: skip-generate%{ endif }
   layout: [3]

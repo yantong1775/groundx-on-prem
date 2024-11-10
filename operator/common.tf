@@ -1,4 +1,5 @@
 locals {
+  ingest_only  = var.cluster.search == false
   is_openshift = var.cluster.type == "openshift"
 
   create_cache = var.cache_existing.addr == null || var.cache_existing.is_instance == null || var.cache_existing.port == null
@@ -26,12 +27,12 @@ locals {
     username    = coalesce(var.file_existing.username, var.file.username)
   }
 
-  create_graph = var.app.search && var.app.graph && (var.graph_existing.addr == null)
+  create_graph = var.cluster.search && var.app.graph && (var.graph_existing.addr == null)
   graph_settings = {
     addr        = coalesce(var.graph_existing.addr, "${var.graph_internal.service}.${var.app_internal.namespace}.svc.cluster.local")
   }
 
-  create_search = var.app.search && (var.search_existing.base_domain == null || var.search_existing.base_url == null || var.search_existing.port == null)
+  create_search = var.cluster.search && (var.search_existing.base_domain == null || var.search_existing.base_url == null || var.search_existing.port == null)
   search_settings = {
     base_domain = coalesce(var.search_existing.base_domain, "${var.search_internal.service}-cluster-master.${var.app_internal.namespace}.svc.cluster.local")
     base_url    = coalesce(var.search_existing.base_url, "https://${var.search_internal.service}-cluster-master.${var.app_internal.namespace}.svc.cluster.local:${var.search_internal.port}")

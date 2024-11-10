@@ -19,6 +19,9 @@ variable "cluster" {
     # admin or developer
     role             = string
 
+    # whether search service should be deployed or not
+    search           = bool
+
     # type of Kubernetes cluster
     # valid values: eks, openshift
     type             = string
@@ -30,6 +33,7 @@ variable "cluster" {
     kube_config_path = "~/.kube/config"
     name             = "eyelevel"
     role             = "admin"
+    search           = true
     type             = "eks"
   }
   validation {

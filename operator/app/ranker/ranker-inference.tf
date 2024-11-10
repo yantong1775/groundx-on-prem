@@ -1,4 +1,6 @@
 resource "helm_release" "ranker_inference_service" {
+  count      = local.ingest_only ? 0 : 1
+
   name       = "${var.ranker_internal.service}-inference-cluster"
   namespace  = var.app_internal.namespace
 

@@ -1,4 +1,6 @@
 resource "helm_release" "ranker_api_service" {
+  count      = local.ingest_only ? 0 : 1
+
   name       = "${var.ranker_internal.service}-api-cluster"
   namespace  = var.app_internal.namespace
 

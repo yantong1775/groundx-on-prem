@@ -12,9 +12,10 @@ resource "helm_release" "groundx_service" {
         search   = "${local.search_settings.base_domain} ${local.search_settings.port}"
         stream   = "${local.stream_settings.base_domain} ${local.stream_settings.port}"
       }
-      image = var.groundx_internal.image
+      image        = var.groundx_internal.image
+      ingestOnly   = local.ingest_only
       nodeSelector = {
-        node = var.cluster_internal.nodes.cpu_only
+        node       = var.cluster_internal.nodes.cpu_only
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

@@ -22,7 +22,7 @@ locals {
     groundxService       = var.groundx_internal.service
     groundxServiceKey    = var.admin.api_key
     groundxUsername      = var.admin.username
-    ingestOnly           = var.app.search == false
+    ingestOnly           = local.ingest_only
     languages            = jsonencode(var.app.languages)
     layoutService        = "${var.layout_internal.service}-api"
     layoutWebhookService = var.layout_webhook_internal.service

@@ -22,6 +22,7 @@ VPC=true
 KC=true
 KCT="eks"
 REGION=""
+SEARCH=true
 
 empty=()
 
@@ -197,6 +198,7 @@ cluster = {
   kube_config_path = "~/.kube/config"
   name = "eyelevel"
   role = "admin"
+  search = $SEARCH
   type = "eks"
 }
 EOF

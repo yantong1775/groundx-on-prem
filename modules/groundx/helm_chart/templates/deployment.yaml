@@ -30,10 +30,12 @@ spec:
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.file }}; do echo waiting for file storage; sleep 2; done"]
+      {{- if not .Values.ingestOnly }}
       - name: wait-for-search
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.search }}; do echo waiting for search; sleep 2; done"]
+      {{- end }}
       - name: wait-for-database
         image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
         imagePullPolicy: "Always"
