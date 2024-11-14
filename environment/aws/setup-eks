@@ -9,6 +9,15 @@ do="$ENV_DIR/../../bin/environment"
 must_have aws
 must_have terraform
 
+confirm_setup=$(prompt_text "Have you copied environment/aws/env.tfvars.example to environment/aws/env.tfvars and configured the settings?")
+
+result=$(prompt_input "yn" "$confirm_setup" "empty[@]" "") && ok
+
+if ! $result; then
+    echo "Cancelling deployment."
+    exit 1
+fi
+
 environments=("aws")
 aws_clusters=("eks")
 

@@ -37,7 +37,9 @@ Please ensure you have the following software tools installed before proceeding:
 
 To setup a VPC and Kubernetes cluster in AWS:
 
-1. Run the following command:
+1. Copy `environment/aws/env.tfvars.example` to `environment/aws/env.tfvars` and update the configurations (none of them **MUST** be modified)
+
+2. Run the following command:
 
 ```
 environment/aws/setup-eks
@@ -48,11 +50,12 @@ You will be prompted for an AWS region to set up your cluster.
 ### Deploy EyeLevel
 
 To deploy the EyeLevel application into your cluster:
-1. Copy `operator/env.tfvars.example` and update the configurations:
+1. Copy `operator/env.tfvars.example` to `operator/env.tfvars` and update the configurations:
   - The ones you **MUST** modify include:
     - `admin.api_key`: Set this to a random UUID. You can generate one by running `bin/uuid`. This will be the API key associated with the admin account and will be used for inter-service communications.
     - `admin.username`: Set this to a random UUID. You can generate one by running `bin/uuid`. This will be the user ID associated with the admin account and will be used for inter-service communications.
     - `admin.email`: Set this to the email address you want associated with the admin account.
+
 2. Run the following command:
 
 ```
