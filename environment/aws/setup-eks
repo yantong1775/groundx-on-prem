@@ -98,7 +98,7 @@ ssh_key="$SSH_KEY"
 
 if $VPC; then
     status "testing VPC configuration"
-    "$do" "$ENV-vpc" "-t" > tf_output.log 2>&1
+    "$do" "$ENV-vpc" "-t" 2>&1 | tee tf_output.log
 
     if [[ $? -ne 0 ]]; then
         error "Terraform apply failed. Check tf_output.log for details." && echo ""
@@ -201,7 +201,7 @@ cluster = {
 }
 EOF
 
-    "$do" "eks" "-t" > tf_output.log 2>&1
+    "$do" "eks" "-t" 2>&1 | tee tf_output.log
 
     if [[ $? -ne 0 ]]; then
         error "Terraform apply failed. Check tf_output.log for details." && echo ""

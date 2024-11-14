@@ -17,7 +17,7 @@ if ! $result; then
 fi
 
 status "testing namespace initialization"
-"$do" "init" "-t" > tf_output.log 2>&1
+"$do" "init" "-t" 2>&1 | tee tf_output.log
 
 if [[ $? -ne 0 ]]; then
     error "Terraform apply failed. Check tf_output.log for details." && echo ""
@@ -37,7 +37,7 @@ fi
 
 ok && echo ""
 status "testing services setup"
-"$do" "services" "-t" > tf_output.log 2>&1
+"$do" "services" "-t" 2>&1 | tee tf_output.log
 
 if [[ $? -ne 0 ]]; then
     error "Terraform apply failed. Check tf_output.log for details." && echo ""
@@ -57,7 +57,7 @@ fi
 
 ok && echo ""
 status "testing application setup"
-"$do" "app" "-t" > tf_output.log 2>&1
+"$do" "app" "-t" 2>&1 | tee tf_output.log
 
 if [[ $? -ne 0 ]]; then
     error "Terraform apply failed. Check tf_output.log for details." && echo ""
