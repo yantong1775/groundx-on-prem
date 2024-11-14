@@ -1194,6 +1194,7 @@ variable "summary_resources" {
           gpu    = number
         })
       })
+      threads    = number
       workers    = number
     })
   })
@@ -1217,16 +1218,17 @@ variable "summary_resources" {
       replicas   = 2
       resources  = {
         limits   = {
-          cpu    = "3"
-          memory = "12Gi"
+          cpu    = "7"
+          memory = "28Gi"
           gpu    = 1
         }
         requests = {
-          cpu    = "2"
-          memory = "8Gi"
+          cpu    = "3.5"
+          memory = "14Gi"
           gpu    = 1
         }
       }
+      threads    = 2
       workers    = 2
     }
   }

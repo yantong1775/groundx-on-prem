@@ -200,7 +200,7 @@ variable "nodes" {
           volume_size           = 75
           volume_type           = "gp3"
         }
-        instance_types          = ["g5.xlarge"]
+        instance_types          = ["g5.2xlarge"]
         max_size                = 5
         min_size                = 1
       }

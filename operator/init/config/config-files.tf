@@ -144,6 +144,7 @@ locals {
       [
         for i in range(var.summary_resources.inference.workers) : templatefile("${local.module_path}/summary/supervisord.conf.tpl", {
           worker_number = i + 1
+          threads       = var.summary_resources.inference.threads
         })
       ]
     )
