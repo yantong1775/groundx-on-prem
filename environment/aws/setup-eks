@@ -24,8 +24,6 @@ KCT="eks"
 REGION=""
 SEARCH=true
 
-empty=()
-
 choose_cluster_existing=$(prompt_menu "What type of Kubernetes cluster do you have?" "aws_clusters[@]")
 choose_cluster_new=$(prompt_menu "What type of Kubernetes cluster do you want to set up?" "aws_clusters[@]")
 choose_environment=$(prompt_menu "What hosting environment do you want to deploy to?" "environments[@]")
@@ -196,7 +194,7 @@ cluster = {
   has_nvidia = false
   internet_access = true
   kube_config_path = "~/.kube/config"
-  name = "eyelevel"
+  prefix = "eyelevel"
   role = "admin"
   search = $SEARCH
   type = "eks"

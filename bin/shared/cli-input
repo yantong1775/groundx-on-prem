@@ -4,6 +4,8 @@ SHARED_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 . "$SHARED_DIR/util"
 
+empty=()
+
 prompt_input() {
     local type="$1"
     local prompt="$2"
