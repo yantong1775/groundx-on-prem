@@ -21,7 +21,7 @@ ENV="aws"
 VPC=true
 KC=true
 KCT="eks"
-REGION=""
+REGION="us-east-2"
 SEARCH=true
 
 choose_cluster_existing=$(prompt_menu "What type of Kubernetes cluster do you have?" "aws_clusters[@]")
@@ -60,7 +60,7 @@ fi
 
 if [[ "$ENV" == "aws" ]]; then
     msg=$(status "Enter your region (e.g. us-east-2)")
-    REGION=$(prompt_input "text" "$enter_region" "empty[@]" "$msg") && ok
+    REGION=$(prompt_input "aws-region" "$enter_region" "empty[@]" "$msg") && ok
 fi
 
 echo "" && echo ""
