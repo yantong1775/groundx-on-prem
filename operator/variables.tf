@@ -38,6 +38,36 @@ variable "app_internal" {
   }
 }
 
+variable "engines" {
+  description        = "Completion engine configurations"
+  type               = list(
+    object(
+      {
+        apiKey       = string
+        baseURL      = string
+        engineID     = string
+        maxRequests  = number
+        maxTokens    = number
+        requestLimit = number
+        type         = string
+        vision       = bool
+      }
+    )
+  )
+  default            = [
+    {
+      apiKey         = null
+      baseURL        = null
+      engineID       = "MiniCPM-V-2_6-int4"
+      maxRequests    = 6
+      maxTokens      = null
+      requestLimit   = null
+      type           = null
+      vision         = true
+    }
+  ]
+}
+
 
 # CACHE
 

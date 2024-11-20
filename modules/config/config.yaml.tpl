@@ -33,6 +33,31 @@ ai:
     defaultKitId: 0
   search: eyelevel
 
+engines:
+%{ for engine in jsondecode(engines) ~}
+  ${engine.engineID}: 
+    engineID: "${engine.engineID}"
+%{ if engine.apiKey != null ~}
+    apiKey: "${engine.apiKey}"
+%{ endif ~}
+%{ if engine.baseURL != null ~}
+    baseURL: "${engine.baseURL}"
+%{ endif ~}
+%{ if engine.maxRequests != null ~}
+    maxRequests: ${engine.maxRequests}
+%{ endif ~}
+%{ if engine.maxTokens != null ~}
+    maxTokens: ${engine.maxTokens}
+%{ endif ~}
+%{ if engine.requestLimit != null ~}
+    requestLimit: ${engine.requestLimit}
+%{ endif ~}
+%{ if engine.type != null ~}
+    type: "${engine.type}"
+%{ endif ~}
+    vision: ${engine.vision}
+%{ endfor ~}
+
 environment: prod
 
 groundxServer:

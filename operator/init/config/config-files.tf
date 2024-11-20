@@ -14,6 +14,7 @@ locals {
     dbRW                 = local.db_endpoints.rw
     dbUser               = var.db.db_username
     deploymentType       = var.groundx_internal.type
+    engines              = jsonencode(var.engines)
     fileBaseDomain       = local.file_settings.base_domain
     filePassword         = local.file_settings.password
     fileService          = var.file_internal.service
