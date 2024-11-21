@@ -67,7 +67,7 @@ spec:
             #- |
             #  export PYTHONPATH=/workspace && while true; do sleep 30; done
             - |
-              export PYTHONPATH=/workspace && supervisord -c /workspace/supervisord.conf
+              export PYTHONPATH=/workspace && python init-summary.py && supervisord -c /workspace/supervisord.conf
           securityContext:
             runAsUser: {{ .Values.securityContext.runAsUser }}
           livenessProbe:
