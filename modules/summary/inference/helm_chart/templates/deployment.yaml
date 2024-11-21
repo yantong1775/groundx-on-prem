@@ -65,9 +65,9 @@ spec:
             - /bin/bash
             - -c
             #- |
-            #  export PYTHONPATH=/workspace && tar -xzf /workspace/hf_models_cache.summary.tar.gz -C /workspace && while true; do sleep 30; done
+            #  export PYTHONPATH=/workspace && tar -xzf /workspace/hf_models_cache.summary.tar.gz -C /workspace && rm /workspace/hf_models_cache.summary.tar.gz && while true; do sleep 30; done
             - |
-              export PYTHONPATH=/workspace && tar -xzf /workspace/hf_models_cache.summary.tar.gz -C /workspace && supervisord -c /workspace/supervisord.conf
+              export PYTHONPATH=/workspace && tar -xzf /workspace/hf_models_cache.summary.tar.gz -C /workspace && rm /workspace/hf_models_cache.summary.tar.gz && supervisord -c /workspace/supervisord.conf
           securityContext:
             runAsUser: {{ .Values.securityContext.runAsUser }}
           livenessProbe:

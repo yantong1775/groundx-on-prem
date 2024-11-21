@@ -59,9 +59,9 @@ variable "engines" {
       apiKey         = null
       baseURL        = null
       engineID       = "MiniCPM-V-2_6-int4"
-      maxRequests    = 12
-      maxTokens      = 100000000
-      requestLimit   = 12
+      maxRequests    = 5
+      maxTokens      = 10000000000
+      requestLimit   = 5
       type           = null
       vision         = true
     }
@@ -1233,16 +1233,16 @@ variable "summary_resources" {
       replicas   = 1
       resources  = {
         limits   = {
-          cpu    = "1"
+          cpu    = "2"
           memory = "1Gi"
         }
         requests = {
-          cpu    = "0.5"
+          cpu    = "1"
           memory = "500Mi"
         }
       }
       threads    = 2
-      workers    = 2
+      workers    = 3
     }
     inference    = {
       replicas   = 2
