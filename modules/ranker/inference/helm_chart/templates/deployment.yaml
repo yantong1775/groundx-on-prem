@@ -72,7 +72,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - ps aux | grep 'search.celery.appSearch' || exit 1
+                - ps aux | grep 'search.celery.appSearch' | grep -v grep || exit 1
             initialDelaySeconds: 30
             periodSeconds: 30
           readinessProbe:
@@ -80,7 +80,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - ps aux | grep 'search.celery.appSearch' || exit 1
+                - ps aux | grep 'search.celery.appSearch' | grep -v grep || exit 1
             initialDelaySeconds: 10
             periodSeconds: 30
           resources:

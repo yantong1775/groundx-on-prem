@@ -1258,7 +1258,7 @@ variable "summary_resources" {
           gpu    = 1
         }
       }
-      threads    = 2
+      threads    = 1
       workers    = 2
     }
   }

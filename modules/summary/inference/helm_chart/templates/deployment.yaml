@@ -75,7 +75,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - ps aux | grep 'summary.celery.appSummary' || exit 1
+                - ps aux | grep 'summary.celery.appSummary' | grep -v grep || exit 1
             initialDelaySeconds: 30
             periodSeconds: 30
           readinessProbe:
@@ -83,7 +83,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - ps aux | grep 'summary.celery.appSummary' || exit 1
+                - ps aux | grep 'summary.celery.appSummary' | grep -v grep || exit 1
             initialDelaySeconds: 10
             periodSeconds: 30
           resources:

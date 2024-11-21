@@ -76,7 +76,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - ps aux | grep 'document.celery_process.app' || exit 1
+                - ps aux | grep 'document.celery_process.app' | grep -v grep || exit 1
             initialDelaySeconds: 30
             periodSeconds: 30
           readinessProbe:
@@ -84,7 +84,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - ps aux | grep 'document.celery_process.app' || exit 1
+                - ps aux | grep 'document.celery_process.app' | grep -v grep || exit 1
             initialDelaySeconds: 10
             periodSeconds: 30
           resources:
