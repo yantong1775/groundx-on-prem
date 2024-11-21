@@ -59,9 +59,9 @@ variable "engines" {
       apiKey         = null
       baseURL        = null
       engineID       = "MiniCPM-V-2_6-int4"
-      maxRequests    = 6
-      maxTokens      = null
-      requestLimit   = null
+      maxRequests    = 12
+      maxTokens      = 100000000
+      requestLimit   = 12
       type           = null
       vision         = true
     }

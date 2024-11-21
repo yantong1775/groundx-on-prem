@@ -65,9 +65,9 @@ spec:
             - /bin/bash
             - -c
             #- |
-            #  export PYTHONPATH=/workspace && while true; do sleep 30; done
+            #  export PYTHONPATH=/workspace && tar -xzf /workspace/hf_models_cache.summary.tar.gz -C /workspace && while true; do sleep 30; done
             - |
-              export PYTHONPATH=/workspace && python init-summary.py && supervisord -c /workspace/supervisord.conf
+              export PYTHONPATH=/workspace && tar -xzf /workspace/hf_models_cache.summary.tar.gz -C /workspace && supervisord -c /workspace/supervisord.conf
           securityContext:
             runAsUser: {{ .Values.securityContext.runAsUser }}
           livenessProbe:
@@ -77,6 +77,7 @@ spec:
                 - -c
                 - ps aux | grep 'summary.celery.appSummary' | grep -v grep || exit 1
             initialDelaySeconds: 30
+            failureThreshold: 10
             periodSeconds: 30
           readinessProbe:
             exec:
@@ -84,8 +85,8 @@ spec:
                 - /bin/sh
                 - -c
                 - ps aux | grep 'summary.celery.appSummary' | grep -v grep || exit 1
-            initialDelaySeconds: 10
-            periodSeconds: 30
+            initialDelaySeconds: 30
+            periodSeconds: 60
           resources:
             limits:
               cpu: "{{ .Values.resources.limits.cpu }}"

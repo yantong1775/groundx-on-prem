@@ -73,7 +73,8 @@ spec:
                 - /bin/sh
                 - -c
                 - ps aux | grep 'search.celery.appSearch' | grep -v grep || exit 1
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
+            failureThreshold: 10
             periodSeconds: 30
           readinessProbe:
             exec:
@@ -81,7 +82,7 @@ spec:
                 - /bin/sh
                 - -c
                 - ps aux | grep 'search.celery.appSearch' | grep -v grep || exit 1
-            initialDelaySeconds: 10
+            initialDelaySeconds: 60
             periodSeconds: 30
           resources:
             limits:
