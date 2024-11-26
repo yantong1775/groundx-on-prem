@@ -71,7 +71,7 @@ spec:
             #- |
             #  export PYTHONPATH=/app && while true; do sleep 30; done
             - |
-              export PYTHONPATH=/app && python init-layout.py && supervisord -c /app/supervisord.conf
+              export PYTHONPATH=/app && python /app/init-layout.py && supervisord -c /app/supervisord.conf
           securityContext:
             runAsUser: {{ .Values.securityContext.runAsUser }}
           livenessProbe:

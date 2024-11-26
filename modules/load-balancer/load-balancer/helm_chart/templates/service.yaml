@@ -5,6 +5,10 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Values.target }}
+  annotations:
+    {{- if .Values.timeout }}
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "{{ .Values.timeout }}"
+    {{- end }}
 spec:
   selector:
     app: {{ .Values.target }}
