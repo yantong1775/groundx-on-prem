@@ -125,12 +125,12 @@ variable "nodes" {
         ebs                     = {
           delete_on_termination = true
           encrypted             = true
-          iops                  = 3000
+          iops                  = null
           kms_key_id            = null
           snapshot_id           = null
-          throughput            = 125
-          volume_size           = 75
-          volume_type           = "gp3"
+          throughput            = null
+          volume_size           = 20
+          volume_type           = "gp2"
         }
         instance_types          = ["m6a.xlarge"]
         max_size                = 10
@@ -142,12 +142,12 @@ variable "nodes" {
         ebs                     = {
           delete_on_termination = true
           encrypted             = true
-          iops                  = 3000
+          iops                  = null
           kms_key_id            = null
           snapshot_id           = null
-          throughput            = 125
-          volume_size           = 75
-          volume_type           = "gp3"
+          throughput            =  null
+          volume_size           = 20
+          volume_type           = "gp2"
         }
         instance_types          = ["t3a.medium"]
         max_size                = 10
@@ -159,12 +159,12 @@ variable "nodes" {
         ebs                     = {
           delete_on_termination = true
           encrypted             = true
-          iops                  = 3000
+          iops                  = null
           kms_key_id            = null
           snapshot_id           = null
-          throughput            = 125
-          volume_size           = 75
-          volume_type           = "gp3"
+          throughput            = null
+          volume_size           = 35
+          volume_type           = "gp2"
         }
         instance_types          = ["g4dn.xlarge"]
         max_size                = 5
@@ -176,12 +176,12 @@ variable "nodes" {
         ebs                     = {
           delete_on_termination = true
           encrypted             = true
-          iops                  = 3000
+          iops                  = null
           kms_key_id            = null
           snapshot_id           = null
-          throughput            = 125
-          volume_size           = 75
-          volume_type           = "gp3"
+          throughput            = null
+          volume_size           = 50
+          volume_type           = "gp2"
         }
         instance_types          = ["g4dn.2xlarge"]
         max_size                = 10
@@ -193,14 +193,14 @@ variable "nodes" {
         ebs                     = {
           delete_on_termination = true
           encrypted             = true
-          iops                  = 3000
+          iops                  = null
           kms_key_id            = null
           snapshot_id           = null
-          throughput            = 125
+          throughput            = null
           volume_size           = 75
-          volume_type           = "gp3"
+          volume_type           = "gp2"
         }
-        instance_types          = ["g5.2xlarge"]
+        instance_types          = ["g5.xlarge"]
         max_size                = 5
         min_size                = 1
       }

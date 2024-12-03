@@ -1,5 +1,5 @@
 resource "helm_release" "summary_api_lb" {
-  count = 1
+  count = local.create_summary ? 1 : 0
 
   depends_on = [helm_release.summary_api_service]
 

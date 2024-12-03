@@ -18,7 +18,7 @@ module "irsa_ebs_csi" {
 resource "aws_eks_addon" "aws_ebs_csi_driver" {
   count = local.should_create ? 1 : 0
 
-  depends_on               = [module.eyelevel_eks]
+  depends_on               = [module.eyelevel_eks, module.irsa_ebs_csi]
 
   cluster_name             = local.cluster_name
   addon_name               = "aws-ebs-csi-driver"

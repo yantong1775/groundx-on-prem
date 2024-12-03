@@ -86,8 +86,8 @@ variable "cluster_internal" {
       }
     }
     pv             = {
-      name         = "eyelevel-ebs-gp3"
-      type         = "gp3"
+      name         = "eyelevel-ebs-gp2"
+      type         = "gp2"
     }
   }
 }
