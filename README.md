@@ -18,10 +18,10 @@ This repo is in Open Beta. Feedback is appreciated and encouraged. To use the ho
 1. [The Infrastructure](#the-infrastructure) 
     1. [Ingest Service](#groundx-ingest-service) 
     1. [Search Service](#groundx-search-service) 
-1. [Using GroundX On Prem](#using-groundx-on-prem)  
+1. [Using GroundX On-Prem](#using-groundx-on-prem)  
 1. [Simple Deployment](#simple-deployment) (from scratch on AWS with minimal configuration)
 1. [Advanced Deployment](#advanced-setup) (from scratch on AWS with more configuration details)
-1. [Deploying to an existing Kubernetes Cluster \<TODO>](#deploying-to-an-existing-kubernetes-cluster)
+1. [Deploying to an existing Kubernetes Cluster](#deploying-to-an-existing-kubernetes-cluster)
 1. [Administrative Notes](#administrative-notes)
 
 ## The Infrastructure
@@ -174,7 +174,7 @@ The Default resource configurations are specified [here](https://github.com/eyel
 ~300 GB gp2
 ```
 
-## Advanced Deployment
+# Advanced Deployment
 
 The previous sections covered how to setup GroundX with minimal configuration. To get GroundX running in AWS with more configuration options, follow these steps:
 
@@ -231,7 +231,21 @@ groundx = Groundx(
 ```
 
 # Deploying to an Existing Kubernetes Cluster
-\<TODO>
+Assuming you have an existing Kubernetes environment, then only the helm operator needs to be installed.
+
+```
+<TODO> Sorry Ben, I don't understand enough to know what to write here.
+
+My thinking was, it can be difficult to follow fragmented tutorials, so I made end-to-end documentation for each major use case, and aligned it with the existing documentation.
+
+So, there's three:
+1. full setup with little config
+2. full setup with a lot of config
+3. only deploying GroundX on an existing kubernetes
+
+This is #3, and I don't understand enough to write it.
+```
+
 
 # Administrative Notes
 
