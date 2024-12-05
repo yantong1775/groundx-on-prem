@@ -103,7 +103,7 @@ Once the setup is complete, run `kubectl -n eyelevel get svc` to get the API end
 For instance, the "external IP" might resemble the following:
 ```    
 EXTERNAL-IP
-b941a120ecd91455fa7b8682be2a9e41-1427794132.us-east-2.elb.amazonaws.com
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxx.us-east-2.elb.amazonaws.com
 ```
 
 That endpoint, in conjuction with the `admin.api_key` defined in step 2.1, can be used to configure the GroundX SDK to communicate with your On-Prem instance of GroundX.
@@ -112,7 +112,7 @@ That endpoint, in conjuction with the `admin.api_key` defined in step 2.1, can b
 from groundx import Groundx
 from groundx.configuration import Configuration
 
-external_ip = 'b941a120ecd91455fa7b8682be2a9e41-1427794132.us-east-2.elb.amazonaws.com'
+external_ip = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxx.us-east-2.elb.amazonaws.com'
 
 groundx = Groundx(
     configuration=Configuration(
@@ -120,6 +120,17 @@ groundx = Groundx(
         api_key="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     )
 )
+```
+
+```javascript
+import { Groundx } from "groundx-typescript-sdk";
+
+const external_ip = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxx.us-east-2.elb.amazonaws.com'
+
+const groundx = new Groundx({
+  apiKey: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  basePath: `http://${external_ip}/api`;,
+});
 ```
 
 ## Simple Deployment 5) Taredown
@@ -192,16 +203,27 @@ The previous sections covered how to setup GroundX with minimal configuration. T
 
 Once GroundX has been deployed, use `kubectl -n eyelevel get routes` to list out all the available routes from the API server, to get the API URL for your deployment, and configure the GroundX client with the API URL and the api key that was defined in configuration.
 
-```
+```python
 from groundx import Groundx
 from groundx.configuration import Configuration
 
 groundx = Groundx(
     configuration=Configuration(
         host="{RESULT FROM GET ROUTES}/api",
-        api_key="5c49be10-d228-4dd8-bbb0-d59300698ef6",
+        api_key="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     )
 )
+```
+
+```javascript
+import { Groundx } from "groundx-typescript-sdk";
+
+const external_ip = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxx.us-east-2.elb.amazonaws.com'
+
+const groundx = new Groundx({
+  apiKey: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  basePath: `${RESULT FROM GET ROUTES}/api`;,
+});
 ```
 
 # Deploying to an Existing Kubernetes Cluster
