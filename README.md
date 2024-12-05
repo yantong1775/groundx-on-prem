@@ -7,7 +7,7 @@
     1. [Using GroundX On-Prem](#simple-deployment-4-using-groundx-on-prem)
     1. [Taredown](#simple-deployment-5-taredown)
     1. [A Note on Cost](#a-note-on-cost)
-1. [Advanced Deployment](#advanced-setup) (from scratch on AWS with more configuration details)
+1. [Advanced Deployment](#advanced-deployment) (from scratch on AWS with more configuration details)
 1. [Deploying to an Existing Kubernetes Cluster](#deploying-to-an-existing-kubernetes-cluster) \<TODO BEN>
 1. [The Infrastructure](#the-infrastructure) 
     1. [Ingest Service](#groundx-ingest-service) 
