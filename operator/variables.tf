@@ -897,12 +897,12 @@ variable "ranker_resources" {
       replicas   = 3
       resources  = {
         limits   = {
-          cpu    = "4"
+          cpu    = "3"
           memory = "14Gi"
           gpu    = 1
         }
         requests = {
-          cpu    = "3.5"
+          cpu    = "2"
           memory = "10Gi"
           gpu    = 1
         }
@@ -1248,13 +1248,13 @@ variable "summary_resources" {
       replicas   = 2
       resources  = {
         limits   = {
-          cpu    = "7"
-          memory = "28Gi"
+          cpu    = "3"
+          memory = "14Gi"
           gpu    = 1
         }
         requests = {
-          cpu    = "3.5"
-          memory = "14Gi"
+          cpu    = "2"
+          memory = "10Gi"
           gpu    = 1
         }
       }
