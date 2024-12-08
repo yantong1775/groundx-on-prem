@@ -1,10 +1,12 @@
+# GroundX On-Prem/On-Cloud Kubernetes Infrastructure As Code
+
 - [What is GroundX On-Prem?](#what-is-groundx-on-prem)
   - [GroundX Ingest Service](#groundx-ingest-service)
   - [GroundX Search Service](#groundx-search-service)
-- [Quick Start](#quick-start)
+- Quick Start
   - [Dependencies](#dependencies)
   - [Deploy to an Existing Kubernetes Cluster](#deploy-to-an-existing-kubernetes-cluster)
-    - [Background](#background)
+    - Background
       - [Node Groups](#node-groups)
       - [Required Compute Resources](#required-compute-resources)
         - [Chip Architecture](#chip-architecture)
