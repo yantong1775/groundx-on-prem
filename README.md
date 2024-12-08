@@ -9,7 +9,7 @@
 **[Quick Start](#dependencies)**
 - [Dependencies](#dependencies)
 - [Deploy to an Existing Kubernetes Cluster](#deploy-to-an-existing-kubernetes-cluster)
-  - **Background**
+  - [Background](#background)
     - [Node Groups](#node-groups)
     - [Required Compute Resources](#required-compute-resources)
       - [Chip Architecture](#chip-architecture)
