@@ -2,12 +2,12 @@
 
 ## Table of Contents
 
-**[What is GroundX On-Prem?]**(#what-is-groundx-on-prem)
+**[What is GroundX On-Prem?](#what-is-groundx-on-prem)**
 
 - [GroundX Ingest Service](#groundx-ingest-service)
 - [GroundX Search Service](#groundx-search-service)
 
-**[Quick Start]**(#dependencies)
+**[Quick Start](#dependencies)&&
 
 - [Dependencies](#dependencies)
 - [Deploy to an Existing Kubernetes Cluster](#deploy-to-an-existing-kubernetes-cluster)
@@ -31,13 +31,13 @@
   - [Deploy GroundX On-Prem to the New Amazon EKS Cluster](#deploy-groundx-on-prem-to-the-new-amazon-eks-cluster)
   - [A Note on Cost](#a-note-on-cost)
 
-**[Using GroundX On-Prem]**(#using-groundx-on-prem)
+**[Using GroundX On-Prem](#using-groundx-on-prem)**
 
 - [Get the API Endpoint](#get-the-api-endpoint)
 - [Use the SDKs](#use-the-sdks)
 - [Use the APIs](#use-the-apis)
 
-**[Tearing Down]**(#tearing-down)
+**[Tearing Down](#tearing-down)**
 
 # What is GroundX On-Prem?
 
