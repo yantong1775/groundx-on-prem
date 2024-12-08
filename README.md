@@ -1,35 +1,43 @@
 # GroundX On-Prem/On-Cloud Kubernetes Infrastructure As Code
 
-- [What is GroundX On-Prem?](#what-is-groundx-on-prem)
-  - [GroundX Ingest Service](#groundx-ingest-service)
-  - [GroundX Search Service](#groundx-search-service)
-- Quick Start
-  - [Dependencies](#dependencies)
-  - [Deploy to an Existing Kubernetes Cluster](#deploy-to-an-existing-kubernetes-cluster)
-    - Background
-      - [Node Groups](#node-groups)
-      - [Required Compute Resources](#required-compute-resources)
-        - [Chip Architecture](#chip-architecture)
-        - [Supported GPUs](#supported-gpus)
-        - [Total Recommended Resources](#total-recommended-resources)
-        - [Node Group Resources](#node-group-resources)
-          - [eyelevel-cpu-only](#eyelevel-cpu-only)
-          - [eyelevel-cpu-memory](#eyelevel-cpu-memory)
-          - [eyelevel-gpu-layout](#eyelevel-gpu-layout)
-          - [eyelevel-gpu-ranker](#eyelevel-gpu-ranker)
-          - [eyelevel-gpu-summary](#eyelevel-gpu-summary)
-    - [Configure Node Groups](#configure-node-groups)
-    - [Create env.tfvars File](#create-envtfvars-file)
-    - [Deploy GroundX On-Prem to Your Kubernetes Cluster](#deploy-groundx-on-prem-to-your-kubernetes-cluster)
-  - [Create and Deploy to a New Amazon EKS Cluster](#create-and-deploy-to-a-new-amazon-eks-cluster)
-    - [Create the VPC and EKS Cluster](#create-the-vpc-and-eks-cluster)
-    - [Deploy GroundX On-Prem to the New Amazon EKS Cluster](#deploy-groundx-on-prem-to-the-new-amazon-eks-cluster)
-    - [A Note on Cost](#a-note-on-cost)
-- [Using GroundX On-Prem](#using-groundx-on-prem)
-  - [Get the API Endpoint](#get-the-api-endpoint)
-  - [Use the SDKs](#use-the-sdks)
-  - [Use the APIs](#use-the-apis)
-- [Tearing Down](#tearing-down)
+## Table of Contents
+
+**[What is GroundX On-Prem?]**(#what-is-groundx-on-prem)
+
+- [GroundX Ingest Service](#groundx-ingest-service)
+- [GroundX Search Service](#groundx-search-service)
+
+**[Quick Start]**(#dependencies)
+
+- [Dependencies](#dependencies)
+- [Deploy to an Existing Kubernetes Cluster](#deploy-to-an-existing-kubernetes-cluster)
+  - **Background**
+    - [Node Groups](#node-groups)
+    - [Required Compute Resources](#required-compute-resources)
+      - [Chip Architecture](#chip-architecture)
+      - [Supported GPUs](#supported-gpus)
+      - [Total Recommended Resources](#total-recommended-resources)
+      - [Node Group Resources](#node-group-resources)
+        - [eyelevel-cpu-only](#eyelevel-cpu-only)
+        - [eyelevel-cpu-memory](#eyelevel-cpu-memory)
+        - [eyelevel-gpu-layout](#eyelevel-gpu-layout)
+        - [eyelevel-gpu-ranker](#eyelevel-gpu-ranker)
+        - [eyelevel-gpu-summary](#eyelevel-gpu-summary)
+  - [Configure Node Groups](#configure-node-groups)
+  - [Create env.tfvars File](#create-envtfvars-file)
+  - [Deploy GroundX On-Prem to Your Kubernetes Cluster](#deploy-groundx-on-prem-to-your-kubernetes-cluster)
+- [Create and Deploy to a New Amazon EKS Cluster](#create-and-deploy-to-a-new-amazon-eks-cluster)
+  - [Create the VPC and EKS Cluster](#create-the-vpc-and-eks-cluster)
+  - [Deploy GroundX On-Prem to the New Amazon EKS Cluster](#deploy-groundx-on-prem-to-the-new-amazon-eks-cluster)
+  - [A Note on Cost](#a-note-on-cost)
+
+**[Using GroundX On-Prem]**(#using-groundx-on-prem)
+
+- [Get the API Endpoint](#get-the-api-endpoint)
+- [Use the SDKs](#use-the-sdks)
+- [Use the APIs](#use-the-apis)
+
+**[Tearing Down]**(#tearing-down)
 
 # What is GroundX On-Prem?
 
