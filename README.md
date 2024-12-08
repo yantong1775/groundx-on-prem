@@ -3,12 +3,10 @@
 ## Table of Contents
 
 **[What is GroundX On-Prem?](#what-is-groundx-on-prem)**
-
 - [GroundX Ingest Service](#groundx-ingest-service)
 - [GroundX Search Service](#groundx-search-service)
 
-**[Quick Start](#dependencies)&&
-
+**[Quick Start](#dependencies)**
 - [Dependencies](#dependencies)
 - [Deploy to an Existing Kubernetes Cluster](#deploy-to-an-existing-kubernetes-cluster)
   - **Background**
@@ -32,7 +30,6 @@
   - [A Note on Cost](#a-note-on-cost)
 
 **[Using GroundX On-Prem](#using-groundx-on-prem)**
-
 - [Get the API Endpoint](#get-the-api-endpoint)
 - [Use the SDKs](#use-the-sdks)
 - [Use the APIs](#use-the-apis)
@@ -92,16 +89,14 @@ If you will be using the Terraform scripts to set up infrastructure in AWS, you 
 
 ## Deploy to an Existing Kubernetes Cluster
 
-This section describes how to deploy GroundX On-Prem to an existing Kubernetes cluster.
-
 If you do not have an existing Kubernetes cluster and would like to use our Terraform scripts to set up an Amazon EKS cluster, you should follow the new Amazon EKS cluster [Quick Start guide](#create-and-deploy-to-a-new-amazon-eks-cluster).
 
 In order to deploy GroundX On-Prem to your Kubernetes cluster, you must:
 
-1. Ensure you have the [required compute resources](#required-compute-resources)
-2. [Configure](#configure-node-groups) or create appropriate node groups and nodes
-3. [Update operator/env.tfvars]((#create-envtfvars-file)) with your cluster information
-4. Run the [deploy script](#deploy-groundx-on-prem-to-your-kubernetes-cluster)
+1. [Check](#required-compute-resources) that you have the required compute resources
+2. [Configure or create](#configure-node-groups) appropriate node groups and nodes
+3. [Update](#create-envtfvars-file) `operator/env.tfvars` with your cluster information
+4. [Run](#deploy-groundx-on-prem-to-your-kubernetes-cluster) the deploy script
 
 ### Background
 
@@ -132,13 +127,13 @@ eyelevel-gpu-summary
 
 ##### Chip Architecture
 
-The **publicly available** GroundX On-Prem Kubernetes pods are **all** built for `x86_64` architecture. Pods built for other architectures, such as `arm64`, are available upon customer request.
+The **publicly available** GroundX On-Prem Kubernetes pods are all built for `x86_64` architecture. Pods built for other architectures, such as `arm64`, are available upon customer request.
 
 ##### Supported GPUs
 
 The GroundX On-Prem GPU pods are designed to run on NVIDIA GPUs with CUDA 12+. Other GPU types or older driver versions are not supported.
 
-As part of the deployment unless otherwise specified, the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator) is installed. If you already have this operator installed in your cluster, set `cluster.has_nvidia` to `true` in your `operator/env.tfvars` config file.
+As part of the deployment, unless otherwise specified, the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator) is installed. If you already have this operator installed in your cluster, set `cluster.has_nvidia` to `true` in your `operator/env.tfvars` config file.
 
 The NVIDIA GPU operator should update your NVIDIA drivers and other software components needed to provision the GPU, so long as you have [supported NVIDIA hardware](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html) on the machine.
 
@@ -178,7 +173,7 @@ eyelevel-gpu-summary
 
 ##### Node Group Resources
 
-The GroundX On-Prem pods are grouped into 5 categories, based on resource requirements, and deploy as described in [node group section](#node-groups).
+The GroundX On-Prem pods are grouped into 5 categories, based on resource requirements, and deploy as described in the [node group section](#node-groups).
 
 These pods can be deployed to 5 different dedicated node groups, a single node group, or any combination in between, so long as the minimum resource requirements are met and the appropriate node labels are applied to the nodes.
 
@@ -192,14 +187,14 @@ Pods in this node group have minimal requirements on CPU, RAM, and disk drive sp
 
 Pods in this node group have a range of requirements on CPU, RAM, and disk drive space but can typically run on most machines with the [supported architecture](#chip-architecture).
 
-Services, such as `OpenSearch`, `MySQL`, and `MinIO`, will deploy to the **eyelevel-cpu-memory** nodes, as will some of the ingestion pipeline pods.
+Services, such as `OpenSearch`, `MySQL`, and `MinIO`, will deploy to the **eyelevel-cpu-memory** nodes, as well as some ingestion pipeline pods.
 
-These pods have the following range of requirements (per pod), which can be found in detail in [operator/variables.tf](operator/variables.tf):
+These pods have the following range of requirements (per pod), which are described detail in [operator/variables.tf](operator/variables.tf):
 
 ```text
-20 - 75    GB disk drive space
-0.5 - 2    CPU cores
-0.5 - 4    GB RAM
+20 - 75 GB    disk drive space
+0.5 - 2       CPU cores
+0.5 - 4 GB    RAM
 ```
 
 ###### eyelevel-gpu-layout
@@ -215,7 +210,7 @@ Each pod requires up to:
 3 GB    RAM
 ```
 
-The current configuration for this service assumes an NVIDIA GPU with 16 GB of GPU memory, 4 CPU cores, and at least 12 GB RAM. It deploys 4 pods per node (called `workers` in `operator/variables.tf`) and claims the GPU via the `nvidia.com/gpu` resource provided by the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator).
+The current configuration for this service assumes an NVIDIA GPU with 16 GB of GPU memory, 4 CPU cores, and at least 12 GB RAM. It deploys 4 pods on this node (called `workers` in `operator/variables.tf`) and claims the GPU via the `nvidia.com/gpu` resource provided by the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator).
 
 If your machine has different resources than this, you will need to modify `layout_resources.inference` in your `operator/env.tfvars` using the per pod requirements described above to optimize for your node resources.
 
@@ -232,7 +227,7 @@ Each pod requires up to:
 0.75 GB    RAM
 ```
 
-The current configuration for this service assumes an NVIDIA GPU with 16 GB of GPU memory, 4 CPU cores, and at least 14 GB RAM. It deploys 14 pods per node (called `workers` in `operator/variables.tf`) and claims the GPU via the `nvidia.com/gpu` resource provided by the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator).
+The current configuration for this service assumes an NVIDIA GPU with 16 GB of GPU memory, 4 CPU cores, and at least 14 GB RAM. It deploys 14 pods on this node (called `workers` in `operator/variables.tf`) and claims the GPU via the `nvidia.com/gpu` resource provided by the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator).
 
 If your machine has different resources than this, you will need to modify `ranker_resources.inference` in your `operator/env.tfvars` using the per pod requirements described above to optimize for your node resources.
 
@@ -249,7 +244,7 @@ Each pod requires up to:
 7 GB     RAM
 ```
 
-The current configuration for this service assumes an NVIDIA GPU with 24 GB of GPU memory, 4 CPU cores, and at least 14 GB RAM. It deploys 2 pods per node (called `workers` in `operator/variables.tf`) and claims the GPU via the `nvidia.com/gpu` resource provided by the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator).
+The current configuration for this service assumes an NVIDIA GPU with 24 GB of GPU memory, 4 CPU cores, and at least 14 GB RAM. It deploys 2 pods on this node (called `workers` in `operator/variables.tf`) and claims the GPU via the `nvidia.com/gpu` resource provided by the [NVIDIA GPU operator](https://github.com/NVIDIA/gpu-operator).
 
 If your machine has different resources than this, you will need to modify `summary_resources.inference` in your `operator/env.tfvars` using the per pod requirements described above to optimize for your node resources.
 
@@ -267,11 +262,11 @@ eyelevel-gpu-summary
 
 Multiple node labels can be applied to the same node group, so long as resources are available as described in the [total recommended resource](#total-recommended-resources) and [node group resources](#node-group-resources) sections.
 
-However, **all** node labels must exist on **at least 1 node group** within your cluster. The label should be applied with the key a string and value one of the node labels above.
+However, **all** node labels must exist on **at least 1 node group** within your cluster. The label should be applied with a string key named `node` and an enumerated string value from the list above.
 
 ### Create env.tfvars File
 
-1. Create `operator/env.tfvars` file
+1. Create `operator/env.tfvars` file by copying the example file
 
 ```bash
 cp operator/env.tfvars.example operator/env.tfvars
@@ -299,8 +294,6 @@ The setup scripts assume your kubeconfig file can be found at `~/.kube/config`. 
 
 ### Deploy GroundX On-Prem to Your Kubernetes Cluster
 
-Assuming
-
 Once `env.tfvars` has been properly configured, run:
 
 ```bash
@@ -311,13 +304,11 @@ This will create a new namespace and deploy GroundX On-Prem into the Kubernetes 
 
 ## Create and Deploy to a New Amazon EKS Cluster
 
-This section describes how to create a new VPC and EKS cluster in AWS and deploy GroundX On-Prem to the EKS cluster.
-
 If you already have a Kubernetes cluster, including an existing AWS EKS cluster, you should follow the existing Kubernetes cluster [Quick Start guide](#deploy-to-an-existing-kubernetes-cluster).
 
 ### Create the VPC and EKS Cluster
 
-1. Create env.tfvars file
+1. Create env.tfvars file by copying the example file
 
 ```bash
 cp environment/aws/env.tfvars.example environment/aws/env.tfvars
@@ -365,7 +356,7 @@ This will create a new namespace and deploy GroundX On-Prem into the Kubernetes 
 
 The resources being created will incur cost via AWS. It is recommended to follow all instructions accurately and completely. So that setup and taredown are both executed completely. Experience with AWS is recommended.
 
-The default resource configurations are specified [here](https://github.com/eyelevelai/eyelevel-iac/blob/main/README.md#:~:text=configurations%20are%20specified-,here,-%2C%20consisting%20of%3A), consisting of:
+The default resource configurations are specified [here](#total-recommended-resources), consisting of:
 
 ```text
 2x m6a.xlarge
@@ -431,11 +422,6 @@ const groundx = new Groundx({
 The [API endpoint](#get-the-api-endpoint), in conjuction with the `admin.api_key` defined during deployment, can be used to interact with your On-Prem instance of GroundX.
 
 All of the methods and operations described in the [GroundX documentation](https://documentation.groundx.ai/reference) are supported with your On-Prem instance of GroundX. You simply have to substitute `https://api.groundx.ai` with your [API endpoint](#get-the-api-endpoint).
-
-```text
-POST
-https://api.groundx.ai/api/v1/ingest/documents/remote
-```
 
 # Tearing Down
 
