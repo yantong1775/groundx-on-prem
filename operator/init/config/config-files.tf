@@ -123,6 +123,7 @@ locals {
     "${local.module_path}/summary/config.py.tpl", {
     cacheAddr        = local.cache_settings.addr
     cachePort        = local.cache_settings.port
+    defaultLimit     = var.summary_resources.inference.replicas * var.summary_resources.inference.workers
     deviceType       = var.summary_internal.inference.device
     summaryService   = var.summary_internal.service
     validAPIKey      = var.admin.api_key
