@@ -1,20 +1,21 @@
-**Table of Contents**
 - [What is GroundX On-Prem?](#what-is-groundx-on-prem)
   - [GroundX Ingest Service](#groundx-ingest-service)
   - [GroundX Search Service](#groundx-search-service)
 - [Quick Start](#quick-start)
+  - [Dependencies](#dependencies)
   - [Deploy to an Existing Kubernetes Cluster](#deploy-to-an-existing-kubernetes-cluster)
-    - [Node Groups](#node-groups)
-    - [Required Compute Resources](#required-compute-resources)
-      - [Chip Architecture](#chip-architecture)
-      - [Supported GPUs](#supported-gpus)
-      - [Total Recommended Resources](#total-recommended-resources)
-      - [Node Group Resources](#node-group-resources)
-        - [eyelevel-cpu-only](#eyelevel-cpu-only)
-        - [eyelevel-cpu-memory](#eyelevel-cpu-memory)
-        - [eyelevel-gpu-layout](#eyelevel-gpu-layout)
-        - [eyelevel-gpu-ranker](#eyelevel-gpu-ranker)
-        - [eyelevel-gpu-summary](#eyelevel-gpu-summary)
+    - [Background](#background)
+      - [Node Groups](#node-groups)
+      - [Required Compute Resources](#required-compute-resources)
+        - [Chip Architecture](#chip-architecture)
+        - [Supported GPUs](#supported-gpus)
+        - [Total Recommended Resources](#total-recommended-resources)
+        - [Node Group Resources](#node-group-resources)
+          - [eyelevel-cpu-only](#eyelevel-cpu-only)
+          - [eyelevel-cpu-memory](#eyelevel-cpu-memory)
+          - [eyelevel-gpu-layout](#eyelevel-gpu-layout)
+          - [eyelevel-gpu-ranker](#eyelevel-gpu-ranker)
+          - [eyelevel-gpu-summary](#eyelevel-gpu-summary)
     - [Configure Node Groups](#configure-node-groups)
     - [Create env.tfvars File](#create-envtfvars-file)
     - [Deploy GroundX On-Prem to Your Kubernetes Cluster](#deploy-groundx-on-prem-to-your-kubernetes-cluster)
@@ -28,7 +29,7 @@
   - [Use the APIs](#use-the-apis)
 - [Tearing Down](#tearing-down)
 
-## What is GroundX On-Prem?
+# What is GroundX On-Prem?
 
 With this repository you can deploy GroundX RAG document ingestion and search capabilities to a Kubernetes cluster in a manner that can be isolated from any external dependencies.
 
@@ -53,19 +54,21 @@ This repo is in Open Beta. Feedback is appreciated and encouraged. To use the ho
 - [GroundX being used to power a multi-modal RAG application](https://www.youtube.com/watch?v=tIiqCG11hzQ)
 - [GroundX being used to power a verbal AI Agent](https://www.youtube.com/watch?v=BL2G3C3_RZU&t=300s)
 
-### GroundX Ingest Service
+## GroundX Ingest Service
 
 The GroundX ingest service expects visually complex documents in a variety of formats. It analyzes those documents with several fine tuned models, converts the documents into a queryable representation which is designed to be understood by LLMs, and stores that information for downstream search.
 
 ![GroundX Ingest Service](doc/groundx-ingest.jpg)
 
-### GroundX Search Service
+## GroundX Search Service
 
 Once documents have been processed via the ingest service they can be queried against via natural language queries. We use a custom configuration of Open Search which has been designed in tandem with the representations generated from the ingest service.
 
 ![GroundX Search Service](doc/groundx-search.jpg)
 
-## Quick Start
+# Quick Start
+
+## Dependencies
 
 Please ensure you have the following software tools installed before proceeding:
 
@@ -77,7 +80,7 @@ If you will be using the Terraform scripts to set up infrastructure in AWS, you 
 
 - `AWS CLI` ([Setup Docs](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html))
 
-### Deploy to an Existing Kubernetes Cluster
+## Deploy to an Existing Kubernetes Cluster
 
 This section describes how to deploy GroundX On-Prem to an existing Kubernetes cluster.
 
@@ -89,6 +92,8 @@ In order to deploy GroundX On-Prem to your Kubernetes cluster, you must:
 2. [Configure](#configure-node-groups) or create appropriate node groups and nodes
 3. [Update operator/env.tfvars]((#create-envtfvars-file)) with your cluster information
 4. Run the [deploy script](#deploy-groundx-on-prem-to-your-kubernetes-cluster)
+
+### Background
 
 #### Node Groups
 
@@ -238,9 +243,9 @@ The current configuration for this service assumes an NVIDIA GPU with 24 GB of G
 
 If your machine has different resources than this, you will need to modify `summary_resources.inference` in your `operator/env.tfvars` using the per pod requirements described above to optimize for your node resources.
 
-#### Configure Node Groups
+### Configure Node Groups
 
-As mentioned in the [node groups](#node-groups) section, node labels are defined in [shared/variables.tf](shared/variables.tf) and must be applied to appropriate nodes within your cluster. Default node label values are:
+As mentioned in the [node groups](#node-groups) section, node labels are defined in [shared/variables.tf](shared/variables.tf) and must be applied to appropriate nodes within your cluster. Default node label values include:
 
 ```text
 eyelevel-cpu-memory
@@ -254,7 +259,7 @@ Multiple node labels can be applied to the same node group, so long as resources
 
 However, **all** node labels must exist on **at least 1 node group** within your cluster. The label should be applied with the key a string and value one of the node labels above.
 
-#### Create env.tfvars File
+### Create env.tfvars File
 
 1. Create `operator/env.tfvars` file
 
@@ -282,7 +287,7 @@ If you need to make changes, as described in the [node group resouces](#node-gro
 
 The setup scripts assume your kubeconfig file can be found at `~/.kube/config`. If that is not the case, you will need to modify `cluster.kube_config_path` in your `operator/env.tfvars` file.
 
-#### Deploy GroundX On-Prem to Your Kubernetes Cluster
+### Deploy GroundX On-Prem to Your Kubernetes Cluster
 
 Assuming
 
@@ -294,13 +299,13 @@ operator/setup
 
 This will create a new namespace and deploy GroundX On-Prem into the Kubernetes cluster.
 
-### Create and Deploy to a New Amazon EKS Cluster
+## Create and Deploy to a New Amazon EKS Cluster
 
 This section describes how to create a new VPC and EKS cluster in AWS and deploy GroundX On-Prem to the EKS cluster.
 
 If you already have a Kubernetes cluster, including an existing AWS EKS cluster, you should follow the existing Kubernetes cluster [Quick Start guide](#deploy-to-an-existing-kubernetes-cluster).
 
-#### Create the VPC and EKS Cluster
+### Create the VPC and EKS Cluster
 
 1. Create env.tfvars file
 
@@ -320,7 +325,7 @@ You will be prompted for an AWS region to set up your cluster, and will also be 
 
 Once this command has executed, a VPC and Kubernetes cluster will be setup. You can proceed to deploying GroundX.
 
-#### Deploy GroundX On-Prem to the New Amazon EKS Cluster
+### Deploy GroundX On-Prem to the New Amazon EKS Cluster
 
 1. Create env.tfvars file
 
@@ -346,7 +351,7 @@ operator/setup
 
 This will create a new namespace and deploy GroundX On-Prem into the Kubernetes cluster.
 
-#### A Note on Cost
+### A Note on Cost
 
 The resources being created will incur cost via AWS. It is recommended to follow all instructions accurately and completely. So that setup and taredown are both executed completely. Experience with AWS is recommended.
 
@@ -361,9 +366,9 @@ The default resource configurations are specified [here](https://github.com/eyel
 ~300 GB gp2
 ```
 
-## Using GroundX On-Prem
+# Using GroundX On-Prem
 
-### Get the API Endpoint
+## Get the API Endpoint
 
 Once the setup is complete, run:
 
@@ -380,7 +385,7 @@ EXTERNAL-IP
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxx.us-east-2.elb.amazonaws.com
 ```
 
-### Use the SDKs
+## Use the SDKs
 
 The [API endpoint](#get-the-api-endpoint), in conjuction with the `admin.api_key` defined during deployment, can be used to configure the GroundX SDK to communicate with your On-Prem instance of GroundX.
 
@@ -411,7 +416,7 @@ const groundx = new Groundx({
 });
 ```
 
-### Use the APIs
+## Use the APIs
 
 The [API endpoint](#get-the-api-endpoint), in conjuction with the `admin.api_key` defined during deployment, can be used to interact with your On-Prem instance of GroundX.
 
@@ -422,7 +427,7 @@ POST
 https://api.groundx.ai/api/v1/ingest/documents/remote
 ```
 
-## Tearing Down
+# Tearing Down
 
 After all resources have been created, tear down can be done with the following commands.
 
