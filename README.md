@@ -61,6 +61,8 @@ This repo is in Open Beta. Feedback is appreciated and encouraged. To use the ho
 - [GroundX being used to power a multi-modal RAG application](https://www.youtube.com/watch?v=tIiqCG11hzQ)
 - [GroundX being used to power a verbal AI Agent](https://www.youtube.com/watch?v=BL2G3C3_RZU&t=300s)
 
+If you're deploying GroundX On-Prem on AWS, you might be interested in this [simple video guide for deploying on AWS](https://youtu.be/lFifBDDh6dc).
+
 ## GroundX Ingest Service
 
 The GroundX ingest service expects visually complex documents in a variety of formats. It analyzes those documents with several fine tuned models, converts the documents into a queryable representation which is designed to be understood by LLMs, and stores that information for downstream search.
