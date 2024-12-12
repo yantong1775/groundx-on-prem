@@ -1,6 +1,6 @@
 GROUNDX COMMUNITY LICENSE AGREEMENT
- 
-# GroundX On Prem Version Release Date: Dec 12, 2024
+
+GroundX On Prem Version Release Date: Dec 12, 2024
 
 - "Agreement" means the terms and conditions for use, reproduction, distribution, and modification of the GroundX Materials set forth herein.
 - "Documentation" means the specifications, manuals, and documentation accompanying GroundX distributed by EyeLevel.ai.
