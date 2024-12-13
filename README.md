@@ -395,17 +395,12 @@ The [API endpoint](#get-the-api-endpoint), in conjuction with the `admin.api_key
 Note: you must append `/api` to your [API endpoint](#get-the-api-endpoint) in the SDK configuration.
 
 ```python
-from groundx import Groundx
-from groundx.configuration import Configuration
+from groundx import GroundX
 
 external_ip = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxx.us-east-2.elb.amazonaws.com'
+api_key="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-groundx = Groundx(
-    configuration=Configuration(
-        host=f"http://{external_ip}/api",
-        api_key="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    )
-)
+client = GroundX(api_key=api_key, base_url=f"http://{external_ip}/api")
 ```
 
 ```typescript
