@@ -63,6 +63,10 @@ This repo is in Open Beta. Feedback is appreciated and encouraged. To use the ho
 
 If you're deploying GroundX On-Prem on AWS, you might be interested in this [simple video guide for deploying on AWS](https://youtu.be/lFifBDDh6dc).
 
+| [![GX Ingest](doc/try-xray.png)](https://dashboard.eyelevel.ai/xray) |
+|:--:|
+| [Test your documents for free online](https://dashboard.eyelevel.ai/xray)|
+
 ## GroundX Ingest Service
 
 The GroundX ingest service expects visually complex documents in a variety of formats. It analyzes those documents with several fine tuned models, converts the documents into a queryable representation which is designed to be understood by LLMs, and stores that information for downstream search.
