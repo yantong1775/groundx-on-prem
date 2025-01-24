@@ -61,7 +61,11 @@ This repo is in Open Beta. Feedback is appreciated and encouraged. To use the ho
 - [GroundX being used to power a multi-modal RAG application](https://www.youtube.com/watch?v=tIiqCG11hzQ)
 - [GroundX being used to power a verbal AI Agent](https://www.youtube.com/watch?v=BL2G3C3_RZU&t=300s)
 
-If you're deploying GroundX On-Prem on AWS, you might be interested in this [simple video guide for deploying on AWS](https://youtu.be/lFifBDDh6dc).
+If you're deploying GroundX On-Prem on AWS, you might be interested in this [simple video guide for deploying on AWS](https://youtu.be/lFifBDDh6dc). To see how well GroundX understands your documents, check out our online testing tool:
+
+| [![GX Ingest](doc/try-xray.png)](https://dashboard.eyelevel.ai/xray) |
+| :--: |
+| [Test your documents for free online](https://dashboard.eyelevel.ai/xray)|
 
 ## GroundX Ingest Service
 
