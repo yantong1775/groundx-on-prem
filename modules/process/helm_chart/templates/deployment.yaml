@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.service.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas.min }}
   selector:
     matchLabels:
       app: {{ .Values.service.name }}
@@ -23,8 +23,8 @@ spec:
           effect: "NoSchedule"
       initContainers:
       - name: wait-for-groundx
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
+        image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+        imagePullPolicy: "{{ .Values.busybox.pull }}"
         command: ['sh', '-c', "until wget --spider -q http://{{ .Values.dependencies.groundx }}:8080/health; do echo waiting for groundx; sleep 2; done"]
       containers:
       - name: {{ .Values.service.name }}
@@ -48,6 +48,13 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 30
+        resources:
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"
         volumeMounts:
         - name: config-volume
           mountPath: /home/golang/.cashbot/config.yaml

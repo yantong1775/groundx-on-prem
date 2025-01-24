@@ -13,10 +13,9 @@ ai:
       baseURL: ${searchBaseUrl}
       index: ${searchIndex}
       languages:
-      %{ for language in jsondecode(languages) ~}
-  - ${language}
-      %{ endfor ~}
-# formating in for loop is weird, this comment is needed
+%{ for language in jsondecode(languages) ~}
+        - ${language}
+%{ endfor ~}
       username: ${searchUser}
       password: ${searchPassword}
   eyelevelSearch:
@@ -32,6 +31,12 @@ ai:
     baseURL: ${summaryBaseUrl}
     defaultKitId: 0
   search: eyelevel
+  searchIndexes:
+    ${searchIndex}:
+      languages:
+%{ for language in jsondecode(languages) ~}
+        - ${language}
+%{ endfor ~}
 
 engines:
 %{ for engine in jsondecode(engines) ~}
@@ -42,6 +47,9 @@ engines:
 %{ endif ~}
 %{ if engine.baseURL != null ~}
     baseURL: "${engine.baseURL}"
+%{ endif ~}
+%{ if engine.maxInputTokens != null ~}
+    maxInputTokens: ${engine.maxInputTokens}
 %{ endif ~}
 %{ if engine.maxRequests != null ~}
     maxRequests: ${engine.maxRequests}
@@ -63,6 +71,7 @@ environment: prod
 groundxServer:
   baseURL: http://${groundxService}.${namespace}.svc.cluster.local
   port: 8080
+  serviceName: ${groundxService}
 
 init:
   ingestOnly: ${ingestOnly}
@@ -83,48 +92,85 @@ integrationTests:
 layoutWebhookServer:
   baseURL: http://${layoutWebhookService}.${namespace}.svc.cluster.local
   port: 8080
+  serviceName: ${layoutWebhookService}
 
 kafka:
-  fileLayoutDev:
-    broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-layout-dev
-  fileLayoutProd:
-    broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-layout-prod
   filePreProcess:
     broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-pre-process
+    groupId: ${namespace}-${streamService}
+    topic: ${preProcessQueue}
   fileProcess:
     broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-process
-  filePostProcess:
-    broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-post-process
+    groupId: ${namespace}-${streamService}
+    topic: ${processQueue}
   fileSummaryDev:
     broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-summary-dev
+    groupId: ${namespace}-${streamService}
+    topic: ${summaryClientQueue}
   fileSummaryProd:
     broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-summary-prod
+    groupId: ${namespace}-${streamService}
+    topic: ${summaryClientQueue}
   fileUpdate:
     broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-update
+    groupId: ${namespace}-${streamService}
+    topic: ${queueQueue}
   fileUpload:
     broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: file-upload
-  stripeEvent:
-    broker: ${streamBaseUrl}
-    groupId: eyelevel-kafka
-    topic: stripe-event
+    groupId: ${namespace}-${streamService}
+    topic: ${uploadQueue}
+
+metrics:
+  active: true
+  api:
+%{ for a in jsondecode(metrics.api) ~}
+    - name: ${a.name}
+%{ endfor ~}
+  document:
+    tokensPerMinute: ${metrics.documentTPM}
+  inference:
+%{ for a in jsondecode(metrics.inference) ~}
+    - name: ${a.name}
+%{ if a.tokensPerMinute != null ~}
+      tokensPerMinute: ${a.tokensPerMinute}
+%{ endif ~}
+%{ endfor ~}
+  page:
+    tokensPerMinute: ${metrics.pageTPM}
+  queue:
+%{ for a in jsondecode(metrics.queue) ~}
+    - name: ${a.name}
+%{ if a.target != null ~}
+      target: ${a.target}
+%{ endif ~}
+%{ if a.threshold != null ~}
+      threshold: ${a.threshold}
+%{ endif ~}
+%{ endfor ~}
+  session:
+    addr: ${metrics.cacheAddr}:${metrics.cachePort}
+    notCluster: ${metrics.cacheNotCluster}
+  summaryRequest:
+    tokensPerMinute: ${metrics.summaryRequestTPM}
+  task:
+%{ for a in jsondecode(metrics.task) ~}
+    - name: ${a.name}
+%{ if a.target != null ~}
+      target: ${a.target}
+%{ endif ~}
+%{ if a.threshold != null ~}
+      threshold: ${a.threshold}
+%{ endif ~}
+%{ endfor ~}
+
+metricsServer:
+  baseURL: http://${metrics.service}.${namespace}.svc.cluster.local
+  port: 8080
+  serviceName: ${metrics.service}
+  sslCACert: ${sslCACert}
+  sslCert: ${sslCert}
+  sslKey: ${sslKey}
+  sslPort: 8443
 
 owner:
   baseURL: http://${groundxService}.${namespace}.svc.cluster.local/api/v1
@@ -134,11 +180,15 @@ owner:
 
 preProcessFileServer:
   baseURL: http://${preProcessService}.${namespace}.svc.cluster.local
+  maxConcurrent: ${preProcessQueueSize}
   port: 8080
+  serviceName: ${preProcessService}
 
 processFileServer:
   baseURL: http://${processService}.${namespace}.svc.cluster.local
+  maxConcurrent: ${processQueueSize}
   port: 8080
+  serviceName: ${processService}
 
 processors:%{ if ingestOnly }
   extraPostDefaults:
@@ -157,8 +207,10 @@ processors:%{ if ingestOnly }
 
 queueFileServer:
   baseURL: http://${queueService}.${namespace}.svc.cluster.local
+  maxConcurrent: ${queueQueueSize}
   pollTime: 1
   port: 8080
+  serviceName: ${queueService}
 
 rec:
   mysql: *mysql
@@ -172,8 +224,9 @@ ssp:
 
 summaryServer:
   baseURL: http://${summaryService}.${namespace}.svc.cluster.local
-  maxConcurrent: ${summaryClientThreads}
+  maxConcurrent: ${summaryClientWorkers}
   port: 8080
+  serviceName: ${summaryClientService}
 
 upload:
   baseDomain: ${fileBaseDomain}
@@ -187,4 +240,6 @@ upload:
 
 uploadFileServer:
   baseURL: http://${uploadService}.${namespace}.svc.cluster.local
+  maxConcurrent: ${uploadQueueSize}
   port: 8080
+  serviceName: ${uploadService}

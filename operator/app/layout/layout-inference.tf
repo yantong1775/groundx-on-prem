@@ -1,5 +1,5 @@
 resource "helm_release" "layout_inference_service" {
-  name       = "${var.layout_internal.service}-inference-cluster"
+  name       = "${var.layout_internal.service}-inference"
   namespace  = var.app_internal.namespace
 
   chart      = "${local.module_path}/layout/inference/helm_chart"
@@ -8,15 +8,27 @@ resource "helm_release" "layout_inference_service" {
 
   values = [
     yamlencode({
+      busybox         = var.app_internal.busybox
+      createSymlink   = local.is_openshift ? false : true
       dependencies    = {
         cache         = "${local.cache_settings.addr} ${local.cache_settings.port}"
         file          = "${local.file_settings.dependency} ${local.file_settings.port}"
       }
-      image           = var.cluster.internet_access ? var.layout_internal.inference.image : var.layout_internal.inference.image_op
-      nodeSelector    = {
-        node          = var.cluster_internal.nodes.gpu_layout
+      image           = {
+        pull          = var.layout_internal.inference.image.pull
+        repository    = "${var.app_internal.repo_url}/${var.layout_internal.inference.image.repository}${local.op_container_suffix}"
+        tag           = var.layout_internal.inference.image.tag
       }
-      replicas        = var.layout_resources.inference.replicas
+      nodeSelector    = {
+        node          = var.layout_resources.inference.node
+      }
+      replicas        = {
+        cooldown      = var.layout_resources.inference.replicas.cooldown
+        max           = local.replicas.layout.inference.max
+        min           = local.replicas.layout.inference.min
+        threshold     = var.layout_resources.inference.replicas.threshold
+      }
+      resources       = var.layout_resources.inference.resources
       securityContext = {
         runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }

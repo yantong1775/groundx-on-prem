@@ -34,13 +34,22 @@ get_containers() {
 build_command="buildx build"
 build_flag=true
 container_dirs=$(get_containers)
+premium="premium/"
 push_flag=true
 repo_target=""
-target="linux/amd64,linux/arm64"
+target="linux/amd64"
 
 while [[ $# -gt 0 ]]
 do
     case $1 in
+    -standard|-s)
+      premium=""
+      shift
+    ;;
+    -premium|-p)
+      premium="premium/"
+      shift
+    ;;
     -no-build|-b)
       build_flag=false
       shift
@@ -125,8 +134,8 @@ for container_dir in $container_dirs; do
             pushd "$container_dir" > /dev/null
             status "\t\u00b7 [$repo_name]\tBuilding"
             if [ "$build_flag" = true ]; then
-                echo $'\t\t' "docker $build_command --platform $target -f $file_name -t public.ecr.aws/c9r4x6y5/eyelevel/$repo_name:latest ." && echo
-                docker $build_command --platform $target -f $file_name -t public.ecr.aws/c9r4x6y5/eyelevel/$repo_name:latest . && echo
+                echo $'\t\t' "docker $build_command --platform $target -f $file_name -t public.ecr.aws/c9r4x6y5/eyelevel/$premium$repo_name:latest ." && echo
+                docker $build_command --platform $target -f $file_name -t public.ecr.aws/c9r4x6y5/eyelevel/$premium$repo_name:latest . && echo
                 status "\tBuilt" && ok && echo
             else
                 warn "skipping" && echo
@@ -134,9 +143,9 @@ for container_dir in $container_dirs; do
 
             status "\t\u00b7 [$repo_name]\tPushing"
             if [ "$push_flag" = true ]; then
-                echo $'\t\t' "docker push public.ecr.aws/c9r4x6y5/eyelevel/$repo_name:latest" && echo
+                echo $'\t\t' "docker push public.ecr.aws/c9r4x6y5/eyelevel/$premium$repo_name:latest" && echo
 
-                docker push public.ecr.aws/c9r4x6y5/eyelevel/$repo_name:latest && echo
+                docker push public.ecr.aws/c9r4x6y5/eyelevel/$premium$repo_name:latest && echo
                 
                 status "\tPushed" && ok
             else

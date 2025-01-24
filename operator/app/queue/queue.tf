@@ -1,26 +1,38 @@
 resource "helm_release" "queue_service" {
-  name       = "${var.queue_internal.service}-cluster"
+  name       = var.queue_internal.service
   namespace  = var.app_internal.namespace
   chart      = "${local.module_path}/queue/helm_chart"
 
   values = [
     yamlencode({
-      dependencies = {
-        groundx  = "${var.groundx_internal.service}.${var.app_internal.namespace}.svc.cluster.local"
+      busybox         = var.app_internal.busybox
+      dependencies    = {
+        groundx       = "${var.groundx_internal.service}.${var.app_internal.namespace}.svc.cluster.local"
       }
-      image = var.queue_internal.image
-      nodeSelector = {
-        node = var.cluster_internal.nodes.cpu_only
+      image           = {
+        pull          = var.queue_internal.image.pull
+        repository    = "${var.app_internal.repo_url}/${var.queue_internal.image.repository}${local.container_suffix}"
+        tag           = var.queue_internal.image.tag
       }
+      nodeSelector    = {
+        node          = var.queue_resources.node
+      }
+      replicas        = {
+        cooldown      = var.queue_resources.replicas.cooldown
+        max           = local.replicas.queue.max
+        min           = local.replicas.queue.min
+        threshold     = var.queue_resources.replicas.threshold
+      }
+      resources       = var.queue_resources.resources
       securityContext = {
-        runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
-        runAsGroup = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
-        fsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
+        runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
+        runAsGroup    = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
+        fsGroup       = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1001) : 1001
       }
-      service = {
-        name      = var.queue_internal.service
-        namespace = var.app_internal.namespace
-        version   = var.queue_internal.version
+      service         = {
+        name          = var.queue_internal.service
+        namespace     = var.app_internal.namespace
+        version       = var.queue_internal.version
       }
     })
   ]

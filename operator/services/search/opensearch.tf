@@ -27,7 +27,7 @@ resource "helm_release" "opensearch_operator" {
       majorVersion = var.search_internal.version
       nodeGroup   = "master"
       nodeSelector = {
-        node = var.cluster_internal.nodes.cpu_memory
+        node = var.search_resources.node
       }
       persistence = {
         enabled = true
@@ -38,7 +38,7 @@ resource "helm_release" "opensearch_operator" {
         fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
         runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
       }
-      plugins = var.search.plugins
+      plugins = local.language_configs.search.plugins
       replicas = var.search_resources.replicas
       resources = var.search_resources.resources
       securityContext = {

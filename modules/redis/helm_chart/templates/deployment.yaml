@@ -7,7 +7,7 @@ metadata:
     app: "{{ .Values.service.name }}"
 spec:
   serviceName: "{{ .Values.service.name }}"
-  replicas: {{ .Values.service.replicaCount }}
+  replicas: {{ .Values.replicas.min }}
   selector:
     matchLabels:
       app: "{{ .Values.service.name }}"
@@ -25,7 +25,7 @@ spec:
       serviceAccountName: "{{ .Values.service.name }}-sa"
       containers:
         - name: "{{ .Values.service.name }}"
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image_repo_url }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: "{{ .Values.image.pull }}"
           ports:
             - containerPort: {{ .Values.service.port }}
@@ -33,6 +33,13 @@ spec:
             runAsUser: {{ .Values.securityContext.runAsUser }}
             runAsGroup: {{ .Values.securityContext.runAsGroup }}
             fsGroup: {{ .Values.securityContext.fsGroup }}
+          resources:
+            limits:
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: "{{ .Values.resources.limits.memory }}"
+            requests:
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: "{{ .Values.resources.requests.memory }}"
           volumeMounts:
             - name: "{{ .Values.service.name }}-persistent-storage"
               mountPath: "{{ .Values.persistence.mountPath }}"
