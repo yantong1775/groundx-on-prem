@@ -83,7 +83,9 @@ Once documents have been processed via the ingest service they can be queried ag
 
 ## Dependencies
 
-Please ensure you have the following software tools installed before proceeding:
+GroundX On-Prem requires Kubernetes cluster `v1.18+`.
+
+Please ensure you also have the following software tools installed before proceeding:
 
 - `bash` shell (version 4.0 or later recommended. AWS Cloud Shell has insufficient resources.)
 - `terraform` ([Setup Docs](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli))

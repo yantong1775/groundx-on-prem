@@ -26,6 +26,43 @@ variable "environment_internal" {
   }
 }
 
+variable "autoscaler_internal" {
+  type           = object({
+    chart        = object({
+      name       = string
+      repository = string
+      version    = string
+    })
+    resources    = object({
+      limits     = object({
+        cpu      = number
+        memory   = string
+      })
+      requests   = object({
+        cpu      = number
+        memory   = string
+      })
+    })
+  })
+  default        = {
+    chart        = {
+      name       = "cluster-autoscaler"
+      repository = "https://kubernetes.github.io/autoscaler"
+      version    = "9.29.0"
+    }
+    resources    = {
+      limits     = {
+        cpu      = 0.2
+        memory   = "512Mi"
+      }
+      requests   = {
+        cpu      = 0.1
+        memory   = "256Mi"
+      } 
+    }
+  }
+}
+
 variable "nodes" {
   description                   = "EKS compute resource information"
   type                          = object({
@@ -121,7 +158,7 @@ variable "nodes" {
     node_groups                 = {
       cpu_memory_nodes          = {
         ami_type                = "AL2023_x86_64_STANDARD"
-        desired_size            = 2
+        desired_size            = 1
         ebs                     = {
           delete_on_termination = true
           encrypted             = true
@@ -133,7 +170,7 @@ variable "nodes" {
           volume_type           = "gp2"
         }
         instance_types          = ["m6a.xlarge"]
-        max_size                = 10
+        max_size                = 4
         min_size                = 1
       }
       cpu_only_nodes            = {
@@ -150,8 +187,8 @@ variable "nodes" {
           volume_type           = "gp2"
         }
         instance_types          = ["t3a.medium"]
-        max_size                = 10
-        min_size                = 1
+        max_size                = 15
+        min_size                = 3
       }
       layout_nodes              = {
         ami_type                = "AL2023_x86_64_NVIDIA"
@@ -172,24 +209,7 @@ variable "nodes" {
       }
       ranker_nodes              = {
         ami_type                = "AL2023_x86_64_NVIDIA"
-        desired_size            = 3
-        ebs                     = {
-          delete_on_termination = true
-          encrypted             = true
-          iops                  = null
-          kms_key_id            = null
-          snapshot_id           = null
-          throughput            = null
-          volume_size           = 50
-          volume_type           = "gp2"
-        }
-        instance_types          = ["g4dn.2xlarge"]
-        max_size                = 10
-        min_size                = 1
-      }
-      summary_nodes             = {
-        ami_type                = "AL2023_x86_64_NVIDIA"
-        desired_size            = 2
+        desired_size            = 1
         ebs                     = {
           delete_on_termination = true
           encrypted             = true
@@ -200,8 +220,25 @@ variable "nodes" {
           volume_size           = 75
           volume_type           = "gp2"
         }
-        instance_types          = ["g5.xlarge"]
-        max_size                = 5
+        instance_types          = ["g4dn.2xlarge"]
+        max_size                = 10
+        min_size                = 1
+      }
+      summary_nodes             = {
+        ami_type                = "AL2023_x86_64_NVIDIA"
+        desired_size            = 1
+        ebs                     = {
+          delete_on_termination = true
+          encrypted             = true
+          iops                  = null
+          kms_key_id            = null
+          snapshot_id           = null
+          throughput            = null
+          volume_size           = 100
+          volume_type           = "gp2"
+        }
+        instance_types          = ["g6e.xlarge"]
+        max_size                = 10
         min_size                = 1
       }
     }

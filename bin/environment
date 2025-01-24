@@ -10,11 +10,6 @@ ENV_BASE="$BIN_DIR/../environment"
 must_have aws
 must_have terraform
 
-valid_envs=("aws")
-recursive_types=("aws")
-
-valid_aws=("aws-vpc" "eks")
-
 ENV=""
 AWS=""
 

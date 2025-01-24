@@ -60,3 +60,11 @@ kubeconfig_eks
 *.key
 *credentials.*
 *.command
+*.rdb
+out
+
+autoscaler.tf
+hpa.tf
+modules/metrics
+modules/scaling/hpa
+operator/app/metrics

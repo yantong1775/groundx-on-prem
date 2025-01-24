@@ -1,30 +1,20 @@
 #!/usr/bin/env bash
 
 CONCURRENCY=1
+MIN_KUBERNETES_VERSION="1.18"
 
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$BIN_DIR/shared/util"
 
-# valid_groups order is important:
-# the groups are executed in order for deploy
-# and reverse order for destroy
-valid_groups=("init" "services" "app")
-recursive_types=("init" "services" "app")
-
-valid_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload" "ranker" "layout" "summary")
-valid_init=("add" "config")
-valid_services=("cache" "db" "file" "graph" "search" "stream")
-
-# for helm release explicit clean up, in case terraform fails to clean up
-golang_apps=("groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload")
-inference_apps=("ranker" "summary")
-inference_process_apps=("layout")
+must_have terraform
+must_have kubectl
 
 ALL=false
 GROUP=""
 APP=""
 INIT=""
 SERVICE=""
+
 
 if [[ "$1" =~ ^- ]]; then
   IN=""
@@ -49,12 +39,16 @@ else
 fi
 
 CLEAR=0
+DEV=0
 TFLAG=0
 
-while getopts ":ct" opt; do
+while getopts ":cdt" opt; do
   case $opt in
     c)
       CLEAR=1
+      ;;
+    d)
+      DEV=1
       ;;
     t)
       TFLAG=1
@@ -70,6 +64,11 @@ while getopts ":ct" opt; do
   esac
 done
 
+if [[ "$DEV" -eq 1 ]]; then
+  echo "Setting dev"
+  export TF_VAR_DEV=1
+fi
+
 destroy() {
   local dir="$1"
 
@@ -81,32 +80,25 @@ destroy() {
       terraform -chdir="$dir" destroy --auto-approve
       for app in "${inference_apps[@]}"; do
         if [[ "$dir" == */"$app" ]]; then
-          helm delete -n eyelevel $app-api-cluster > /dev/null 2>&1
-          helm delete -n eyelevel $app-inference-cluster > /dev/null 2>&1
-          if [[ "$app" == "layout" ]]; then
-            helm delete -n eyelevel $app-process > /dev/null 2>&1
-          fi
+          helm delete -n eyelevel $app-api > /dev/null 2>&1
+          helm delete -n eyelevel $app-inference > /dev/null 2>&1
           return 0
         fi
       done
       for app in "${inference_process_apps[@]}"; do
         if [[ "$dir" == */"$app" ]]; then
-          helm delete -n eyelevel $app-api-cluster > /dev/null 2>&1
-          helm delete -n eyelevel $app-inference-cluster > /dev/null 2>&1
+          helm delete -n eyelevel $app-api > /dev/null 2>&1
+          helm delete -n eyelevel $app-inference > /dev/null 2>&1
+          helm delete -n eyelevel $app-map > /dev/null 2>&1
           helm delete -n eyelevel $app-process > /dev/null 2>&1
           helm delete -n eyelevel $app-ocr > /dev/null 2>&1
+          helm delete -n eyelevel $app-save > /dev/null 2>&1
           return 0
         fi
       done
       for app in "${golang_apps[@]}"; do
         if [[ "$dir" == */"$app" ]]; then
-          helm delete -n eyelevel $app-cluster > /dev/null 2>&1
-          return 0
-        fi
-      done
-      for app in "${helm_apps[@]}"; do
-        if [[ "$dir" == */"$app" ]]; then
-          helm delete -n eyelevel $app-cluster > /dev/null 2>&1
+          helm delete -n eyelevel $app > /dev/null 2>&1
           return 0
         fi
       done
@@ -132,7 +124,15 @@ fi
 if [[ -n "$GROUP" ]]; then
   if [[ " ${valid_groups[@]} " =~ " $GROUP " ]]; then
     if [[ " ${recursive_types[@]} " =~ " $GROUP " ]]; then
-      recurse_directories $do "$BIN_DIR/../operator/$GROUP" $CONCURRENCY
+      if [[ "$GROUP" == "init" ]]; then
+        recurse_group $do "$BIN_DIR/../operator/$GROUP" $CONCURRENCY "${valid_init[@]}"
+      elif [[ "$GROUP" == "services" ]]; then
+        recurse_group $do "$BIN_DIR/../operator/$GROUP" $CONCURRENCY "${valid_services[@]}"
+      elif [[ "$GROUP" == "app" ]]; then
+        recurse_group $do "$BIN_DIR/../operator/$GROUP" $CONCURRENCY "${valid_apps[@]}"
+      else
+        recurse_directories $do "$BIN_DIR/../operator/$GROUP" $CONCURRENCY
+      fi
     else
       $do "$BIN_DIR/../operator/$GROUP"
     fi
@@ -149,7 +149,15 @@ elif [[ -n "$SERVICE" ]]; then
 else
   for dir in "${valid_groups[@]}"; do
     if [[ " ${recursive_types[@]} " =~ " $dir " ]]; then
-      recurse_directories $do "$BIN_DIR/../operator/$dir" $CONCURRENCY
+      if [[ "$dir" == "init" ]]; then
+        recurse_group $do "$BIN_DIR/../operator/$dir" $CONCURRENCY "${valid_init[@]}"
+      elif [[ "$dir" == "services" ]]; then
+        recurse_group $do "$BIN_DIR/../operator/$dir" $CONCURRENCY "${valid_services[@]}"
+      elif [[ "$dir" == "app" ]]; then
+        recurse_group $do "$BIN_DIR/../operator/$dir" $CONCURRENCY "${valid_apps[@]}"
+      else
+        recurse_directories $do "$BIN_DIR/../operator/$dir" $CONCURRENCY
+      fi
     else
       $do "$BIN_DIR/../operator/$dir"
     fi

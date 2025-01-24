@@ -1,3 +1,14 @@
+locals {
+  proxy = {
+    limits = var.db_resources.proxy.resources.limits.cpu < 1 ? "${var.db_resources.proxy.resources.limits.cpu * 1000}m" : var.db_resources.proxy.resources.limits.cpu
+    requests = var.db_resources.proxy.resources.requests.cpu < 1 ? "${var.db_resources.proxy.resources.requests.cpu * 1000}m" : var.db_resources.proxy.resources.requests.cpu
+  }
+  pxc = {
+    limits = var.db_resources.resources.limits.cpu < 1 ? "${var.db_resources.resources.limits.cpu * 1000}m" : var.db_resources.resources.limits.cpu
+    requests = var.db_resources.resources.requests.cpu < 1 ? "${var.db_resources.resources.requests.cpu * 1000}m" : var.db_resources.resources.requests.cpu
+  }
+}
+
 resource "helm_release" "percona_operator" {
   count = local.create_database ? 1 : 0
 
@@ -11,7 +22,7 @@ resource "helm_release" "percona_operator" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.cluster_internal.nodes.cpu_memory
+        node = var.db_resources.node
       }
     })
   ]
@@ -34,46 +45,64 @@ resource "helm_release" "percona_cluster" {
       backup = {
         enabled = var.db_internal.backup
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.db_resources.node
         }
       }
       haproxy = {
         enabled = true
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.db_resources.node
         }
-        resources = var.db_resources.proxy.resources
+        resources = {
+          limits            = {
+            cpu             = local.proxy.limits
+            memory          = var.db_resources.proxy.resources.limits.memory
+          }
+          requests          = {
+            cpu             = local.proxy.requests
+            memory          = var.db_resources.proxy.resources.requests.memory
+          }
+        }
         size    = var.db_resources.proxy.replicas
       }
       logcollector = {
         enabled = var.db_internal.logcollector_enable
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.db_resources.node
         }
       }
       nodeSelector = {
-        node = var.cluster_internal.nodes.cpu_memory
+        node = var.db_resources.node
       }
       pmm = {
         enabled = var.db_internal.pmm_enable
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.db_resources.node
         }
       }
       proxysql = {
         enabled = false
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.db_resources.node
         }
       }
       pxc = {
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.db_resources.node
         }
         persistence = {
           size = var.db_resources.pv_size
         }
-        resources = var.db_resources.resources
+        resources = {
+          limits            = {
+            cpu             = local.pxc.limits
+            memory          = var.db_resources.resources.limits.memory
+          }
+          requests          = {
+            cpu             = local.pxc.requests
+            memory          = var.db_resources.resources.requests.memory
+          }
+        }
         size = var.db_resources.replicas
       }
       secrets = {

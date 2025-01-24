@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.service.name }}
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.replicas.min }}
   selector:
     matchLabels:
       app: {{ .Values.service.name }}
@@ -24,18 +24,20 @@ spec:
           effect: "NoSchedule"
       initContainers:
         - name: wait-for-cache
-          image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-          imagePullPolicy: "Always"
+          image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+          imagePullPolicy: "{{ .Values.busybox.pull }}"
           command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"]
         - name: wait-for-file-storage
-          image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-          imagePullPolicy: "Always"
+          image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+          imagePullPolicy: "{{ .Values.busybox.pull }}"
           command: ['sh', '-c', "until nc -z {{ .Values.dependencies.file }}; do echo waiting for file storage; sleep 2; done"]
+        {{- if .Values.createSymlink }}
         - name: create-symlink
-          image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-          imagePullPolicy: "Always"
+          image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+          imagePullPolicy: "{{ .Values.busybox.pull }}"
           command: ["/bin/sh", "-c", "--"]
           args: ["echo 'Running ldconfig_symlink.sh on this node'; /scripts/ldconfig_symlink.sh"]
+        {{- end }}
           securityContext:
             privileged: true
           resources:
@@ -43,9 +45,11 @@ spec:
               cpu: 10m
               memory: 50Mi
           volumeMounts:
+            {{- if .Values.createSymlink }}
             - name: {{ .Values.service.name }}
               mountPath: /scripts/ldconfig_symlink.sh
               subPath: ldconfig_symlink.sh
+            {{- end }}
             - name: host-sbin
               mountPath: /host-sbin
             - name: host-usr-sbin
@@ -64,38 +68,33 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
           workingDir: /app
-          # LOAD_MODEL=yes && LOCAL=0 && export PYTHONPATH=/app && celery -A document.celery_process.app worker -n layout-w1 --loglevel=INFO --concurrency=1 --queues=layout_queue
           command:
             - /bin/sh
             - -c
-            #- |
-            #  export PYTHONPATH=/app && while true; do sleep 30; done
             - |
               export PYTHONPATH=/app && python /app/init-layout.py && supervisord -c /app/supervisord.conf
           securityContext:
             runAsUser: {{ .Values.securityContext.runAsUser }}
           livenessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - ps aux | grep 'document.celery_process.app' | grep -v grep || exit 1
-            initialDelaySeconds: 60
-            failureThreshold: 10
-            periodSeconds: 30
+            httpGet:
+              path: /alive
+              port: 8080
+            initialDelaySeconds: 120
+            failureThreshold: 8
+            periodSeconds: 15
           readinessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - ps aux | grep 'document.celery_process.app' | grep -v grep || exit 1
-            initialDelaySeconds: 60
-            periodSeconds: 30
+            httpGet:
+              path: /health
+              port: 8080
           resources:
             limits:
-              nvidia.com/gpu: {{ .Values.replicas }}
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: "{{ .Values.resources.limits.memory }}"
+              nvidia.com/gpu: {{ .Values.resources.limits.gpu }}
             requests:
-              nvidia.com/gpu: {{ .Values.replicas }}
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: "{{ .Values.resources.requests.memory }}"
+              nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
           volumeMounts:
             - name: config-models
               mountPath: /app/config_models.py
@@ -115,11 +114,13 @@ spec:
             name: layout-config-py-map
         - name: supervisord-volume
           configMap:
-            name: layout-supervisord-16gb-conf-map
+            name: layout-inference-supervisord-16gb-conf-map
+        {{- if .Values.createSymlink }}
         - name: {{ .Values.service.name }}
           configMap:
             name: ldconfig-symlink-map
             defaultMode: 0555
+        {{- end }}
         - name: host-sbin
           hostPath:
             path: /sbin

@@ -1,3 +1,10 @@
+locals {
+  pool = {
+    limits = var.file_resources.resources.limits.cpu < 1 ? "${var.file_resources.resources.limits.cpu * 1000}m" : var.file_resources.resources.limits.cpu
+    requests = var.file_resources.resources.requests.cpu < 1 ? "${var.file_resources.resources.requests.cpu * 1000}m" : var.file_resources.resources.requests.cpu
+  }
+}
+
 resource "helm_release" "minio_operator" {
   count = local.create_file ? 1 : 0
 
@@ -17,7 +24,7 @@ resource "helm_release" "minio_operator" {
           fsGroup    = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.GID, 1000) : 1000)
         }
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.file_resources.node
         }
         replicaCount    = var.file_resources.operator.replicas
         securityContext = {
@@ -54,7 +61,7 @@ resource "helm_release" "minio_tenant" {
         }
         name = "${var.file_internal.service}-tenant"
         nodeSelector = {
-          node = var.cluster_internal.nodes.cpu_memory
+          node = var.file_resources.node
         }
         pools = [{
           containerSecurityContext = {
@@ -64,7 +71,17 @@ resource "helm_release" "minio_tenant" {
           }
           name = "${var.file_internal.service}-tenant-pool-0"
           nodeSelector = {
-            node = var.cluster_internal.nodes.cpu_memory
+            node = var.file_resources.node
+          }
+          resources = {
+            limits            = {
+              cpu             = local.pool.limits
+              memory          = var.file_resources.resources.limits.memory
+            }
+            requests          = {
+              cpu             = local.pool.requests
+              memory          = var.file_resources.resources.requests.memory
+            }
           }
           securityContext = {
             runAsUser  = tonumber(local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1000) : 1000)
@@ -75,7 +92,6 @@ resource "helm_release" "minio_tenant" {
           size             = var.file_resources.pool_size
           volumesPerServer = var.file_resources.pool_server_volumes
         }]
-        resources = var.file_resources.resources
       }
     })
   ]

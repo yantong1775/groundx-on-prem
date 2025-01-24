@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.service.name }}
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.replicas.min }}
   selector:
     matchLabels:
       app: {{ .Values.service.name }}
@@ -24,14 +24,16 @@ spec:
           effect: "NoSchedule"
       initContainers:
         - name: wait-for-cache
-          image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-          imagePullPolicy: "Always"
+          image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+          imagePullPolicy: "{{ .Values.busybox.pull }}"
           command: ["sh", "-c", "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"]
+        {{- if .Values.createSymlink }}
         - name: create-symlink
-          image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-          imagePullPolicy: "Always"
+          image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+          imagePullPolicy: "{{ .Values.busybox.pull }}"
           command: ["/bin/sh", "-c", "--"]
           args: ["echo 'Running ldconfig_symlink.sh on this node'; /scripts/ldconfig_symlink.sh"]
+        {{- end }}
           securityContext:
             privileged: true
           resources:
@@ -39,9 +41,11 @@ spec:
               cpu: 10m
               memory: 50Mi
           volumeMounts:
+            {{- if .Values.createSymlink }}
             - name: {{ .Values.service.name }}
               mountPath: /scripts/ldconfig_symlink.sh
               subPath: ldconfig_symlink.sh
+            {{- end }}
             - name: host-sbin
               mountPath: /host-sbin
             - name: host-usr-sbin
@@ -50,6 +54,71 @@ spec:
               mountPath: /host-bin
             - name: host-usr-bin
               mountPath: /host-usr-bin
+        - name: update-permissions
+          image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+          imagePullPolicy: "{{ .Values.busybox.pull }}"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsGroup }} /workspace/hf_models_cache && chmod -R 777 /workspace/hf_models_cache
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: model-volume
+              mountPath: /workspace/hf_models_cache
+        - name: download-model
+          image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+          imagePullPolicy: "{{ .Values.busybox.pull }}"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              download_and_extract_model() {
+                echo "Model downloading started..."
+
+                touch /workspace/hf_models_cache/downloading
+
+                echo "00 01 02" | tr ' ' '\n' | xargs -n 1 -P 5 -I {} sh -c \
+                  'MAX_RETRIES=3; RETRIES=0; SUCCESS=0; PART={}; URL=https://upload.groundx.ai/ranker/model/{{ .Values.model }}/model.tar.gz.part.$PART; \
+                  while [ $RETRIES -lt $MAX_RETRIES ]; do \
+                    echo "Download [attempt $RETRIES] ranker.tar.gz.part.$PART"; \
+                    wget -q -O /workspace/hf_models_cache/ranker.tar.gz.part.$PART $URL && { echo "Downloaded ranker.tar.gz.part.$PART successfully."; SUCCESS=1; break; }; \
+                    echo "Failed to download $URL. Retrying..."; RETRIES=$((RETRIES + 1)); sleep 3; \
+                  done; \
+                  [ $SUCCESS -eq 0 ] && { echo "Failed to download $URL after $MAX_RETRIES attempts. Exiting."; rm /workspace/hf_models_cache/downloading; exit 1; }; \
+                  echo "Unzipping ranker.tar.gz.part.$PART..."; tar -xzf /workspace/hf_models_cache/ranker.tar.gz.part.$PART -C /workspace/hf_models_cache/; echo "Unzipping ranker.tar.gz.part.$PART complete...";'
+
+                rm /workspace/hf_models_cache/ranker.tar.*
+                rm /workspace/hf_models_cache/downloading
+                touch /workspace/hf_models_cache/complete
+              }
+              if [ ! -f /workspace/hf_models_cache/complete ]; then
+                if [ ! -f /workspace/hf_models_cache/downloading ]; then
+                  download_and_extract_model
+                else
+                  echo "Download in progress by another pod. Waiting..."
+                  while [ -f /workspace/hf_models_cache/downloading ] || [ ! -f /workspace/hf_models_cache/complete ]; do
+                    sleep $((3 + RANDOM % 2))
+                  done
+
+                  if [ ! -f /workspace/hf_models_cache/complete ]; then
+                    download_and_extract_model
+                  else
+                    echo "Model cache ready."
+                  fi
+                fi
+              else
+                echo "Model cache already exists. Skipping download."
+              fi
+
+              echo "Model load done."
+          securityContext:
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.securityContext.runAsGroup }}
+          volumeMounts:
+            - name: model-volume
+              mountPath: /workspace/hf_models_cache
       containers:
         - name: {{ .Values.service.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -64,9 +133,10 @@ spec:
             - /bin/sh
             - -c
             - |
-              export PYTHONPATH=/workspace && python /workspace/init-ranker.py && supervisord -c /workspace/supervisord.conf
+              export PYTHONPATH=/workspace && supervisord -c /workspace/supervisord.conf
           securityContext:
             runAsUser: {{ .Values.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.securityContext.runAsGroup }}
           livenessProbe:
             exec:
               command:
@@ -103,6 +173,8 @@ spec:
             - name: supervisord-volume
               mountPath: /workspace/supervisord.conf
               subPath: supervisord.conf
+            - name: model-volume
+              mountPath: /workspace/hf_models_cache
       volumes:
         - name: config-models
           configMap:
@@ -113,10 +185,12 @@ spec:
         - name: supervisord-volume
           configMap:
             name: ranker-supervisord-16gb-conf-map
+        {{- if .Values.createSymlink }}
         - name: {{ .Values.service.name }}
           configMap:
             name: ldconfig-symlink-map
             defaultMode: 0555
+        {{- end }}
         - name: host-sbin
           hostPath:
             path: /sbin
@@ -133,3 +207,6 @@ spec:
           hostPath:
             path: /usr/bin
             type: Directory
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.pv.name }}

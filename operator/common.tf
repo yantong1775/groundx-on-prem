@@ -2,11 +2,21 @@ locals {
   ingest_only  = var.cluster.search == false
   is_openshift = var.cluster.type == "openshift"
 
+  container_suffix    = var.DEV == 1 ? "-dev" : ""
+  op_container_suffix = var.cluster.internet_access ? (var.DEV == 1 ? "-dev" : "") : (var.DEV == 1 ? "-op-dev" : "-op")
+
   create_cache = var.cache_existing.addr == null || var.cache_existing.is_instance == null || var.cache_existing.port == null
   cache_settings = {
     addr        = coalesce(var.cache_existing.addr, "${var.cache_internal.service}.${var.app_internal.namespace}.svc.cluster.local")
     is_instance = coalesce(var.cache_existing.is_instance, var.cache_internal.is_instance)
     port        = coalesce(var.cache_existing.port, var.cache_internal.port)
+  }
+
+  create_metrics_cache = local.create_cache && var.cache_resources.metrics
+  metrics_cache_settings = {
+    addr        = var.cache_resources.metrics ? coalesce(var.cache_existing.addr, "${var.cache_internal.service}-${var.metrics_internal.service}.${var.app_internal.namespace}.svc.cluster.local") : local.cache_settings.addr
+    is_instance = var.cache_resources.metrics ? coalesce(var.cache_existing.is_instance, var.cache_internal.is_instance) : local.cache_settings.is_instance
+    port        = var.cache_resources.metrics ? coalesce(var.cache_existing.port, var.cache_internal.port) : local.cache_settings.port
   }
 
   create_database = var.db_existing.port == null || var.db_existing.ro == null || var.db_existing.rw == null
@@ -38,10 +48,26 @@ locals {
     base_url    = coalesce(var.search_existing.base_url, "https://${var.search_internal.service}-cluster-master.${var.app_internal.namespace}.svc.cluster.local:${var.search_internal.port}")
     port        = coalesce(var.search_existing.port, var.search_internal.port)
   }
+  language_configs = contains(var.app.languages, "ko") ? merge({}, var.language_configs["ko"]) : merge({}, var.language_configs["en"])
+
+  ranker_model = {
+    throughput = try(
+      [for model in local.language_configs.models : model.throughput if model.type == "ranker"][0],
+      var.ranker_resources.inference.throughput,
+    ),
+    version = try(
+      [for model in local.language_configs.models : model.version if model.type == "ranker"][0],
+      "current",
+    ),
+    workers = try(
+      [for model in local.language_configs.models : model.workers if model.type == "ranker"][0],
+      var.ranker_resources.inference.workers,
+    ),
+  }
 
   create_stream = var.stream_existing.base_domain == null || var.stream_existing.base_url == null || var.stream_existing.port == null
   stream_settings = {
-    base_domain = coalesce(var.stream_existing.base_domain, "${var.stream_internal.service}-cluster-cluster-kafka-bootstrap.${var.app_internal.namespace}.svc.cluster.local")
+    base_domain = coalesce(var.stream_existing.base_domain, "${var.stream_internal.service}-cluster-kafka-bootstrap.${var.app_internal.namespace}.svc.cluster.local")
     port        = coalesce(var.stream_existing.port, var.stream_internal.port)
   }
 
@@ -49,6 +75,6 @@ locals {
 
   summary_credentials = {
     api_key  = coalesce(var.summary_existing.api_key, var.admin.api_key)
-    base_url = coalesce(var.summary_existing.base_url, "http://${var.summary_internal.service}-api.${var.app_internal.namespace}.svc.cluster.local")
+    base_url = coalesce(var.summary_existing.base_url, "http://${var.summary_internal.service}-service.${var.app_internal.namespace}.svc.cluster.local")
   }
 }

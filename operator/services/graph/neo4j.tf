@@ -17,7 +17,7 @@ resource "helm_release" "neo4j" {
         password     = "test"
       }
       nodeSelector = {
-        node = var.cluster_internal.nodes.cpu_memory
+        node = var.graph_resources.node
       }
       securityContext = {
         runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001

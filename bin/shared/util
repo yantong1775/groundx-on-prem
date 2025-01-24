@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
 
+valid_envs=("aws")
+recursive_types=("aws")
+
+valid_aws=("aws-vpc" "eks")
+
+# valid_groups order is important:
+# the groups are executed in order for deploy
+# and reverse order for destroy
+valid_groups=("init" "services" "app")
+recursive_types=("init" "services" "app")
+
+valid_apps=("metrics" "groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload" "layout" "summary" "ranker")
+valid_init=("add" "config")
+valid_services=("cache" "db" "file" "graph" "search" "stream")
+
+# for helm release explicit clean up, in case terraform fails to clean up
+golang_apps=("metrics" "groundx" "layout-webhook" "pre-process" "process" "queue" "summary-client" "upload")
+inference_apps=("ranker" "summary")
+inference_process_apps=("layout")
+
 deploy() {
   local dir="$1"
 
@@ -75,6 +95,50 @@ recurse_directories() {
   fi
 }
 
+recurse_group() {
+  local do=$1
+  local dir="$2"
+  local max_concurrent=$3
+  shift 3
+  local valid_subdirs=("$@")
+  local semaphore=$max_concurrent
+  local pids=()
+
+  if [[ -d "$dir" ]]; then
+    for sub_dir in "${valid_subdirs[@]}"; do
+      local full_path="$dir/$sub_dir"
+      if [[ -d "$full_path" ]]; then
+        if [[ $max_concurrent -gt 1 ]]; then
+          (
+            $do "$full_path"
+          ) &
+          pids+=($!)
+
+          ((semaphore--))
+
+          if [[ $semaphore -eq 0 ]]; then
+            wait -n
+            ((semaphore++))
+          fi
+        else
+          $do "$full_path"
+        fi
+      fi
+    done
+    if [[ $max_concurrent -gt 1 ]]; then
+      for pid in "${pids[@]}"; do
+        wait "$pid" || {
+          echo "Error: A process failed for $sub_dir."
+          exit 1
+        }
+      done
+    fi
+  else
+    echo "Error: Directory '$dir' does not exist."
+    exit 1
+  fi
+}
+
 recurse_ordered() {
   local do=$1
   shift
@@ -101,6 +165,27 @@ test_aws() {
     aws eks list-clusters > /dev/null 2>&1
 
     return $?
+}
+
+test_kubernetes_version() {
+  local MIN_KUBERNETES_VERSION=$1
+
+  local SERVER_VERSION
+  SERVER_VERSION=$(kubectl version --output=json 2>/dev/null | jq -r '.serverVersion.gitVersion' | sed -E 's/^v|-.+//')
+
+  SERVER_VERSION=$(echo "$SERVER_VERSION" | awk -F. '{print $1"."$2}')
+
+  if [[ -z "$SERVER_VERSION" ]]; then
+    error "Unable to determine Kubernetes server version. Is 'kubectl' configured correctly?"
+    return 1
+  fi
+
+  if [[ $(printf '%s\n' "$SERVER_VERSION" "$MIN_KUBERNETES_VERSION" | sort -V | head -n1) == "$MIN_KUBERNETES_VERSION" && "$SERVER_VERSION" != "$MIN_KUBERNETES_VERSION" ]]; then
+    return 0
+  else
+    error "Kubernetes server version ($SERVER_VERSION) does not meet the minimum requirement ($MIN_KUBERNETES_VERSION)"
+    return 1
+  fi
 }
 
 warn() { echo -e "$@ \e[33;1m\u26a0\e[0m"; }

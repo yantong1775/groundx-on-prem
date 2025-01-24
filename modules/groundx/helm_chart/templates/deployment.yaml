@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.service.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas.min }}
   selector:
     matchLabels:
       app: {{ .Values.service.name }}
@@ -23,26 +23,26 @@ spec:
           effect: "NoSchedule"
       initContainers:
       - name: wait-for-cache
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
+        image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+        imagePullPolicy: "{{ .Values.busybox.pull }}"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.cache }}; do echo waiting for cache; sleep 2; done"]
       - name: wait-for-file-storage
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
+        image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+        imagePullPolicy: "{{ .Values.busybox.pull }}"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.file }}; do echo waiting for file storage; sleep 2; done"]
       {{- if not .Values.ingestOnly }}
       - name: wait-for-search
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
+        image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+        imagePullPolicy: "{{ .Values.busybox.pull }}"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.search }}; do echo waiting for search; sleep 2; done"]
       {{- end }}
       - name: wait-for-database
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
+        image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+        imagePullPolicy: "{{ .Values.busybox.pull }}"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.database }}; do echo waiting for database; sleep 2; done"]
       - name: wait-for-stream
-        image: public.ecr.aws/c9r4x6y5/eyelevel/busybox:latest
-        imagePullPolicy: "Always"
+        image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
+        imagePullPolicy: "{{ .Values.busybox.pull }}"
         command: ['sh', '-c', "until nc -z {{ .Values.dependencies.stream }}; do echo waiting for stream; sleep 2; done"]
       containers:
       - name: {{ .Values.service.name }}
@@ -66,6 +66,13 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 30
+        resources:
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"
         volumeMounts:
         - name: config-volume
           mountPath: /home/golang/.cashbot/config.yaml

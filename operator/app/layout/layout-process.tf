@@ -6,26 +6,33 @@ resource "helm_release" "layout_process_service" {
 
   values = [
     yamlencode({
-      dependencies = {
-        cache = "${local.cache_settings.addr} ${local.cache_settings.port}"
-        file  = "${local.file_settings.dependency} ${local.file_settings.port}"
+      busybox         = var.app_internal.busybox
+      dependencies    = {
+        cache         = "${local.cache_settings.addr} ${local.cache_settings.port}"
+        file          = "${local.file_settings.dependency} ${local.file_settings.port}"
       }
-      image = var.layout_internal.process.image
+      image           = {
+        pull          = var.layout_internal.process.image.pull
+        repository    = "${var.app_internal.repo_url}/${var.layout_internal.process.image.repository}${local.container_suffix}"
+        tag           = var.layout_internal.process.image.tag
+      }
       nodeSelector    = {
-        node          = var.cluster_internal.nodes.cpu_memory
+        node          = var.layout_resources.process.node
       }
-      queues = (
-        var.layout.ocr.type == "google" ?
-          "process_queue,ocr_queue,map_queue,save_queue" :
-          "process_queue,map_queue,save_queue"
-      )
+      replicas        = {
+        cooldown      = var.layout_resources.process.replicas.cooldown
+        max           = local.replicas.layout.process.max
+        min           = local.replicas.layout.process.min
+        threshold     = var.layout_resources.process.replicas.threshold
+      }
+      resources       = var.layout_resources.process.resources
       securityContext = {
-        runAsUser  = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
+        runAsUser     = local.is_openshift ? coalesce(data.external.get_uid_gid[0].result.UID, 1001) : 1001
       }
-      service = {
-        name      = "${var.layout_internal.service}-process"
-        namespace = var.app_internal.namespace
-        version   = var.layout_internal.version
+      service         = {
+        name          = "${var.layout_internal.service}-process"
+        namespace     = var.app_internal.namespace
+        version       = var.layout_internal.version
       }
     })
   ]

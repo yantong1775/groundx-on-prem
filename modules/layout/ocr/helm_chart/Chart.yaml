@@ -1,5 +1,0 @@
-apiVersion: v2
-name: "layout OCR"
-description: "A Helm chart for layout OCR"
-version: 0.0.1
-appVersion: "0.0.1"

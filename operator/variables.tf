@@ -27,43 +27,59 @@ variable "app" {
 }
 
 variable "app_internal" {
-  description = "EyeLevel application internal information (do not change)"
-  type        = object({
-    namespace = string
-    pv_class  = string
+  description    = "EyeLevel application internal information (do not change)"
+  type           = object({
+    busybox      = object({
+      pull       = string
+      repository = string
+      tag        = string
+    })
+    log_level    = string
+    namespace    = string
+    pv_class     = string
+    repo_url     = string
   })
-  default     = {
-    namespace = "eyelevel"
-    pv_class  = "empty"
+  default        = {
+    busybox      = {
+      pull       = "Always"
+      repository = "public.ecr.aws/c9r4x6y5/eyelevel/busybox"
+      tag        = "latest"
+    }
+    log_level    = "info"
+    namespace    = "eyelevel"
+    pv_class     = "empty"
+    repo_url     = "public.ecr.aws/c9r4x6y5/eyelevel"
   }
 }
 
 variable "engines" {
-  description        = "Completion engine configurations"
-  type               = list(
+  description          = "Completion engine configurations"
+  type                 = list(
     object(
       {
-        apiKey       = string
-        baseURL      = string
-        engineID     = string
-        maxRequests  = number
-        maxTokens    = number
-        requestLimit = number
-        type         = string
-        vision       = bool
+        apiKey         = string
+        baseURL        = string
+        engineID       = string
+        maxInputTokens = number
+        maxRequests    = number
+        maxTokens      = number
+        requestLimit   = number
+        type           = string
+        vision         = bool
       }
     )
   )
-  default            = [
+  default              = [
     {
-      apiKey         = null
-      baseURL        = null
-      engineID       = "MiniCPM-V-2_6-int4"
-      maxRequests    = 4
-      maxTokens      = 10000000000
-      requestLimit   = 4
-      type           = null
-      vision         = true
+      apiKey           = null
+      baseURL          = null
+      engineID         = "mcpm-o-2-6"
+      maxInputTokens   = 2000
+      maxRequests      = 4
+      maxTokens        = 10000000000
+      requestLimit     = 4
+      type             = null
+      vision           = true
     }
   ]
 }
@@ -103,7 +119,7 @@ variable "cache_internal" {
   default            = {
     image            = {
       pull           = "Always"
-      repository     = "public.ecr.aws/c9r4x6y5/eyelevel/redis"
+      repository     = "redis"
       tag            = "latest"
     }
     is_instance      = true
@@ -112,36 +128,6 @@ variable "cache_internal" {
     port             = 6379
     service          = "redis"
     version          = "6.1"
-  }
-}
-
-variable "cache_resources" {
-  description  = "Cache compute resource information"
-  type         = object({
-    replicas   = number
-    resources  = object({
-      limits   = object({
-        cpu    = string
-        memory = string
-      })
-      requests = object({
-        cpu    = string
-        memory = string
-      })
-    })
-  })
-  default      = {
-    replicas   = 1
-    resources  = {
-      limits   = {
-        cpu    = "2"
-        memory = "4Gi"
-      }
-      requests = {
-        cpu    = "2"
-        memory = "4Gi"
-      }
-    }
   }
 }
 
@@ -237,64 +223,6 @@ variable "db_internal" {
   }
 }
 
-variable "db_resources" {
-  description    = "Database compute resource information"
-  type           = object({
-    proxy        = object({
-      replicas   = number
-      resources  = object({
-        limits   = object({
-          cpu    = string
-          memory = string
-        })
-        requests = object({
-          cpu    = string
-          memory = string
-        })
-      })
-    })
-    pv_size      = string
-    replicas     = number
-    resources    = object({
-      limits     = object({
-        cpu      = string
-        memory   = string
-      })
-      requests   = object({
-        cpu      = string
-        memory   = string
-      })
-    })
-  })
-  default        = {
-    proxy        = {
-      replicas   = 1
-      resources  = {
-        limits   = {
-          cpu    = "600m"
-          memory = "1Gi"
-        }
-        requests = {
-          cpu    = "600m"
-          memory = "1Gi"
-        }
-      }
-    }
-    pv_size      = "20Gi"
-    replicas     = 1
-    resources    = {
-      limits     = {
-        cpu      = "600m"
-        memory   = "1Gi"
-      }
-      requests   = {
-        cpu      = "600m"
-        memory   = "1Gi"
-      }
-    }
-  }
-}
-
 
 # FILE
 
@@ -372,50 +300,6 @@ variable "file_internal" {
   }
 }
 
-variable "file_resources" {
-  description           = "Database compute resource information"
-  type                  = object({
-    operator            = object({
-      replicas          = number
-    })
-    pool_size           = string
-    pool_servers        = number
-    pool_server_volumes = number
-    pv_path             = string
-    resources           = object({
-      limits            = object({
-        cpu             = string
-        memory          = string
-      })
-      requests          = object({
-        cpu             = string
-        memory          = string
-      })
-    })
-    ssl                 = bool
-  })
-  default               = {
-    operator            = {
-      replicas          = 1
-    }
-    pool_size           = "50Gi"
-    pool_servers        = 1
-    pool_server_volumes = 1
-    pv_path             = "/Users/USER/mnt/minio"
-    resources           = {
-      limits            = {
-        cpu             = "4"
-        memory          = "8Gi"
-      }
-      requests          = {
-        cpu             = "2"
-        memory          = "4Gi"
-      }
-    }
-    ssl                 = false
-  }
-}
-
 
 # GRAPH
 
@@ -451,36 +335,6 @@ variable "graph_internal" {
   }
 }
 
-variable "graph_resources" {
-  description  = "Graph compute resource information"
-  type         = object({
-    replicas   = number
-    resources  = object({
-      limits   = object({
-        cpu    = string
-        memory = string
-      })
-      requests = object({
-        cpu    = string
-        memory = string
-      })
-    })
-  })
-  default      = {
-    replicas   = 1
-    resources  = {
-      limits   = {
-        cpu    = "1"
-        memory = "4Gi"
-      }
-      requests = {
-        cpu    = "0.5"
-        memory = "2Gi"
-      }
-    }
-  }
-}
-
 
 # GROUNDX
 
@@ -488,11 +342,13 @@ variable "groundx" {
   description     = "GroundX service information"
   type            = object({
     load_balancer = object({
+      internal    = bool
       port        = number
     })
   })
   default         = {
     load_balancer = {
+      internal    = false
       port        = 80
     }
   }
@@ -514,12 +370,67 @@ variable "groundx_internal" {
   default        = {
     image        = {
       pull       = "Always"
-      repository = "public.ecr.aws/c9r4x6y5/eyelevel/groundx"
+      repository = "groundx"
       tag        = "latest"
     }
     service      = "groundx"
     type         = "all"
     version      = "0.0.1"
+  }
+}
+
+
+# LANGUAGES
+
+variable "language_configs" {
+  type                = map(
+    object({
+      models          = list(
+        object({
+          maxTokens   = number
+          name        = string
+          throughput  = number
+          type        = string
+          version     = string
+          workers     = number
+        })
+      )
+      search          = object({
+        plugins       = object({
+          enabled     = bool
+          installList = list(string)
+        })
+      })
+    })
+  )
+  default             = {
+    en                = {
+      models          = []
+      search          = {
+        plugins       = {
+          enabled     = false
+          installList = []
+        }
+      }
+    }
+    ko                = {
+      models          = [
+        {
+          maxTokens   = 131072
+          name        = "Bllossom/llama-3.2-Korean-Bllossom-3B"
+          throughput  = 400000
+          type        = "ranker"
+          version     = "ko"
+          workers     = 2
+        },
+      ]
+      search          = {
+        plugins       = {
+          enabled     = true
+          installList = ["analysis-nori"]
+        }
+      }
+    }
   }
 }
 
@@ -563,14 +474,26 @@ variable "layout_internal" {
         repository = string
         tag        = string
       })
-      image_op     = object({
+      queues       = string
+    })
+    models         = object({
+      device       = string
+    })
+    map            = object({
+      image        = object({
         pull       = string
         repository = string
         tag        = string
       })
+      queues       = string
     })
-    models         = object({
-      device     = string
+    ocr            = object({
+      image        = object({
+        pull       = string
+        repository = string
+        tag        = string
+      })
+      queues       = string
     })
     process        = object({
       image        = object({
@@ -578,6 +501,15 @@ variable "layout_internal" {
         repository = string
         tag        = string
       })
+      queues       = string
+    })
+    save           = object({
+      image        = object({
+        pull       = string
+        repository = string
+        tag        = string
+      })
+      queues       = string
     })
     service        = string
     version        = string
@@ -586,104 +518,55 @@ variable "layout_internal" {
     api            = {
       image        = {
         pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
+        repository = "python-api"
         tag        = "latest"
       }
     }
     inference      = {
       image        = {
         pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference"
+        repository = "layout-inference"
         tag        = "latest"
       }
-      image_op     = {
-        pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/layout-inference-op"
-        tag        = "latest"
-      }
+      queues       = "layout_queue"
     }
     models         = {
       device       = "cuda"
     }
+    map            = {
+      image        = {
+        pull       = "Always"
+        repository = "layout-process"
+        tag        = "latest"
+      }
+      queues       = "map_queue"
+    }
+    ocr            = {
+      image        = {
+        pull       = "Always"
+        repository = "layout-process"
+        tag        = "latest"
+      }
+      queues       = "ocr_queue"
+    }
     process        = {
       image        = {
         pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/layout-process"
+        repository = "layout-process"
         tag        = "latest"
       }
+      queues       = "process_queue"
+    }
+    save           = {
+      image        = {
+        pull       = "Always"
+        repository = "layout-process"
+        tag        = "latest"
+      }
+      queues       = "save_queue"
     }
     service        = "layout"
     version        = "0.0.1"
-  }
-}
-
-variable "layout_resources" {
-  description   = "Layout compute resource information"
-  type           = object({
-    api          = object({
-      replicas   = number
-      resources  = object({
-        limits   = object({
-          cpu    = string
-          memory = string
-        })
-        requests = object({
-          cpu    = string
-          memory = string
-        })
-      })
-      threads    = number
-      workers    = number
-    })
-    inference    = object({
-      replicas   = number
-      resources  = object({
-        limits   = object({
-          cpu    = string
-          memory = string
-          gpu    = number
-        })
-        requests = object({
-          cpu    = string
-          memory = string
-          gpu    = number
-        })
-      })
-      workers    = number
-    })
-  })
-  default     = {
-    api          = {
-      replicas   = 1
-      resources  = {
-        limits   = {
-          cpu    = "1"
-          memory = "1Gi"
-        }
-        requests = {
-          cpu    = "0.5"
-          memory = "500Mi"
-        }
-      }
-      threads    = 2
-      workers    = 2
-    }
-    inference    = {
-      replicas   = 1
-      resources  = {
-        limits   = {
-          cpu    = "3"
-          memory = "12Gi"
-          gpu    = 1
-        }
-        requests = {
-          cpu    = "2"
-          memory = "8Gi"
-          gpu    = 1
-        }
-      }
-      workers    = 4
-    }
   }
 }
 
@@ -704,10 +587,35 @@ variable "layout_webhook_internal" {
   default        = {
     image        = {
       pull       = "Always"
-      repository = "public.ecr.aws/c9r4x6y5/eyelevel/layout-webhook"
+      repository = "layout-webhook"
       tag        = "latest"
     }
     service      = "layout-webhook"
+    version      = "0.0.1"
+  }
+}
+
+
+# METRICS
+
+variable "metrics_internal" {
+  description    = "Metrics internal settings"
+  type           = object({
+    image        = object({
+      pull       = string
+      repository = string
+      tag        = string
+    })
+    service      = string
+    version      = string
+  })
+  default        = {
+    image        = {
+      pull       = "Always"
+      repository = "metrics"
+      tag        = "latest"
+    }
+    service      = "metrics"
     version      = "0.0.1"
   }
 }
@@ -723,15 +631,17 @@ variable "pre_process_internal" {
       repository = string
       tag        = string
     })
+    queue        = string
     service      = string
     version      = string
   })
   default        = {
     image        = {
       pull       = "Always"
-      repository = "public.ecr.aws/c9r4x6y5/eyelevel/pre-process"
+      repository = "pre-process"
       tag        = "latest"
     }
+    queue        = "file-pre-process"
     service      = "pre-process"
     version      = "0.0.1"
   }
@@ -748,15 +658,17 @@ variable "process_internal" {
       repository = string
       tag        = string
     })
+    queue        = string
     service      = string
     version      = string
   })
   default        = {
     image        = {
       pull       = "Always"
-      repository = "public.ecr.aws/c9r4x6y5/eyelevel/process"
+      repository = "process"
       tag        = "latest"
     }
+    queue        = "file-process"
     service      = "process"
     version      = "0.0.1"
   }
@@ -773,15 +685,17 @@ variable "queue_internal" {
       repository = string
       tag        = string
     })
+    queue        = string
     service      = string
     version      = string
   })
   default        = {
     image        = {
       pull       = "Always"
-      repository = "public.ecr.aws/c9r4x6y5/eyelevel/queue"
+      repository = "queue"
       tag        = "latest"
     }
+    queue        = "file-update"
     service      = "queue"
     version      = "0.0.1"
   }
@@ -807,11 +721,12 @@ variable "ranker_internal" {
         repository = string
         tag        = string
       })
-      image_op     = object({
-        pull       = string
-        repository = string
-        tag        = string
+      pv            = object({
+        access      = string
+        capacity    = string
+        mount       = string
       })
+      queues       = string
     })
     service        = string
     version        = string
@@ -820,7 +735,7 @@ variable "ranker_internal" {
     api            = {
       image        = {
         pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
+        repository = "python-api"
         tag        = "latest"
       }
     }
@@ -828,87 +743,18 @@ variable "ranker_internal" {
       device       = "cuda"
       image        = {
         pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference"
+        repository = "ranker-inference"
         tag        = "latest"
       }
-      image_op     = {
-        pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/ranker-inference-op"
-        tag        = "latest"
+      pv            = {
+        access      = "ReadWriteMany"
+        capacity    = "10Gi"
+        mount       = "/mnt/ranker-model"
       }
+      queues       = "inference_queue"
     }
     service        = "ranker"
     version        = "0.0.1"
-  }
-}
-
-variable "ranker_resources" {
-  description   = "Ranker compute resource information"
-  type           = object({
-    api          = object({
-      replicas   = number
-      resources  = object({
-        limits   = object({
-          cpu    = string
-          memory = string
-        })
-        requests = object({
-          cpu    = string
-          memory = string
-        })
-      })
-      threads    = number
-      workers    = number
-    })
-    inference    = object({
-      replicas   = number
-      resources  = object({
-        limits   = object({
-          cpu    = string
-          memory = string
-          gpu    = number
-        })
-        requests = object({
-          cpu    = string
-          memory = string
-          gpu    = number
-        })
-      })
-      workers    = number
-    })
-  })
-  default        = {
-    api          = {
-      replicas   = 1
-      resources  = {
-        limits   = {
-          cpu    = "1"
-          memory = "1Gi"
-        }
-        requests = {
-          cpu    = "0.5"
-          memory = "500Mi"
-        }
-      }
-      threads    = 2
-      workers    = 2
-    }
-    inference    = {
-      replicas   = 3
-      resources  = {
-        limits   = {
-          cpu    = "3"
-          memory = "14Gi"
-          gpu    = 1
-        }
-        requests = {
-          cpu    = "2"
-          memory = "10Gi"
-          gpu    = 1
-        }
-      }
-      workers    = 14
-    }
   }
 }
 
@@ -920,20 +766,12 @@ variable "search" {
   type            = object({
     index         = string
     password      = string
-    plugins       = object({
-      enabled     = bool
-      installList = list(string)
-    })
     root_password = string
     user          = string
   })
   default         = {
     index         = "prod-1"
     password      = "R0otb_*t!kazs"
-    plugins       = {
-      enabled     = false
-      installList = []
-    }
     root_password = "R0otb_*t!kazs"
     user          = "eyelevel"
   }
@@ -991,30 +829,6 @@ variable "search_internal" {
   }
 }
 
-variable "search_resources" {
-  description     = "Search compute resource information"
-  type            = object({
-    pv_size       = string
-    replicas      = number
-    resources     = object({
-      requests    = object({
-        cpu       = string
-        memory    = string
-      })
-    })
-  })
-  default         = {
-    pv_size       = "20Gi"
-    replicas      = 1
-    resources     = {
-      requests    = {
-        cpu       = "1"
-        memory    = "512Mi"
-      }
-    }
-  }
-}
-
 
 # STREAM
 
@@ -1068,63 +882,6 @@ variable "stream_internal" {
   }
 }
 
-variable "stream_resources" {
-  description       = "Stream compute resource information"
-  type              = object({
-    operator        = object({
-      replicas      = number
-    })
-    partitions      = number
-    resources       = object({
-      limits        = object({
-        cpu         = string
-        memory      = string
-      })
-      requests      = object({
-        cpu         = string
-        memory      = string
-      })
-    })
-    retention_bytes = number
-    segment_bytes   = number
-    service         = object({
-      replicas      = number
-      storage       = string
-    })
-    zookeeper       = object({
-      replicas      = number
-      storage       = string
-    })
-  })
-  default           = {
-    operator        = {
-      replicas      = 1
-    }
-    partitions      = 3
-    resources       = {
-      limits        = {
-        cpu         = "2"
-        memory      = "4Gi"
-      }
-      requests      = {
-        cpu         = "1"
-        memory      = "2Gi"
-      }
-    }
-    retention_bytes = 1073741824
-    segment_bytes   = 1073741824
-    service         = {
-      replicas      = 2
-      storage       = "10Gi"
-    }
-    zookeeper       = {
-      replicas      = 1
-      storage       = "5Gi"
-    }
-  }
-}
-
-
 # SUMMARY
 
 variable "summary_existing" {
@@ -1141,126 +898,58 @@ variable "summary_existing" {
 }
 
 variable "summary_internal" {
-  description    = "Summary internal settings"
-  type           = object({
-    api            = object({
-      image        = object({
-        pull       = string
-        repository = string
-        tag        = string
+  description       = "Summary internal settings"
+  type              = object({
+    api             = object({
+      image         = object({
+        pull        = string
+        repository  = string
+        tag         = string
       })
     })
-    inference      = object({
-      device       = string
-      image        = object({
-        pull       = string
-        repository = string
-        tag        = string
+    inference       = object({
+      device        = string
+      deviceUtilize = number
+      image         = object({
+        pull        = string
+        repository  = string
+        tag         = string
       })
-      image_op     = object({
-        pull       = string
-        repository = string
-        tag        = string
+      pv            = object({
+        access      = string
+        capacity    = string
+        mount       = string
       })
+      queues        = string
     })
-    service        = string
-    version        = string
+    service         = string
+    version         = string
   })
-  default        = {
-    api            = {
-      image        = {
-        pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/python-api"
-        tag        = "latest"
+  default           = {
+    api             = {
+      image         = {
+        pull        = "Always"
+        repository  = "python-api"
+        tag         = "latest"
       }
     }
-    inference      = {
-      device       = "cuda"
-      image        = {
-        pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/summary-inference"
-        tag        = "latest"
+    inference       = {
+      device        = "cuda"
+      deviceUtilize = 0.5
+      image         = {
+        pull        = "Always"
+        repository  = "summary-inference"
+        tag         = "latest"
       }
-      image_op     = {
-        pull       = "Always"
-        repository = "public.ecr.aws/c9r4x6y5/eyelevel/summary-inference-op"
-        tag        = "latest"
+      pv            = {
+        access      = "ReadWriteMany"
+        capacity    = "20Gi"
+        mount       = "/mnt/summary-model"
       }
+      queues        = "summary_inference_queue"
     }
-    service        = "summary"
-    version        = "0.0.1"
-  }
-}
-
-variable "summary_resources" {
-  description    = "Summary compute resource information"
-  type           = object({
-    api          = object({
-      replicas   = number
-      resources  = object({
-        limits   = object({
-          cpu    = string
-          memory = string
-        })
-        requests = object({
-          cpu    = string
-          memory = string
-        })
-      })
-      threads    = number
-      workers    = number
-    })
-    inference    = object({
-      replicas   = number
-      resources  = object({
-        limits   = object({
-          cpu    = string
-          memory = string
-          gpu    = number
-        })
-        requests = object({
-          cpu    = string
-          memory = string
-          gpu    = number
-        })
-      })
-      threads    = number
-      workers    = number
-    })
-  })
-  default        = {
-    api          = {
-      replicas   = 1
-      resources  = {
-        limits   = {
-          cpu    = "2"
-          memory = "1Gi"
-        }
-        requests = {
-          cpu    = "1"
-          memory = "500Mi"
-        }
-      }
-      threads    = 3
-      workers    = 2
-    }
-    inference    = {
-      replicas   = 2
-      resources  = {
-        limits   = {
-          cpu    = "3"
-          memory = "14Gi"
-          gpu    = 1
-        }
-        requests = {
-          cpu    = "2"
-          memory = "10Gi"
-          gpu    = 1
-        }
-      }
-      threads    = 1
-      workers    = 2
-    }
+    service         = "summary"
+    version         = "0.0.1"
   }
 }
 
@@ -1275,49 +964,19 @@ variable "summary_client_internal" {
       repository = string
       tag        = string
     })
+    queue        = string
     service      = string
     version      = string
   })
   default        = {
     image        = {
       pull       = "Always"
-      repository = "public.ecr.aws/c9r4x6y5/eyelevel/summary-client"
+      repository = "summary-client"
       tag        = "latest"
     }
+    queue        = "file-summary"
     service      = "summary-client"
     version      = "0.0.1"
-  }
-}
-
-variable "summary_client_resources" {
-  description  = "Summary client compute resource information"
-  type         = object({
-    replicas   = number
-    resources  = object({
-      limits   = object({
-        cpu    = string
-        memory = string
-      })
-      requests = object({
-        cpu    = string
-        memory = string
-      })
-    })
-    threads    = number
-  })
-  default      = {
-    replicas   = 1
-    resources  = {
-      limits   = {
-        cpu    = "1"
-        memory = "2Gi"
-      }
-      requests = {
-        cpu    = "0.5"
-        memory = "500Mi"
-      }
-    }
-    threads    = 2
   }
 }
 
@@ -1325,23 +984,33 @@ variable "summary_client_resources" {
 # UPLOAD
 
 variable "upload_internal" {
-  description    = "Upload client internal settings"
+  description    = "Upload internal settings"
   type           = object({
     image        = object({
       pull       = string
       repository = string
       tag        = string
     })
+    queue        = string
     service      = string
     version      = string
   })
   default        = {
     image        = {
       pull       = "Always"
-      repository = "public.ecr.aws/c9r4x6y5/eyelevel/upload"
+      repository = "upload"
       tag        = "latest"
     }
+    queue        = "file-upload"
     service      = "upload"
     version      = "0.0.1"
   }
+}
+
+# CLI
+
+variable "DEV" {
+  type    = number
+  default = 0
+  description = "Set to 1 for development containers."
 }
