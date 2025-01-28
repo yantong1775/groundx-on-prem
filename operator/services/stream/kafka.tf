@@ -9,7 +9,7 @@ resource "helm_release" "strimzi_operator" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.stream_resources.node
+        node = local.node_assignment.stream
       }
       replicas = var.stream_resources.operator.replicas
     })
@@ -28,7 +28,7 @@ resource "helm_release" "kafka_cluster" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.stream_resources.node
+        node = local.node_assignment.stream
       }
       partitions = {
         pre_process    = local.replicas.pre_process.max

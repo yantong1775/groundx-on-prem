@@ -11,7 +11,7 @@ resource "helm_release" "ranker_model_pv" {
       capacity    = var.ranker_internal.inference.pv.capacity
       mount       = var.ranker_internal.inference.pv.mount
       name        = "${var.ranker_internal.service}-model-pv"
-      storage     = var.cluster_internal.pv.name
+      storage     = var.cluster.pv.name
       service     = {
         name      = "${var.ranker_internal.service}-inference"
       }

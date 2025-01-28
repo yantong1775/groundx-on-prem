@@ -22,8 +22,9 @@ resource "helm_release" "summary_inference_service" {
         repository        = "${var.app_internal.repo_url}/${var.summary_internal.inference.image.repository}${local.op_container_suffix}"
         tag               = var.summary_internal.inference.image.tag
       }
+      local               = var.cluster.environment == "local"
       nodeSelector        = {
-        node              = var.summary_resources.inference.node
+        node              = local.node_assignment.summary_inference
       }
       pv                  = {
         access            = var.summary_internal.inference.pv.access

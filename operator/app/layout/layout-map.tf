@@ -16,8 +16,9 @@ resource "helm_release" "layout_map_service" {
         repository    = "${var.app_internal.repo_url}/${var.layout_internal.map.image.repository}${local.container_suffix}"
         tag           = var.layout_internal.map.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.layout_resources.map.node
+        node          = local.node_assignment.layout_map
       }
       replicas        = {
         cooldown      = var.layout_resources.map.replicas.cooldown

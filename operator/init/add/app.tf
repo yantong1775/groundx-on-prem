@@ -4,17 +4,6 @@ resource "kubernetes_namespace" "eyelevel" {
   }
 }
 
-resource "kubernetes_storage_class_v1" "local_storage" {
-  count = var.app_internal.pv_class != "empty" ? 1 : 0
-
-  metadata {
-    name = var.app_internal.pv_class
-  }
-
-  storage_provisioner = "kubernetes.io/no-provisioner"
-  volume_binding_mode = "WaitForFirstConsumer"
-}
-
 resource "tls_private_key" "ca_key" {
   algorithm = "RSA"
   rsa_bits  = 2048

@@ -14,8 +14,9 @@ resource "helm_release" "process_service" {
         repository    = "${var.app_internal.repo_url}/${var.process_internal.image.repository}${local.container_suffix}"
         tag           = var.process_internal.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.process_resources.node
+        node          = local.node_assignment.process
       }
       replicas        = {
         cooldown      = var.process_resources.replicas.cooldown

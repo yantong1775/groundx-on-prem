@@ -22,9 +22,10 @@ resource "helm_release" "ranker_inference_service" {
         repository    = "${var.app_internal.repo_url}/${var.ranker_internal.inference.image.repository}${local.op_container_suffix}"
         tag           = var.ranker_internal.inference.image.tag
       }
+      local           = var.cluster.environment == "local"
       model           = local.ranker_model.version
       nodeSelector    = {
-        node          = var.ranker_resources.inference.node
+        node          = local.node_assignment.ranker_inference
       }
       pv              = {
         access        = var.ranker_internal.inference.pv.access

@@ -19,8 +19,9 @@ resource "helm_release" "layout_inference_service" {
         repository    = "${var.app_internal.repo_url}/${var.layout_internal.inference.image.repository}${local.op_container_suffix}"
         tag           = var.layout_internal.inference.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.layout_resources.inference.node
+        node          = local.node_assignment.layout_inference
       }
       replicas        = {
         cooldown      = var.layout_resources.inference.replicas.cooldown

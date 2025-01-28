@@ -11,7 +11,7 @@ resource "helm_release" "summary_model_pv" {
       capacity    = var.summary_internal.inference.pv.capacity
       mount       = var.summary_internal.inference.pv.mount
       name        = "${var.summary_internal.service}-model-pv"
-      storage     = var.cluster_internal.pv.name
+      storage     = var.cluster.pv.name
       service     = {
         name      = "${var.summary_internal.service}-inference"
       }

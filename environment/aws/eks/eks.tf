@@ -20,7 +20,7 @@ locals {
   node_groups = merge(
     {
       cpu_memory_nodes                                      = {
-        name                                                = var.cluster_internal.nodes.cpu_memory
+        name                                                = var.cluster.nodes.cpu_memory
 
         ami_type                                            = var.nodes.node_groups.cpu_memory_nodes.ami_type
         instance_types                                      = var.nodes.node_groups.cpu_memory_nodes.instance_types
@@ -40,19 +40,19 @@ locals {
         }
 
         labels                                              = {
-          "node"                                            = var.cluster_internal.nodes.cpu_memory
+          "node"                                            = var.cluster.nodes.cpu_memory
         }
 
         tags                                                = {
           Environment                                       = var.environment.stage
-          Name                                              = var.cluster_internal.nodes.cpu_memory
+          Name                                              = var.cluster.nodes.cpu_memory
           Terraform                                         = "true"
           "k8s.io/cluster-autoscaler/enabled"               = "true"
           "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
         }
       },
       cpu_only_nodes                                        = {
-        name                                                = var.cluster_internal.nodes.cpu_only
+        name                                                = var.cluster.nodes.cpu_only
 
         ami_type                                            = var.nodes.node_groups.cpu_only_nodes.ami_type
         instance_types                                      = var.nodes.node_groups.cpu_only_nodes.instance_types
@@ -72,19 +72,19 @@ locals {
         }
 
         labels                                              = {
-          "node"                                            = var.cluster_internal.nodes.cpu_only
+          "node"                                            = var.cluster.nodes.cpu_only
         }
 
         tags                                                = {
           Environment                                       = var.environment.stage
-          Name                                              = var.cluster_internal.nodes.cpu_only
+          Name                                              = var.cluster.nodes.cpu_only
           Terraform                                         = "true"
           "k8s.io/cluster-autoscaler/enabled"               = "true"
           "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
         }
       },
       gpu_layout_nodes                                      = {
-        name                                                = var.cluster_internal.nodes.gpu_layout
+        name                                                = var.cluster.nodes.gpu_layout
 
         ami_type                                            = var.nodes.node_groups.layout_nodes.ami_type
         instance_types                                      = var.nodes.node_groups.layout_nodes.instance_types
@@ -104,19 +104,19 @@ locals {
         }
 
         labels                                              = {
-          "node"                                            = var.cluster_internal.nodes.gpu_layout
+          "node"                                            = var.cluster.nodes.gpu_layout
         }
 
         tags                                                = {
           Environment                                       = var.environment.stage
-          Name                                              = var.cluster_internal.nodes.gpu_layout
+          Name                                              = var.cluster.nodes.gpu_layout
           Terraform                                         = "true"
           "k8s.io/cluster-autoscaler/enabled"               = "true"
           "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
         }
       },
       gpu_summary_nodes                                     = {
-        name                                                = var.cluster_internal.nodes.gpu_summary
+        name                                                = var.cluster.nodes.gpu_summary
 
         ami_type                                            = var.nodes.node_groups.summary_nodes.ami_type
         instance_types                                      = var.nodes.node_groups.summary_nodes.instance_types
@@ -136,12 +136,12 @@ locals {
         }
 
         labels                                              = {
-          "node"                                            = var.cluster_internal.nodes.gpu_summary
+          "node"                                            = var.cluster.nodes.gpu_summary
         }
 
         tags                                                = {
           Environment                                       = var.environment.stage
-          Name                                              = var.cluster_internal.nodes.gpu_summary
+          Name                                              = var.cluster.nodes.gpu_summary
           Terraform                                         = "true"
           "k8s.io/cluster-autoscaler/enabled"               = "true"
           "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
@@ -150,7 +150,7 @@ locals {
     },
     var.cluster.search ? {
       gpu_ranker_nodes                                      = {
-        name                                                = var.cluster_internal.nodes.gpu_ranker
+        name                                                = var.cluster.nodes.gpu_ranker
 
         ami_type                                            = var.nodes.node_groups.ranker_nodes.ami_type
         instance_types                                      = var.nodes.node_groups.ranker_nodes.instance_types
@@ -170,12 +170,12 @@ locals {
         }
 
         labels                                              = {
-          "node"                                            = var.cluster_internal.nodes.gpu_ranker
+          "node"                                            = var.cluster.nodes.gpu_ranker
         }
 
         tags                                                = {
           Environment                                       = var.environment.stage
-          Name                                              = var.cluster_internal.nodes.gpu_ranker
+          Name                                              = var.cluster.nodes.gpu_ranker
           Terraform                                         = "true"
           "k8s.io/cluster-autoscaler/enabled"               = "true"
           "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"

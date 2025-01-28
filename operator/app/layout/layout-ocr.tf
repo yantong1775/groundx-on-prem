@@ -18,8 +18,9 @@ resource "helm_release" "layout_ocr_service" {
         repository    = "${var.app_internal.repo_url}/${var.layout_internal.ocr.image.repository}${local.container_suffix}"
         tag           = var.layout_internal.ocr.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.layout_resources.ocr.node
+        node          = local.node_assignment.layout_ocr
       }
       replicas        = {
         cooldown      = var.layout_resources.ocr.replicas.cooldown

@@ -66,6 +66,7 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 30
+        {{- if not .Values.local }}
         resources:
           limits:
             cpu: "{{ .Values.resources.limits.cpu }}"
@@ -73,6 +74,7 @@ spec:
           requests:
             cpu: "{{ .Values.resources.requests.cpu }}"
             memory: "{{ .Values.resources.requests.memory }}"
+        {{- end }}
         volumeMounts:
         - name: config-volume
           mountPath: /home/golang/.cashbot/config.yaml

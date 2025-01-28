@@ -1,8 +1,8 @@
 resource "kubernetes_storage_class" "eyelevel_ebs_pv" {
-  count = var.cluster.environment == "aws" ? 1 : 0
+  count = var.cluster.pv.type == "gp2" && var.cluster.environment == "aws" ? 1 : 0
 
   metadata {
-    name = "${var.cluster_internal.pv.name}"
+    name = "${var.cluster.pv.name}"
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
     }
@@ -13,6 +13,6 @@ resource "kubernetes_storage_class" "eyelevel_ebs_pv" {
   volume_binding_mode  = "WaitForFirstConsumer"
 
   parameters = {
-    type = var.cluster_internal.pv.type
+    type = var.cluster.pv.type
   }
 }

@@ -82,6 +82,7 @@ destroy() {
         if [[ "$dir" == */"$app" ]]; then
           helm delete -n eyelevel $app-api > /dev/null 2>&1
           helm delete -n eyelevel $app-inference > /dev/null 2>&1
+          helm delete -n eyelevel $app-model-pv > /dev/null 2>&1
           return 0
         fi
       done

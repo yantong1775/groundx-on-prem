@@ -19,8 +19,9 @@ resource "helm_release" "groundx_service" {
         tag           = var.groundx_internal.image.tag
       }
       ingestOnly      = local.ingest_only
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.groundx_resources.node
+        node          = local.node_assignment.groundx
       }
       replicas        = {
         cooldown      = var.groundx_resources.replicas.cooldown

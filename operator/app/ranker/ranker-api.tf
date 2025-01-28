@@ -17,8 +17,9 @@ resource "helm_release" "ranker_api_service" {
         repository    = "${var.app_internal.repo_url}/${var.ranker_internal.api.image.repository}${local.container_suffix}"
         tag           = var.ranker_internal.api.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.ranker_resources.api.node
+        node          = local.node_assignment.ranker_api
       }
       replicas        = {
         cooldown      = var.ranker_resources.api.replicas.cooldown

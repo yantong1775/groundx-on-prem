@@ -14,8 +14,9 @@ resource "helm_release" "summary_client_service" {
         repository    = "${var.app_internal.repo_url}/${var.summary_client_internal.image.repository}${local.container_suffix}"
         tag           = var.summary_client_internal.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.summary_client_resources.node
+        node          = local.node_assignment.summary_client
       }
       replicas        = {
         cooldown      = var.summary_client_resources.replicas.cooldown

@@ -33,7 +33,6 @@ spec:
           imagePullPolicy: "{{ .Values.busybox.pull }}"
           command: ["/bin/sh", "-c", "--"]
           args: ["echo 'Running ldconfig_symlink.sh on this node'; /scripts/ldconfig_symlink.sh"]
-        {{- end }}
           securityContext:
             privileged: true
           resources:
@@ -41,11 +40,9 @@ spec:
               cpu: 10m
               memory: 50Mi
           volumeMounts:
-            {{- if .Values.createSymlink }}
             - name: {{ .Values.service.name }}
               mountPath: /scripts/ldconfig_symlink.sh
               subPath: ldconfig_symlink.sh
-            {{- end }}
             - name: host-sbin
               mountPath: /host-sbin
             - name: host-usr-sbin
@@ -54,6 +51,8 @@ spec:
               mountPath: /host-bin
             - name: host-usr-bin
               mountPath: /host-usr-bin
+        {{- end }}
+        {{- if not .Values.local }}
         - name: update-permissions
           image: {{ .Values.busybox.repository }}:{{ .Values.busybox.tag }}
           imagePullPolicy: "{{ .Values.busybox.pull }}"
@@ -119,6 +118,7 @@ spec:
           volumeMounts:
             - name: model-volume
               mountPath: /workspace/hf_models_cache
+        {{- end }}
       containers:
         - name: {{ .Values.service.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -129,11 +129,19 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
           workingDir: /workspace
+          {{- if .Values.local }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              export PYTHONPATH=/workspace && /workspace/init-ranker.py && supervisord -c /workspace/supervisord.conf
+          {{- else }}
           command:
             - /bin/sh
             - -c
             - |
               export PYTHONPATH=/workspace && supervisord -c /workspace/supervisord.conf
+          {{- end }}
           securityContext:
             runAsUser: {{ .Values.securityContext.runAsUser }}
             runAsGroup: {{ .Values.securityContext.runAsGroup }}
@@ -154,6 +162,7 @@ spec:
                 - ps aux | grep 'ranker.celery.appSearch' | grep -v grep || exit 1
             initialDelaySeconds: 60
             periodSeconds: 30
+          {{- if not .Values.local }}
           resources:
             limits:
               cpu: "{{ .Values.resources.limits.cpu }}"
@@ -163,6 +172,7 @@ spec:
               cpu: "{{ .Values.resources.requests.cpu }}"
               memory: "{{ .Values.resources.requests.memory }}"
               nvidia.com/gpu: {{ .Values.resources.requests.gpu }}
+          {{- end }}
           volumeMounts:
             - name: config-models
               mountPath: /workspace/config_models.py
@@ -190,7 +200,6 @@ spec:
           configMap:
             name: ldconfig-symlink-map
             defaultMode: 0555
-        {{- end }}
         - name: host-sbin
           hostPath:
             path: /sbin
@@ -207,6 +216,7 @@ spec:
           hostPath:
             path: /usr/bin
             type: Directory
+        {{- end }}
         - name: model-volume
           persistentVolumeClaim:
             claimName: {{ .Values.pv.name }}

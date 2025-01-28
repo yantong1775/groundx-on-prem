@@ -27,7 +27,7 @@ resource "helm_release" "opensearch_operator" {
       majorVersion = var.search_internal.version
       nodeGroup   = "master"
       nodeSelector = {
-        node = var.search_resources.node
+        node = local.node_assignment.search
       }
       persistence = {
         enabled = true

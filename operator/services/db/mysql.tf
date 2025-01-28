@@ -22,7 +22,7 @@ resource "helm_release" "percona_operator" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = var.db_resources.node
+        node = local.node_assignment.db
       }
     })
   ]
@@ -45,13 +45,13 @@ resource "helm_release" "percona_cluster" {
       backup = {
         enabled = var.db_internal.backup
         nodeSelector = {
-          node = var.db_resources.node
+          node = local.node_assignment.db
         }
       }
       haproxy = {
         enabled = true
         nodeSelector = {
-          node = var.db_resources.node
+          node = local.node_assignment.db
         }
         resources = {
           limits            = {
@@ -68,27 +68,27 @@ resource "helm_release" "percona_cluster" {
       logcollector = {
         enabled = var.db_internal.logcollector_enable
         nodeSelector = {
-          node = var.db_resources.node
+          node = local.node_assignment.db
         }
       }
       nodeSelector = {
-        node = var.db_resources.node
+        node = local.node_assignment.db
       }
       pmm = {
         enabled = var.db_internal.pmm_enable
         nodeSelector = {
-          node = var.db_resources.node
+          node = local.node_assignment.db
         }
       }
       proxysql = {
         enabled = false
         nodeSelector = {
-          node = var.db_resources.node
+          node = local.node_assignment.db
         }
       }
       pxc = {
         nodeSelector = {
-          node = var.db_resources.node
+          node = local.node_assignment.db
         }
         persistence = {
           size = var.db_resources.pv_size

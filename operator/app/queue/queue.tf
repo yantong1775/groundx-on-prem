@@ -14,8 +14,9 @@ resource "helm_release" "queue_service" {
         repository    = "${var.app_internal.repo_url}/${var.queue_internal.image.repository}${local.container_suffix}"
         tag           = var.queue_internal.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.queue_resources.node
+        node          = local.node_assignment.queue
       }
       replicas        = {
         cooldown      = var.queue_resources.replicas.cooldown

@@ -17,8 +17,9 @@ resource "helm_release" "summary_api_service" {
         repository    = "${var.app_internal.repo_url}/${var.summary_internal.api.image.repository}${local.container_suffix}"
         tag           = var.summary_internal.api.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.summary_resources.api.node
+        node          = local.node_assignment.summary_api
       }
       replicas        = {
         cooldown      = var.summary_resources.api.replicas.cooldown

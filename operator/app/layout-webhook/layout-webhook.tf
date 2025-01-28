@@ -14,8 +14,9 @@ resource "helm_release" "layout_webhook_service" {
         repository    = "${var.app_internal.repo_url}/${var.layout_webhook_internal.image.repository}${local.container_suffix}"
         tag           = var.layout_webhook_internal.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.layout_webhook_resources.node
+        node          = local.node_assignment.layout_webhook
       }
       replicas        = {
         cooldown      = var.layout_webhook_resources.replicas.cooldown

@@ -14,8 +14,9 @@ resource "helm_release" "upload_service" {
         repository    = "${var.app_internal.repo_url}/${var.upload_internal.image.repository}${local.container_suffix}"
         tag           = var.upload_internal.image.tag
       }
+      local           = var.cluster.environment == "local"
       nodeSelector    = {
-        node          = var.upload_resources.node
+        node          = local.node_assignment.upload
       }
       replicas        = {
         cooldown      = var.upload_resources.replicas.cooldown

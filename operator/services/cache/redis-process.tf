@@ -11,7 +11,7 @@ resource "helm_release" "redis_process" {
       image = var.cache_internal.image
       image_repo_url = var.app_internal.repo_url
       nodeSelector = {
-        node = var.cache_resources.node
+        node = local.node_assignment.cache
       }
       persistence = {
         mountPath = var.cache_internal.mount_path

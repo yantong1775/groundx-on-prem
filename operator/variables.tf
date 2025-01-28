@@ -36,7 +36,6 @@ variable "app_internal" {
     })
     log_level    = string
     namespace    = string
-    pv_class     = string
     repo_url     = string
   })
   default        = {
@@ -47,7 +46,6 @@ variable "app_internal" {
     }
     log_level    = "info"
     namespace    = "eyelevel"
-    pv_class     = "empty"
     repo_url     = "public.ecr.aws/c9r4x6y5/eyelevel"
   }
 }
