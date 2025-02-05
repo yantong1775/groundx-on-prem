@@ -68,178 +68,146 @@ variable "nodes" {
   type = object({
     node_groups = object({
       cpu_memory_nodes = object({
-        ami_type     = string
-        desired_size = number
-        ebs = object({
-          delete_on_termination = bool
-          encrypted             = bool
-          iops                  = number
-          kms_key_id            = string
-          snapshot_id           = string
-          throughput            = number
-          volume_size           = string
-          volume_type           = string
-        })
-        instance_types = list(string)
-        max_size       = number
-        min_size       = number
+        name         = string
+        machine_type     = string # aws instance_type
+        image_type = string # aws ami_type
+        min_count       = number # aws min_size
+        max_count       = number # aws max_size
+        node_count     = number # aws desired_size
+
+        disk_size_gb    = number # aws ebs
+        disk_type       = string
       })
       cpu_only_nodes = object({
-        ami_type     = string
-        desired_size = number
-        ebs = object({
-          delete_on_termination = bool
-          encrypted             = bool
-          iops                  = number
-          kms_key_id            = string
-          snapshot_id           = string
-          throughput            = number
-          volume_size           = string
-          volume_type           = string
-        })
-        instance_types = list(string)
-        max_size       = number
-        min_size       = number
+        name         = string
+        machine_type     = string
+        image_type = string
+        min_count       = number
+        max_count       = number
+
+        disk_size_gb    = number
+        disk_type       = string
       })
       layout_nodes = object({
-        ami_type     = string
-        desired_size = number
-        ebs = object({
-          delete_on_termination = bool
-          encrypted             = bool
-          iops                  = number
-          kms_key_id            = string
-          snapshot_id           = string
-          throughput            = number
-          volume_size           = string
-          volume_type           = string
-        })
-        instance_types = list(string)
-        max_size       = number
-        min_size       = number
+        name         = string
+        machine_type     = string
+        image_type = string
+        min_count       = number
+        max_count       = number
+
+        disk_size_gb    = number
+        disk_type       = string
+
+        gpu_driver_version = string
+        accelerator_count  = number
+        accelerator_type   = string
+
+        #gpu_sharing_strategy        = string
+        #max_shared_clients_per_gpu = number
       })
       ranker_nodes = object({
-        ami_type     = string
-        desired_size = number
-        ebs = object({
-          delete_on_termination = bool
-          encrypted             = bool
-          iops                  = number
-          kms_key_id            = string
-          snapshot_id           = string
-          throughput            = number
-          volume_size           = string
-          volume_type           = string
-        })
-        instance_types = list(string)
-        max_size       = number
-        min_size       = number
+        name         = string
+        machine_type     = string
+        image_type = string
+        min_count       = number
+        max_count       = number
+
+        disk_size_gb    = number
+        disk_type       = string
+
+        gpu_driver_version = string
+        accelerator_count  = number
+        accelerator_type   = string
+
+        #gpu_sharing_strategy        = string
+        #max_shared_clients_per_gpu = number
       })
       summary_nodes = object({
-        ami_type     = string
-        desired_size = number
-        ebs = object({
-          delete_on_termination = bool
-          encrypted             = bool
-          iops                  = number
-          kms_key_id            = string
-          snapshot_id           = string
-          throughput            = number
-          volume_size           = string
-          volume_type           = string
-        })
-        instance_types = list(string)
-        max_size       = number
-        min_size       = number
+        name         = string
+        machine_type     = string
+        image_type = string
+        min_count       = number
+        max_count       = number
+
+        disk_size_gb    = number
+        disk_type       = string
+
+        gpu_driver_version = string
+        accelerator_count  = number
+        accelerator_type   = string
+
+        #gpu_sharing_strategy        = string
+        #max_shared_clients_per_gpu = number
       })
     })
   })
   default = {
     node_groups = {
       cpu_memory_nodes = {
-        ami_type     = "AL2023_x86_64_STANDARD"
-        desired_size = 1
-        ebs = {
-          delete_on_termination = true
-          encrypted             = true
-          iops                  = null
-          kms_key_id            = null
-          snapshot_id           = null
-          throughput            = null
-          volume_size           = 20
-          volume_type           = "gp2"
-        }
-        instance_types = ["m6a.xlarge"]
-        max_size       = 4
-        min_size       = 1
+        name        = "cpu_memory_nodes"
+        machine_type = "e2-standard-4" # 4 vCPUs, 16 GB memory
+        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        min_count = 1
+        max_count = 4
+        node_count = 1
+
+        disk_size_gb = 20
+        disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
       }
       cpu_only_nodes = {
-        ami_type     = "AL2023_x86_64_STANDARD"
-        desired_size = 3
-        ebs = {
-          delete_on_termination = true
-          encrypted             = true
-          iops                  = null
-          kms_key_id            = null
-          snapshot_id           = null
-          throughput            = null
-          volume_size           = 20
-          volume_type           = "gp2"
-        }
-        instance_types = ["t3a.medium"]
-        max_size       = 15
-        min_size       = 3
+        name        = "cpu_only_nodes"
+        machine_type = "e2-standard-2" # 2 vCPUs, 8 GB memory
+        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        min_count = 3
+        max_count = 15
+        node_count = 3
+
+        disk_size_gb = 20
+        disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
       }
       layout_nodes = {
-        ami_type     = "AL2023_x86_64_NVIDIA"
-        desired_size = 1
-        ebs = {
-          delete_on_termination = true
-          encrypted             = true
-          iops                  = null
-          kms_key_id            = null
-          snapshot_id           = null
-          throughput            = null
-          volume_size           = 35
-          volume_type           = "gp2"
-        }
-        instance_types = ["g4dn.xlarge"]
-        max_size       = 5
-        min_size       = 1
+        name        = "layout_nodes"
+        machine_type = "n1-standard-4" # 4 vCPUs, 15 GB memory
+        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        min_count = 1
+        max_count = 5
+        node_count = 1
+
+        disk_size_gb = 35
+        disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
+
+        accelerator_count  = 1
+        accelerator_type   = "nvidia-tesla-t4" # 16 GB GPU memory, v100 p100 are also available
+        gpu_driver_version = "LATEST"
       }
       ranker_nodes = {
-        ami_type     = "AL2023_x86_64_NVIDIA"
-        desired_size = 1
-        ebs = {
-          delete_on_termination = true
-          encrypted             = true
-          iops                  = null
-          kms_key_id            = null
-          snapshot_id           = null
-          throughput            = null
-          volume_size           = 75
-          volume_type           = "gp2"
-        }
-        instance_types = ["g4dn.2xlarge"]
-        max_size       = 10
-        min_size       = 1
+        name        = "layout_nodes"
+        machine_type = "n1-standard-8" # 8 vCPUs, 30 GB memory !!! need to be confirmed.
+        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        min_count = 1
+        max_count = 10
+        node_count = 1
+
+        disk_size_gb = 75
+        disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
+
+        accelerator_count  = 1
+        accelerator_type   = "nvidia-tesla-t4" # 16 GB GPU memory, v100 p100 are also available
+        gpu_driver_version = "LATEST"
       }
       summary_nodes = {
-        ami_type     = "AL2023_x86_64_NVIDIA"
-        desired_size = 1
-        ebs = {
-          delete_on_termination = true
-          encrypted             = true
-          iops                  = null
-          kms_key_id            = null
-          snapshot_id           = null
-          throughput            = null
-          volume_size           = 100
-          volume_type           = "gp2"
-        }
-        instance_types = ["g6e.xlarge"]
-        max_size       = 10
-        min_size       = 1
+        name        = "layout_nodes"
+        machine_type = "g2-standard-4" # 4 vCPUs, 24 GB memory !!! need to be confirmed.
+        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        min_count = 1
+        max_count = 10
+        node_count = 1
+
+        disk_size_gb = 75
+        disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
+
+        accelerator_count  = 1
+        gpu_driver_version = "LATEST"
       }
     }
   }
