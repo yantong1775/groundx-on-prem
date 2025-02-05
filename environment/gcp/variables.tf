@@ -145,7 +145,7 @@ variable "nodes" {
     node_groups = {
       cpu_memory_nodes = {
         name        = "cpu_memory_nodes"
-        machine_type = "e2-standard-4" # 4 vCPUs, 16 GB memory
+        machine_type = "n2-standard-4" # 4 vCPUs, 16 GB memory, Up to 10 Gbps network bandwidth
         image_type = "cos-117-lts" # x86 family Container Optimized OS
         min_count = 1
         max_count = 4
