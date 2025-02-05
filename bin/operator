@@ -89,6 +89,7 @@ destroy() {
       for app in "${inference_process_apps[@]}"; do
         if [[ "$dir" == */"$app" ]]; then
           helm delete -n eyelevel $app-api > /dev/null 2>&1
+          helm delete -n eyelevel $app-correct > /dev/null 2>&1
           helm delete -n eyelevel $app-inference > /dev/null 2>&1
           helm delete -n eyelevel $app-map > /dev/null 2>&1
           helm delete -n eyelevel $app-process > /dev/null 2>&1

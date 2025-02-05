@@ -466,6 +466,14 @@ variable "layout_internal" {
         tag        = string
       })
     })
+    correct        = object({
+      image        = object({
+        pull       = string
+        repository = string
+        tag        = string
+      })
+      queues       = string
+    })
     inference      = object({
       image        = object({
         pull       = string
@@ -519,6 +527,14 @@ variable "layout_internal" {
         repository = "python-api"
         tag        = "latest"
       }
+    }
+    correct        = {
+      image        = {
+        pull       = "Always"
+        repository = "layout-process"
+        tag        = "latest"
+      }
+      queues       = "correct_queue"
     }
     inference      = {
       image        = {

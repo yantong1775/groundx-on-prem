@@ -29,6 +29,23 @@ locals {
 
   layout_ocr_data = var.layout.ocr.credentials != "" ? file("${path.module}/../../../${var.layout.ocr.credentials}") : ""
 
+  layout_correct_supervisord = "${
+    file(
+      "${local.module_path}/layout/supervisord.base.conf.tpl"
+    )
+  }\n${
+    join(
+      "\n",
+      [
+        for i in range(var.layout_resources.map.workers) : templatefile("${local.module_path}/layout/supervisord.process.conf.tpl", {
+          queues         = var.layout_internal.correct.queues
+          threads        = var.layout_resources.map.threads
+          worker_number  = i + 1
+        })
+      ]
+    )
+  }"
+
   layout_inference_supervisord = "${
     file(
       "${local.module_path}/layout/supervisord.base.conf.tpl"
@@ -156,6 +173,17 @@ resource "kubernetes_config_map" "layout_inference_supervisord_16gb_conf" {
 
   data = {
     "supervisord.conf" = local.layout_inference_supervisord
+  }
+}
+
+resource "kubernetes_config_map" "layout_correct_supervisord_conf" {
+  metadata {
+    name      = "layout-correct-supervisord-conf-map"
+    namespace = var.app_internal.namespace
+  }
+
+  data = {
+    "supervisord.conf" = local.layout_correct_supervisord
   }
 }
 
