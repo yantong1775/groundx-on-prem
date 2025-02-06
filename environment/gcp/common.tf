@@ -7,10 +7,6 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
-# provider "aws" {
-#   region = var.environment.region
-# }
-
 provider "random" {}
 
 resource "random_string" "name_suffix" {

@@ -7,7 +7,9 @@ variable "environment" {
       arn  = string
       name = string
     }))
+    project_id = string
     region          = string
+    zones = list(string)
     security_groups = list(string)
     ssh_key_name    = string
     stage           = string
@@ -64,7 +66,7 @@ variable "autoscaler_internal" {
 }
 
 variable "nodes" {
-  description = "EKS compute resource information"
+  description = "GKE compute resource information"
   type = object({
     node_groups = object({
       cpu_memory_nodes = object({

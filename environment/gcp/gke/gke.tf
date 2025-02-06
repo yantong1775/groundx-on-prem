@@ -1,47 +1,20 @@
 locals {
   should_create = var.environment.vpc_id != "" && length(var.environment.subnets) > 0
 
-  access_entries = merge({
-    for entry in var.environment.cluster_role_arns : entry.name => {
-      kubernetes_groups = []
-      principal_arn     = entry.arn
-
-      policy_associations = {
-        cluster = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
-  })
-
   node_groups = merge(
     {
       cpu_memory_nodes                                      = {
         name                                                = var.cluster.nodes.cpu_memory
 
-        ami_type                                            = var.nodes.node_groups.cpu_memory_nodes.ami_type
-        instance_types                                      = var.nodes.node_groups.cpu_memory_nodes.instance_types
-        key_name                                            = var.environment.ssh_key_name
-        vpc_security_group_ids                              = var.environment.security_groups
+        machine_type                                            = var.nodes.node_groups.cpu_memory_nodes.machine_type
+        image_type                                      = var.nodes.node_groups.cpu_memory_nodes.image_type
 
-        desired_size                                        = var.nodes.node_groups.cpu_memory_nodes.desired_size
-        max_size                                            = var.nodes.node_groups.cpu_memory_nodes.max_size
-        min_size                                            = var.nodes.node_groups.cpu_memory_nodes.min_size
+        node_count                                        = var.nodes.node_groups.cpu_memory_nodes.node_count
+        max_count                                            = var.nodes.node_groups.cpu_memory_nodes.max_count
+        min_count                                            = var.nodes.node_groups.cpu_memory_nodes.min_count
 
-        ebs_optimized                                       = true
-        block_device_mappings                               = {
-          xvda                                              = {
-            device_name                                     = "/dev/xvda"
-            ebs                                             = var.nodes.node_groups.cpu_memory_nodes.ebs
-          }
-        }
-
-        labels                                              = {
-          "node"                                            = var.cluster.nodes.cpu_memory
-        }
+        disk_size_gb                                      = var.nodes.node_groups.cpu_memory_nodes.disk_size_gb
+        disk_type                                         = var.nodes.node_groups.cpu_memory_nodes.disk_type
 
         tags                                                = {
           Environment                                       = var.environment.stage
@@ -54,26 +27,15 @@ locals {
       cpu_only_nodes                                        = {
         name                                                = var.cluster.nodes.cpu_only
 
-        ami_type                                            = var.nodes.node_groups.cpu_only_nodes.ami_type
-        instance_types                                      = var.nodes.node_groups.cpu_only_nodes.instance_types
-        key_name                                            = var.environment.ssh_key_name
-        vpc_security_group_ids                              = var.environment.security_groups
+        machine_type                                            = var.nodes.node_groups.cpu_only_nodes.machine_type
+        image_type                                      = var.nodes.node_groups.cpu_only_nodes.image_type
 
-        desired_size                                        = var.nodes.node_groups.cpu_only_nodes.desired_size
-        max_size                                            = var.nodes.node_groups.cpu_only_nodes.max_size
-        min_size                                            = var.nodes.node_groups.cpu_only_nodes.min_size
+        node_count                                        = var.nodes.node_groups.cpu_only_nodes.node_count
+        max_count                                            = var.nodes.node_groups.cpu_only_nodes.max_count
+        min_count                                            = var.nodes.node_groups.cpu_only_nodes.min_count
 
-        ebs_optimized                                       = true
-        block_device_mappings                               = {
-          xvda                                              = {
-            device_name                                     = "/dev/xvda"
-            ebs                                             = var.nodes.node_groups.cpu_only_nodes.ebs
-          }
-        }
-
-        labels                                              = {
-          "node"                                            = var.cluster.nodes.cpu_only
-        }
+        disk_size_gb                                      = var.nodes.node_groups.cpu_only_nodes.disk_size_gb
+        disk_type                                         = var.nodes.node_groups.cpu_only_nodes.disk_type
 
         tags                                                = {
           Environment                                       = var.environment.stage
@@ -86,26 +48,19 @@ locals {
       gpu_layout_nodes                                      = {
         name                                                = var.cluster.nodes.gpu_layout
 
-        ami_type                                            = var.nodes.node_groups.layout_nodes.ami_type
-        instance_types                                      = var.nodes.node_groups.layout_nodes.instance_types
-        key_name                                            = var.environment.ssh_key_name
-        vpc_security_group_ids                              = var.environment.security_groups
+        machine_type                                            = var.nodes.node_groups.layout_nodes.machine_type
+        image_type                                      = var.nodes.node_groups.layout_nodes.image_type
 
-        desired_size                                        = var.nodes.node_groups.layout_nodes.desired_size
-        max_size                                            = var.nodes.node_groups.layout_nodes.max_size
-        min_size                                            = var.nodes.node_groups.layout_nodes.min_size
+        node_count                                        = var.nodes.node_groups.layout_nodes.node_count
+        max_count                                            = var.nodes.node_groups.layout_nodes.max_count
+        min_count                                            = var.nodes.node_groups.layout_nodes.min_count 
 
-        ebs_optimized                                       = true
-        block_device_mappings                               = {
-          xvda                                              = {
-            device_name                                     = "/dev/xvda"
-            ebs                                             = var.nodes.node_groups.layout_nodes.ebs
-          }
-        }
+        disk_size_gb                                      = var.nodes.node_groups.layout_nodes.disk_size_gb
+        disk_type                                         = var.nodes.node_groups.layout_nodes.disk_type
 
-        labels                                              = {
-          "node"                                            = var.cluster.nodes.gpu_layout
-        }
+        accelerator_count                                 = var.nodes.node_groups.layout_nodes.accelerator_count
+        accelerator_type                                  = var.nodes.node_groups.layout_nodes.accelerator_type
+        gpu_driver_version                                = var.nodes.node_groups.layout_nodes.gpu_driver_version
 
         tags                                                = {
           Environment                                       = var.environment.stage
@@ -118,26 +73,19 @@ locals {
       gpu_summary_nodes                                     = {
         name                                                = var.cluster.nodes.gpu_summary
 
-        ami_type                                            = var.nodes.node_groups.summary_nodes.ami_type
-        instance_types                                      = var.nodes.node_groups.summary_nodes.instance_types
-        key_name                                            = var.environment.ssh_key_name
-        vpc_security_group_ids                              = var.environment.security_groups
+        machine_type                                            = var.nodes.node_groups.summary_nodes.machine_type
+        image_type                                      = var.nodes.node_groups.summary_nodes.image_type
 
-        desired_size                                        = var.nodes.node_groups.summary_nodes.desired_size
-        max_size                                            = var.nodes.node_groups.summary_nodes.max_size
-        min_size                                            = var.nodes.node_groups.summary_nodes.min_size
+        node_count                                        = var.nodes.node_groups.summary_nodes.node_count
+        max_count                                            = var.nodes.node_groups.summary_nodes.max_count
+        min_count                                            = var.nodes.node_groups.summary_nodes.min_count
 
-        ebs_optimized                                       = true
-        block_device_mappings                               = {
-          xvda                                              = {
-            device_name                                     = "/dev/xvda"
-            ebs                                             = var.nodes.node_groups.summary_nodes.ebs
-          }
-        }
+        disk_size_gb                                      = var.nodes.node_groups.summary_nodes.disk_size_gb
+        disk_type                                         = var.nodes.node_groups.summary_nodes.disk_type
 
-        labels                                              = {
-          "node"                                            = var.cluster.nodes.gpu_summary
-        }
+        accelerator_count                                 = var.nodes.node_groups.summary_nodes.accelerator_count
+        gpu_driver_version                                = var.nodes.node_groups.summary_nodes.gpu_driver_version
+        
 
         tags                                                = {
           Environment                                       = var.environment.stage
@@ -152,26 +100,19 @@ locals {
       gpu_ranker_nodes                                      = {
         name                                                = var.cluster.nodes.gpu_ranker
 
-        ami_type                                            = var.nodes.node_groups.ranker_nodes.ami_type
-        instance_types                                      = var.nodes.node_groups.ranker_nodes.instance_types
-        key_name                                            = var.environment.ssh_key_name
-        vpc_security_group_ids                              = var.environment.security_groups
+        machine_type                                            = var.nodes.node_groups.ranker_nodes.machine_type
+        image_type                                      = var.nodes.node_groups.ranker_nodes.image_type
 
-        desired_size                                        = var.nodes.node_groups.ranker_nodes.desired_size
-        max_size                                            = var.nodes.node_groups.ranker_nodes.max_size
-        min_size                                            = var.nodes.node_groups.ranker_nodes.min_size
+        node_count                                        = var.nodes.node_groups.ranker_nodes.node_count
+        max_count                                            = var.nodes.node_groups.ranker_nodes.max_count
+        min_count                                            = var.nodes.node_groups.ranker_nodes.min_count
 
-        ebs_optimized                                       = true
-        block_device_mappings                               = {
-          xvda                                              = {
-            device_name                                     = "/dev/xvda"
-            ebs                                             = var.nodes.node_groups.ranker_nodes.ebs
-          }
-        }
+        disk_size_gb                                      = var.nodes.node_groups.ranker_nodes.disk_size_gb
+        disk_type                                         = var.nodes.node_groups.ranker_nodes.disk_type
 
-        labels                                              = {
-          "node"                                            = var.cluster.nodes.gpu_ranker
-        }
+        accelerator_count                                 = var.nodes.node_groups.ranker_nodes.accelerator_count
+        accelerator_type                                  = var.nodes.node_groups.ranker_nodes.accelerator_type
+        gpu_driver_version                                = var.nodes.node_groups.ranker_nodes.gpu_driver_version
 
         tags                                                = {
           Environment                                       = var.environment.stage
@@ -187,25 +128,18 @@ locals {
 module "eyelevel_eks" {
   count = local.should_create ? 1 : 0
 
-  source                                   = "terraform-aws-modules/eks/aws"
-  version                                  = ">= 20.0"
+  source                                   = "terraform-google-modules/kubernetes-engine/google"
+  project_id = var.environment.project_id
+  name                                    = local.cluster_name
+  region                                 = var.environment.region
+  zones = var.environment.zones
+  network = var.environment.vpc_id
+  subnetwork = var.environment.subnetwork
+  ip_range_pods              = "us-central1-01-gke-01-pods" # The name of the secondary subnet ip range to use for pods
+  ip_range_services          = "us-central1-01-gke-01-services"# The name of the secondary subnet range to use for services
 
-  cluster_name                             = local.cluster_name
-  iam_role_name                            = "${local.cluster_name}-cluster-role"
+  node_pools = local.node_groups
 
-  cluster_endpoint_private_access          = true
-  cluster_endpoint_public_access           = true
-  enable_cluster_creator_admin_permissions = true
-  subnet_ids                               = var.environment.subnets
-  vpc_id                                   = var.environment.vpc_id
-
-  access_entries                           = local.access_entries
-
-  eks_managed_node_group_defaults          = {
-    iam_role_name                          = "${local.cluster_name}-node-role"
-  }
-
-  eks_managed_node_groups                  = local.node_groups
 }
 
 resource "null_resource" "wait_for_eks" {
