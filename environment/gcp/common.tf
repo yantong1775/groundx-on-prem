@@ -7,6 +7,11 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
+provider "google" {
+  project = var.environment.project_id
+  region  = var.environment.region
+}
+
 provider "random" {}
 
 resource "random_string" "name_suffix" {

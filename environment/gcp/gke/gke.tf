@@ -125,7 +125,7 @@ locals {
     } : {})
 }
 
-module "eyelevel_eks" {
+module "eyelevel_gke" {
   count = local.should_create ? 1 : 0
 
   source                                   = "terraform-google-modules/kubernetes-engine/google"
@@ -145,9 +145,11 @@ module "eyelevel_eks" {
 resource "null_resource" "wait_for_eks" {
   count = local.should_create ? 1 : 0
 
-  depends_on = [module.eyelevel_eks]
+  depends_on = [module.eyelevel_gke]
 
+  # update kubeconfig for gke cluster
+  # https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl
   provisioner "local-exec" {
-    command  = "aws eks update-kubeconfig --region ${var.environment.region} --name ${local.cluster_name}"
+    command  = "gcloud container clusters get-credentials ${local.cluster_name} --region ${var.environment.region}"
   }
 }
