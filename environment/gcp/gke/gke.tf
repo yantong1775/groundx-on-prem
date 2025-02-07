@@ -129,14 +129,17 @@ module "eyelevel_gke" {
   count = local.should_create ? 1 : 0
 
   source                                   = "terraform-google-modules/kubernetes-engine/google"
+  
   project_id = var.environment.project_id
   name                                    = local.cluster_name
   region                                 = var.environment.region
   zones = var.environment.zones
+
+  # network settings
   network = var.environment.vpc_id
   subnetwork = var.environment.subnetwork
-  ip_range_pods              = "us-central1-01-gke-01-pods" # The name of the secondary subnet ip range to use for pods
-  ip_range_services          = "us-central1-01-gke-01-services"# The name of the secondary subnet range to use for services
+  ip_range_pods              = var.vpc.pods_secondary_range_name # The name of the secondary subnet ip range to use for pods
+  ip_range_services          = var.vpc.services_secondary_range_name # The name of the secondary subnet range to use for services
 
   node_pools = local.node_groups
 
