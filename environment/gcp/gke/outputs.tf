@@ -1,4 +1,4 @@
 output "cluster_endpoint" {
-  description = "Endpoint for EKS control plane"
-  value       = length(module.eyelevel_eks) > 0 ? module.eyelevel_eks[0].cluster_endpoint : "(not created)"
+  description = "Endpoint for GKE control plane"
+  value       = length(module.eyelevel_gke) > 0 ? module.eyelevel_gke[0].endpoint : "(not created)"
 }
