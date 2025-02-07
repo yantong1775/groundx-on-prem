@@ -1,5 +1,22 @@
 # Progress
 
+## 06/02/2025
+
+### update the gke module terraform
+
+### update the vpc terraform code
+
+1. what is the mapping for aws vpc private and public subnetwork?
+2. how to correctly setup the secondary ip range for pods and services?
+3. how to output the firewall id using the vpc module?
+
+### TODO:
+
+setup service account permission
+setup local gcloud
+modify the setup-gcp sh file.
+hopefully run the bash file to see if it works -> see what quota limits need to be increased.
+
 ## 05/02/2025
 
 ### find the matched machine and image type for node pools
