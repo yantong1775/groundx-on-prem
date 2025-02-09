@@ -1,6 +1,6 @@
-output "ssh_security_group" {
-  description = "Security group ID that allows SSH from VPC subnets only, add this to env.tfvars to enable SSH"
-  value       = aws_security_group.ssh_access.id
+output "ssh_firewall" {
+  description = "firewall ID that allows SSH from VPC subnets only, add this to env.tfvars to enable SSH"
+  value       = google_compute_firewall.allow-ssh-only-ingress.self_link
 }
 
 output "subnets" {
