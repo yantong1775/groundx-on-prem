@@ -1,5 +1,13 @@
 # Progress
 
+## 09/02/2025
+
+### provision the vpc
+
+### provision the gke cluster (almost)
+
+n1+t4 is not available to the current zone. Need to specify a valid zone for this.
+
 ## 06/02/2025
 
 ### update the gke module terraform
