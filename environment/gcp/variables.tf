@@ -86,6 +86,7 @@ variable "nodes" {
         image_type = string
         min_count       = number
         max_count       = number
+        node_count = number
 
         disk_size_gb    = number
         disk_type       = string
@@ -96,6 +97,7 @@ variable "nodes" {
         image_type = string
         min_count       = number
         max_count       = number
+        node_count = number
 
         disk_size_gb    = number
         disk_type       = string
@@ -113,6 +115,7 @@ variable "nodes" {
         image_type = string
         min_count       = number
         max_count       = number
+        node_count = number
 
         disk_size_gb    = number
         disk_type       = string
@@ -130,6 +133,7 @@ variable "nodes" {
         image_type = string
         min_count       = number
         max_count       = number
+        node_count = number
 
         disk_size_gb    = number
         disk_type       = string
@@ -148,7 +152,7 @@ variable "nodes" {
       cpu_memory_nodes = {
         name        = "cpu_memory_nodes"
         machine_type = "n2-standard-4" # 4 vCPUs, 16 GB memory, Up to 10 Gbps network bandwidth
-        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        image_type = "cos_containerd" # x86 family Container Optimized OS
         min_count = 1
         max_count = 4
         node_count = 1
@@ -159,7 +163,7 @@ variable "nodes" {
       cpu_only_nodes = {
         name        = "cpu_only_nodes"
         machine_type = "e2-standard-2" # 2 vCPUs, 8 GB memory
-        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        image_type = "cos_containerd" # x86 family Container Optimized OS
         min_count = 3
         max_count = 15
         node_count = 3
@@ -170,7 +174,7 @@ variable "nodes" {
       layout_nodes = {
         name        = "layout_nodes"
         machine_type = "n1-standard-4" # 4 vCPUs, 15 GB memory
-        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        image_type = "cos_containerd" # x86 family Container Optimized OS
         min_count = 1
         max_count = 5
         node_count = 1
@@ -185,7 +189,7 @@ variable "nodes" {
       ranker_nodes = {
         name        = "layout_nodes"
         machine_type = "n1-standard-8" # 8 vCPUs, 30 GB memory !!! need to be confirmed.
-        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        image_type = "cos_containerd" # x86 family Container Optimized OS
         min_count = 1
         max_count = 10
         node_count = 1
@@ -200,7 +204,7 @@ variable "nodes" {
       summary_nodes = {
         name        = "layout_nodes"
         machine_type = "g2-standard-4" # 4 vCPUs, 24 GB memory !!! need to be confirmed.
-        image_type = "cos-117-lts" # x86 family Container Optimized OS
+        image_type = "cos_containerd" # x86 family Container Optimized OS
         min_count = 1
         max_count = 10
         node_count = 1

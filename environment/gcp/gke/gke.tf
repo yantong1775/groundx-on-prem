@@ -15,14 +15,18 @@ locals {
 
         disk_size_gb                                      = var.nodes.node_groups.cpu_memory_nodes.disk_size_gb
         disk_type                                         = var.nodes.node_groups.cpu_memory_nodes.disk_type
-
-        tags                                                = {
-          Environment                                       = var.environment.stage
-          Name                                              = var.cluster.nodes.cpu_memory
-          Terraform                                         = "true"
-          "k8s.io/cluster-autoscaler/enabled"               = "true"
-          "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        }
+        
+        accelerator_count  = 0
+        accelerator_type   = ""
+        gpu_driver_version = ""
+        
+        # tags                                                = {
+        #   Environment                                       = var.environment.stage
+        #   Name                                              = var.cluster.nodes.cpu_memory
+        #   Terraform                                         = "true"
+        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
+        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
+        # }
       },
       cpu_only_nodes                                        = {
         name                                                = var.cluster.nodes.cpu_only
@@ -37,13 +41,16 @@ locals {
         disk_size_gb                                      = var.nodes.node_groups.cpu_only_nodes.disk_size_gb
         disk_type                                         = var.nodes.node_groups.cpu_only_nodes.disk_type
 
-        tags                                                = {
-          Environment                                       = var.environment.stage
-          Name                                              = var.cluster.nodes.cpu_only
-          Terraform                                         = "true"
-          "k8s.io/cluster-autoscaler/enabled"               = "true"
-          "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        }
+        accelerator_count  = 0
+        accelerator_type   = ""
+        gpu_driver_version = ""
+        # tags                                                = {
+        #   Environment                                       = var.environment.stage
+        #   Name                                              = var.cluster.nodes.cpu_only
+        #   Terraform                                         = "true"
+        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
+        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
+        # }
       },
       gpu_layout_nodes                                      = {
         name                                                = var.cluster.nodes.gpu_layout
@@ -62,13 +69,13 @@ locals {
         accelerator_type                                  = var.nodes.node_groups.layout_nodes.accelerator_type
         gpu_driver_version                                = var.nodes.node_groups.layout_nodes.gpu_driver_version
 
-        tags                                                = {
-          Environment                                       = var.environment.stage
-          Name                                              = var.cluster.nodes.gpu_layout
-          Terraform                                         = "true"
-          "k8s.io/cluster-autoscaler/enabled"               = "true"
-          "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        }
+        # tags                                                = {
+        #   Environment                                       = var.environment.stage
+        #   Name                                              = var.cluster.nodes.gpu_layout
+        #   Terraform                                         = "true"
+        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
+        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
+        # }
       },
       gpu_summary_nodes                                     = {
         name                                                = var.cluster.nodes.gpu_summary
@@ -84,16 +91,16 @@ locals {
         disk_type                                         = var.nodes.node_groups.summary_nodes.disk_type
 
         accelerator_count                                 = var.nodes.node_groups.summary_nodes.accelerator_count
+        accelerator_type = var.nodes.node_groups.summary_nodes.accelerator_type
         gpu_driver_version                                = var.nodes.node_groups.summary_nodes.gpu_driver_version
-        
 
-        tags                                                = {
-          Environment                                       = var.environment.stage
-          Name                                              = var.cluster.nodes.gpu_summary
-          Terraform                                         = "true"
-          "k8s.io/cluster-autoscaler/enabled"               = "true"
-          "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        }
+        # tags                                                = {
+        #   Environment                                       = var.environment.stage
+        #   Name                                              = var.cluster.nodes.gpu_summary
+        #   Terraform                                         = "true"
+        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
+        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
+        # }
       } 
     },
     var.cluster.search ? {
@@ -114,13 +121,13 @@ locals {
         accelerator_type                                  = var.nodes.node_groups.ranker_nodes.accelerator_type
         gpu_driver_version                                = var.nodes.node_groups.ranker_nodes.gpu_driver_version
 
-        tags                                                = {
-          Environment                                       = var.environment.stage
-          Name                                              = var.cluster.nodes.gpu_ranker
-          Terraform                                         = "true"
-          "k8s.io/cluster-autoscaler/enabled"               = "true"
-          "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        }
+        # tags                                                = {
+        #   Environment                                       = var.environment.stage
+        #   Name                                              = var.cluster.nodes.gpu_ranker
+        #   Terraform                                         = "true"
+        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
+        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
+        # }
       }
     } : {})
 }
@@ -137,15 +144,15 @@ module "eyelevel_gke" {
 
   # network settings
   network = var.environment.vpc_id
-  subnetwork = var.environment.subnetwork
+  subnetwork = var.environment.subnets[0]
   ip_range_pods              = var.vpc.pods_secondary_range_name # The name of the secondary subnet ip range to use for pods
   ip_range_services          = var.vpc.services_secondary_range_name # The name of the secondary subnet range to use for services
 
-  node_pools = local.node_groups
+  node_pools = values(local.node_groups)
 
 }
 
-resource "null_resource" "wait_for_eks" {
+resource "null_resource" "wait_for_gke" {
   count = local.should_create ? 1 : 0
 
   depends_on = [module.eyelevel_gke]
