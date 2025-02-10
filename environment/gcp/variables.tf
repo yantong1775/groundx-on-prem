@@ -209,6 +209,7 @@ variable "nodes" {
         disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
 
         accelerator_count  = 1
+        accelerator_type = "nvidia-l4-vws"
         gpu_driver_version = "LATEST"
       }
     }

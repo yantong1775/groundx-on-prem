@@ -34,7 +34,7 @@ resource "google_compute_firewall" "allow-ssh-only-ingress" {
     ports    = ["22"]
   }
   // Allow SSH from VPC subnets only
-  source_ranges = google_compute_subnetwork.gke-subnet.ip_cidr_range
+  source_ranges = [google_compute_subnetwork.gke-subnet.ip_cidr_range]
 }
 
 resource "google_compute_firewall" "allow-all-egress" {

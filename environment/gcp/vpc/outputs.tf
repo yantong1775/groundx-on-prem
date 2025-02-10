@@ -5,10 +5,10 @@ output "ssh_firewall" {
 
 output "subnets" {
   description = "Subnets for EyeLevel VPC, add these to env.tfvars"
-  value       = module.eyelevel_vpc.subnets
+  value       = google_compute_subnetwork.gke-subnet.self_link
 }
 
 output "vpc_id" {
   description = "VPC ID for EyeLevel VPC, add this to env.tfvars"
-  value       = module.eyelevel_vpc.network_id
+  value       = google_compute_network.vpc.self_link
 }
