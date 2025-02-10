@@ -150,6 +150,8 @@ module "eyelevel_gke" {
 
   node_pools = values(local.node_groups)
 
+  deletion_protection = false
+
 }
 
 resource "null_resource" "wait_for_gke" {
