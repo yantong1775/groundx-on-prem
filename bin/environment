@@ -8,10 +8,12 @@ BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_BASE="$BIN_DIR/../environment"
 
 must_have aws
+must_have gcloud
 must_have terraform
 
 ENV=""
 AWS=""
+GCP=""
 
 if [[ "$1" =~ ^- ]]; then
   IN=""
@@ -23,11 +25,17 @@ else
     ENV=$IN
     if [[ "$ENV" == "aws" ]]; then
       test_aws || { error "aws command isn't working (are you authorized?)"; exit 2; }
+    elif [[ "$ENV" == "gcp" ]]; then
+      test_gcp || { error "gcloud command isn't working (are you authorized?)"; exit 2; }
     fi
   elif [[ " ${valid_aws[@]} " =~ " $IN " ]]; then
     AWS=$IN
 
     test_aws || { error "aws command isn't working (are you authorized?)"; exit 2; }
+  elif [[ " ${valid_gcp[@]} " =~ " $IN " ]]; then
+    GCP=$IN
+
+    test_gcp || { error "gcloud command isn't working (are you authorized?)"; exit 2; }
   else
     { error "Unknown request type: [$IN]"; exit 1; }
   fi
@@ -109,5 +117,11 @@ elif [[ -n "$AWS" ]]; then
     $do "$ENV_BASE/aws/eks"
   elif [[ "$AWS" == "aws-vpc" ]]; then
     $do "$ENV_BASE/aws/vpc"
+  fi
+elif [[ -n "$GCP" ]]; then
+  if [[ "$GCP" == "gke" ]]; then
+    $do "$ENV_BASE/gcp/gke"
+  elif [[ "$GCP" == "gcp-vpc" ]]; then
+    $do "$ENV_BASE/gcp/vpc"
   fi
 fi

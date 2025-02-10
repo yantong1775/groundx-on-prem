@@ -6,7 +6,7 @@ do="$ENV_DIR/../../bin/environment"
 . "$ENV_DIR/../../bin/shared/cli-input"
 . "$ENV_DIR/../../bin/shared/util"
 
-must_have aws
+must_have gcloud
 must_have terraform
 
 confirm_setup=$(prompt_text "Have you copied environment/aws/env.tfvars.example to environment/aws/env.tfvars and configured the settings?")
@@ -18,19 +18,19 @@ if ! $result; then
     exit 1
 fi
 
-environments=("aws")
-aws_clusters=("eks")
+environments=("aws", "gcp")
+aws_clusters=("eks", "gke")
 
 check_env=false
 check_vpc=false
-check_kc=false
-check_kct=false
+check_kc=true
+check_kct=true
 
-ENV="aws"
+ENV="gcp"
 VPC=true
 KC=true
-KCT="eks"
-REGION="us-east-2"
+KCT="gke"
+REGION="us-east-1"
 SEARCH=true
 
 choose_cluster_existing=$(prompt_menu "What type of Kubernetes cluster do you have?" "aws_clusters[@]")
@@ -47,6 +47,11 @@ fi
 
 if [[ "$ENV" == "aws" ]]; then
     test_aws || { error "aws command isn't working (are you logged in and authorized?)"; exit 2; }
+elif [[ "$ENV" == "gcp" ]]; then
+    test_gcp || { error "gcloud command isn't working (are you logged in and authorized?)"; exit 2; }
+else
+    error "Unknown environment: $ENV"
+    exit 1
 fi
 
 if $check_vpc; then

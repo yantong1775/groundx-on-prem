@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-valid_envs=("aws")
-recursive_types=("aws")
+valid_envs=("aws", "gcp")
+recursive_types=("aws", "gcp")
 
 valid_aws=("aws-vpc" "eks")
+valid_gcp=("gcp-vpc" "gke")
 
 # valid_groups order is important:
 # the groups are executed in order for deploy
@@ -164,6 +165,11 @@ status() { echo -ne "\e[37;1m$@: \e[0m"; }
 test_aws() {
     aws eks list-clusters > /dev/null 2>&1
 
+    return $?
+}
+
+test_gcp() {
+    gcloud container clusters list > /dev/null 2>&1
     return $?
 }
 
