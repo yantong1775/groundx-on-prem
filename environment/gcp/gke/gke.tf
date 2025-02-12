@@ -18,7 +18,7 @@ locals {
         
         accelerator_count  = 0
         accelerator_type   = ""
-        gpu_driver_version = ""
+        gpu_driver_version = "INSTALLATION_DISABLED"
         
         # tags                                                = {
         #   Environment                                       = var.environment.stage
@@ -43,7 +43,7 @@ locals {
 
         accelerator_count  = 0
         accelerator_type   = ""
-        gpu_driver_version = ""
+        gpu_driver_version = "INSTALLATION_DISABLED"
         # tags                                                = {
         #   Environment                                       = var.environment.stage
         #   Name                                              = var.cluster.nodes.cpu_only
@@ -67,7 +67,8 @@ locals {
 
         accelerator_count                                 = var.nodes.node_groups.layout_nodes.accelerator_count
         accelerator_type                                  = var.nodes.node_groups.layout_nodes.accelerator_type
-        gpu_driver_version                                = var.nodes.node_groups.layout_nodes.gpu_driver_version
+        # gpu_driver_version                                = var.nodes.node_groups.layout_nodes.gpu_driver_version
+        gpu_driver_version = "INSTALLATION_DISABLED"
 
         # tags                                                = {
         #   Environment                                       = var.environment.stage
@@ -92,7 +93,8 @@ locals {
 
         accelerator_count                                 = var.nodes.node_groups.summary_nodes.accelerator_count
         accelerator_type = var.nodes.node_groups.summary_nodes.accelerator_type
-        gpu_driver_version                                = var.nodes.node_groups.summary_nodes.gpu_driver_version
+        # gpu_driver_version                                = var.nodes.node_groups.summary_nodes.gpu_driver_version
+        gpu_driver_version = "INSTALLATION_DISABLED"
 
         # tags                                                = {
         #   Environment                                       = var.environment.stage
@@ -119,7 +121,8 @@ locals {
 
         accelerator_count                                 = var.nodes.node_groups.ranker_nodes.accelerator_count
         accelerator_type                                  = var.nodes.node_groups.ranker_nodes.accelerator_type
-        gpu_driver_version                                = var.nodes.node_groups.ranker_nodes.gpu_driver_version
+        # gpu_driver_version                                = var.nodes.node_groups.ranker_nodes.gpu_driver_version
+        gpu_driver_version = "INSTALLATION_DISABLED"
 
         # tags                                                = {
         #   Environment                                       = var.environment.stage
@@ -149,6 +152,24 @@ module "eyelevel_gke" {
   ip_range_services          = var.vpc.services_secondary_range_name # The name of the secondary subnet range to use for services
 
   node_pools = values(local.node_groups)
+
+  node_pools_labels = {
+    cpu_memory_nodes  = {
+      "gke-no-default-nvidia-gpu-device-plugin" =  true
+    },
+    cpu_only_nodes    = {
+      "gke-no-default-nvidia-gpu-device-plugin" =  true
+    },
+    gpu_layout_nodes  = {
+      "gke-no-default-nvidia-gpu-device-plugin" =  true
+    },
+    gpu_summary_nodes = {
+      "gke-no-default-nvidia-gpu-device-plugin" =  true
+    },
+    gpu_ranker_nodes  = {
+      "gke-no-default-nvidia-gpu-device-plugin" =  true
+    }
+  }
 
   deletion_protection = false
 
