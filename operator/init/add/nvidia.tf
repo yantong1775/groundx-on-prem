@@ -8,7 +8,7 @@ resource "helm_release" "gpu_operator" {
   version          = var.cluster_internal.nvidia.chart.version
 
   namespace        = var.cluster_internal.nvidia.namespace
-  create_namespace = true
+  create_namespace = false
   atomic           = true
   cleanup_on_fail  = true
   reset_values     = true

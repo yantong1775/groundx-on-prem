@@ -53,7 +53,7 @@ variable "cluster" {
   })
   default = {
     autoscale        = false
-    environment      = "aws"
+    environment      = "gcp"
     has_nvidia       = false
     internet_access  = true
     kube_config_path = "~/.kube/config"
@@ -80,7 +80,7 @@ variable "cluster" {
         max      = 3600000
       }
     }
-    type = "eks"
+    type = "gke"
   }
 }
 
@@ -100,13 +100,13 @@ variable "cluster_internal" {
   })
   default = {
     nvidia = {
-      driver    = "550.144.03"
+      driver    = "latest"
       name      = "nvidia-gpu-operator"
       namespace = "nvidia-gpu-operator"
       chart = {
         name       = "gpu-operator"
         repository = "https://helm.ngc.nvidia.com/nvidia"
-        version    = "v24.9.1"
+        version    = "v24.9.2"
       }
     }
   }
