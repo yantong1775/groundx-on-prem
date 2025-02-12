@@ -1,5 +1,68 @@
 # Progress
 
+## 02/12
+
+### TODO
+
+1. fix the daemon no node selected if it is an issue
+2. find out what's going on with the terraform code, why directly using helm works but terraform code does not.
+3. Currently the resourceQuota is manually added using kubectl apply, need to add to the terraform code.
+4. Try proceeding to the service deployment.
+
+## 02/11
+
+1. operator setup
+2. check the workload
+
+#### gpu-operator-setup
+
+In workload, error says:
+
+Error creating: insufficient quota to match these scopes: [{PriorityClass In [system-node-critical system-cluster-critical[]}]
+
+According to docs from nvidia: https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/google-gke.html
+
+A ResourceQuota shoule be created under the gpu-operator namespace
+
+kubenetes doc: https://kubernetes.io/docs/concepts/policy/resource-quotas/#limit-priority-class-consumption-by-default
+
+#### pod initializing forever
+
+##### First Error: Failed to create pod sandbox
+
+Normal Scheduled 5m9s default-scheduler Successfully assigned nvidia-gpu-operator/nvidia-operator-validator-9c7fb to gke-eyelevel-utcgge-eyelevel-gpu-rank-2891ab6f-tlvf
+Warning FailedCreatePodSandBox 3s (x24 over 5m9s) kubelet Failed to create pod sandbox: rpc error: code = Unknown desc = failed to get sandbox runtime: no runtime for "nvidia" is configured
+
+##### Possible cause: node created with gpu driver
+
+##### possible fix: when creating the node, disable the driver install
+
+##### Second error: image pull error
+
+work around: directly using helm to deploy the services.
+
+```
+helm install --wait --generate-name \
+    -n gpu-operator \
+    nvidia/gpu-operator \
+    --version=v24.9.2 \
+    --set hostPaths.driverInstallDir=/home/kubernetes/bin/nvidia \
+    --set toolkit.installDir=/home/kubernetes/bin/nvidia \
+    --set cdi.enabled=true \
+    --set cdi.default=true \
+    --set driver.enabled=false
+```
+
+##### Third Error:
+
+After fixing the above error, most pods can be deployed, remaining issues are DaemonSet has no nodes selected.
+![alt text](/progress/02/11/Screenshot%202025-02-11%20at%2010.48.58 PM.png)
+
+describe using kubectl get:
+
+[nvidia-device-plugin-mps-control-daemon.log](/progress/02/11/nvidia-device-plugin-mps-control-daemon.log)
+[nvidia-mig-manager.log](/progress/02/11/nvidia-mig-manager.log)
+
 ## 09/02/2025
 
 ### provision the vpc
@@ -7,6 +70,11 @@
 ### provision the gke cluster (almost)
 
 n1+t4 is not available to the current zone. Need to specify a valid zone for this.
+
+#### note
+
+if terraform destroy fails and says deletion_protection is set to true.
+locate the deletion project in tfstate, manually change it to false, so that terraform can delete the cluster.
 
 ## 06/02/2025
 
