@@ -1,5 +1,21 @@
 # Progress
 
+## 02/14
+
+### TODO
+
+1. try fix service error
+2. try deploy app
+
+## 02/13
+
+most service deployed successfully.
+
+1. kafka-cluster-entity-operator show error:
+   1. Session 0x0 for sever localhost/127.0.0.1:2181, Closing socket connection. Attempting reconnect except it is a SessionExpiredException.
+      java.net.ConnectException: Connection refused
+      Possible cause: zoo keeper is down?
+
 ## 02/12
 
 ### TODO
@@ -105,7 +121,7 @@ The min, max and desired size remain the same.
       2. gcp uses n2-standard-4, 4 vcpu 16Gib mem, network bandwidth up to 10
    2. cpu_only_nodes:
       1. aws uses t3a.medium, 2 vcpus, 4 Gib mem, network burst bandwidth 5.
-      2. gcp uses e2-standard-2: 2vcpus, 8 Gib mem, network bandwidth up to 4
+      2. gcp uses e2-standard-2: 2vcpus, 8 Gib mem, network bandwidth up to 4 -> increase vcpu 4
 2. for gpu nodes,
    aws provide ami AL2023_x86_64_NVIDIA which configure the gpu driver.
    for gcp, standard machine need to configure gpu type, count, and driver version. Also need to configure gpu sharing(**need to be done**)
