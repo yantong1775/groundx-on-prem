@@ -106,8 +106,8 @@ variable "nodes" {
         accelerator_count  = number
         accelerator_type   = string
 
-        #gpu_sharing_strategy        = string
-        #max_shared_clients_per_gpu = number
+        gpu_sharing_strategy        = string
+        max_shared_clients_per_gpu = number
       })
       ranker_nodes = object({
         name         = string
@@ -124,8 +124,8 @@ variable "nodes" {
         accelerator_count  = number
         accelerator_type   = string
 
-        #gpu_sharing_strategy        = string
-        #max_shared_clients_per_gpu = number
+        gpu_sharing_strategy        = string
+        max_shared_clients_per_gpu = number
       })
       summary_nodes = object({
         name         = string
@@ -142,8 +142,8 @@ variable "nodes" {
         accelerator_count  = number
         accelerator_type   = string
 
-        #gpu_sharing_strategy        = string
-        #max_shared_clients_per_gpu = number
+        gpu_sharing_strategy        = string
+        max_shared_clients_per_gpu = number
       })
     })
   })
@@ -157,7 +157,7 @@ variable "nodes" {
         max_count = 4
         node_count = 1
 
-        disk_size_gb = 20
+        disk_size_gb = 40
         disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
       }
       cpu_only_nodes = {
@@ -185,6 +185,8 @@ variable "nodes" {
         accelerator_count  = 1
         accelerator_type   = "nvidia-tesla-t4" # 16 GB GPU memory, v100 p100 are also available
         gpu_driver_version = "LATEST"
+        gpu_sharing_strategy = "MPS"
+        max_shared_clients_per_gpu = 2
       }
       ranker_nodes = {
         name        = "layout_nodes"
@@ -200,6 +202,9 @@ variable "nodes" {
         accelerator_count  = 1
         accelerator_type   = "nvidia-tesla-t4" # 16 GB GPU memory, v100 p100 are also available
         gpu_driver_version = "LATEST"
+        gpu_sharing_strategy = "MPS"
+        max_shared_clients_per_gpu = 2
+
       }
       summary_nodes = {
         name        = "layout_nodes"
@@ -215,6 +220,9 @@ variable "nodes" {
         accelerator_count  = 1
         accelerator_type = "nvidia-l4-vws"
         gpu_driver_version = "LATEST"
+        gpu_sharing_strategy = "MPS"
+        max_shared_clients_per_gpu = 2
+
       }
     }
   }
