@@ -28,7 +28,7 @@ resource "helm_release" "kafka_cluster" {
   values = [
     yamlencode({
       nodeSelector = {
-        "node_pool" = local.node_assignment.stream
+        node = local.node_assignment.stream
       }
       partitions = {
         pre_process    = local.replicas.pre_process.max
