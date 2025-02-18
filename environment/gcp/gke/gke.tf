@@ -20,13 +20,6 @@ locals {
         accelerator_type   = ""
         gpu_driver_version = "INSTALLATION_DISABLED"
         
-        # tags                                                = {
-        #   Environment                                       = var.environment.stage
-        #   Name                                              = var.cluster.nodes.cpu_memory
-        #   Terraform                                         = "true"
-        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
-        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        # }
       },
       cpu_only_nodes                                        = {
         name                                                = var.cluster.nodes.cpu_only
@@ -44,13 +37,7 @@ locals {
         accelerator_count  = 0
         accelerator_type   = ""
         gpu_driver_version = "INSTALLATION_DISABLED"
-        # tags                                                = {
-        #   Environment                                       = var.environment.stage
-        #   Name                                              = var.cluster.nodes.cpu_only
-        #   Terraform                                         = "true"
-        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
-        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        # }
+
       },
       gpu_layout_nodes                                      = {
         name                                                = var.cluster.nodes.gpu_layout
@@ -67,16 +54,8 @@ locals {
 
         accelerator_count                                 = var.nodes.node_groups.layout_nodes.accelerator_count
         accelerator_type                                  = var.nodes.node_groups.layout_nodes.accelerator_type
-        # gpu_driver_version                                = var.nodes.node_groups.layout_nodes.gpu_driver_version
         gpu_driver_version = "INSTALLATION_DISABLED"
 
-        # tags                                                = {
-        #   Environment                                       = var.environment.stage
-        #   Name                                              = var.cluster.nodes.gpu_layout
-        #   Terraform                                         = "true"
-        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
-        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        # }
       },
       gpu_summary_nodes                                     = {
         name                                                = var.cluster.nodes.gpu_summary
@@ -93,16 +72,7 @@ locals {
 
         accelerator_count                                 = var.nodes.node_groups.summary_nodes.accelerator_count
         accelerator_type = var.nodes.node_groups.summary_nodes.accelerator_type
-        # gpu_driver_version                                = var.nodes.node_groups.summary_nodes.gpu_driver_version
         gpu_driver_version = "INSTALLATION_DISABLED"
-
-        # tags                                                = {
-        #   Environment                                       = var.environment.stage
-        #   Name                                              = var.cluster.nodes.gpu_summary
-        #   Terraform                                         = "true"
-        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
-        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        # }
       } 
     },
     var.cluster.search ? {
@@ -121,16 +91,8 @@ locals {
 
         accelerator_count                                 = var.nodes.node_groups.ranker_nodes.accelerator_count
         accelerator_type                                  = var.nodes.node_groups.ranker_nodes.accelerator_type
-        # gpu_driver_version                                = var.nodes.node_groups.ranker_nodes.gpu_driver_version
-        gpu_driver_version = "INSTALLATION_DISABLED"
 
-        # tags                                                = {
-        #   Environment                                       = var.environment.stage
-        #   Name                                              = var.cluster.nodes.gpu_ranker
-        #   Terraform                                         = "true"
-        #   "k8s.io/cluster-autoscaler/enabled"               = "true"
-        #   "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
-        # }
+        gpu_driver_version = "INSTALLATION_DISABLED"
       }
     } : {})
 }
