@@ -19,7 +19,7 @@ spec:
         node_pool: "{{ .Values.nodeSelector.node }}"
       runtimeClassName: nvidia
       tolerations:
-        - key: "node"
+        - key: "node_pool"
           value: "{{ .Values.nodeSelector.node }}"
           effect: "NoSchedule"
       initContainers:

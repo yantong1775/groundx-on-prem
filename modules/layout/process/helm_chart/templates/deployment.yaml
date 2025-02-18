@@ -18,7 +18,7 @@ spec:
       nodeSelector: 
         node_pool: "{{ .Values.nodeSelector.node }}"
       tolerations:
-        - key: "node"
+        - key: "node_pool"
           value: "{{ .Values.nodeSelector.node }}"
           effect: "NoSchedule"
       initContainers:

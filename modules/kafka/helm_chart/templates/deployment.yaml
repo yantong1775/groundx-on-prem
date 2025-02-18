@@ -34,12 +34,12 @@ spec:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
                 - matchExpressions:
-                  - key: node
+                  - key: node_pool
                     operator: In
                     values:
                     - "{{ .Values.nodeSelector.node }}"
         tolerations:
-          - key: "node"
+          - key: "node_pool"
             value: "{{ .Values.nodeSelector.node }}"
             effect: "NoSchedule"
     storage:
@@ -55,12 +55,12 @@ spec:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
                 - matchExpressions:
-                  - key: node
+                  - key: node_pool
                     operator: In
                     values:
                     - "{{ .Values.nodeSelector.node }}"
         tolerations:
-          - key: "node"
+          - key: "node_pool"
             value: "{{ .Values.nodeSelector.node }}"
             effect: "NoSchedule"
     storage:
