@@ -1,9 +1,9 @@
 locals {
   node_assignment = {
-    cache             = var.cluster.nodes.cpu_only
-    db                = var.cluster.nodes.cpu_only
-    file              = var.cluster.nodes.cpu_only
-    graph             = var.cluster.nodes.cpu_only
+    cache             = var.cluster.nodes.cpu_memory
+    db                = var.cluster.nodes.cpu_memory
+    file              = var.cluster.nodes.cpu_memory
+    graph             = var.cluster.nodes.cpu_memory
     groundx           = var.cluster.nodes.cpu_only
     layout_api        = var.cluster.nodes.cpu_only
     layout_inference  = var.cluster.nodes.gpu_layout
@@ -21,8 +21,8 @@ locals {
     summary_api       = var.cluster.nodes.cpu_only
     summary_inference = var.cluster.nodes.gpu_summary
     summary_client    = var.cluster.nodes.cpu_only
-    search            = var.cluster.nodes.cpu_only
-    stream            = var.cluster.nodes.cpu_only
+    search            = var.cluster.nodes.cpu_memory
+    stream            = var.cluster.nodes.cpu_memory
     upload            = var.cluster.nodes.cpu_only
   }
 }
