@@ -16,7 +16,7 @@ spec:
         app: {{ .Values.service.name }}
     spec:
       nodeSelector:
-        node: "{{ .Values.nodeSelector.node }}"
+        node_pool: "{{ .Values.nodeSelector.node }}"
       runtimeClassName: nvidia
       tolerations:
         - key: "node"

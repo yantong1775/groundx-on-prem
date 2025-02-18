@@ -16,7 +16,7 @@ spec:
         app: {{ .Values.service.name }}
     spec:
       nodeSelector: 
-        node: "{{ .Values.nodeSelector.node }}"
+        node_pool: "{{ .Values.nodeSelector.node }}"
       tolerations:
         - key: "node"
           value: "{{ .Values.nodeSelector.node }}"

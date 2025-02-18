@@ -22,7 +22,8 @@ resource "helm_release" "percona_operator" {
   values = [
     yamlencode({
       nodeSelector = {
-        node = local.node_assignment.db
+        # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
       }
     })
   ]
@@ -45,13 +46,17 @@ resource "helm_release" "percona_cluster" {
       backup = {
         enabled = var.db_internal.backup
         nodeSelector = {
-          node = local.node_assignment.db
+          # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
+
         }
       }
       haproxy = {
         enabled = true
         nodeSelector = {
-          node = local.node_assignment.db
+          # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
+
         }
         resources = {
           limits            = {
@@ -64,31 +69,49 @@ resource "helm_release" "percona_cluster" {
           }
         }
         size    = var.db_resources.proxy.replicas
+        readinessDelaySec = "15"
+        readinessProbes = {
+          initialDelaySeconds= 15
+          timeoutSeconds= 3
+          periodSeconds= 5
+          successThreshold= 1
+          failureThreshold= 3
+        }
       }
       logcollector = {
         enabled = var.db_internal.logcollector_enable
         nodeSelector = {
-          node = local.node_assignment.db
+          # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
+
         }
       }
       nodeSelector = {
-        node = local.node_assignment.db
+        # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
+
       }
       pmm = {
         enabled = var.db_internal.pmm_enable
         nodeSelector = {
-          node = local.node_assignment.db
+          # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
+
         }
       }
       proxysql = {
         enabled = false
         nodeSelector = {
-          node = local.node_assignment.db
+          # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
+
         }
       }
       pxc = {
         nodeSelector = {
-          node = local.node_assignment.db
+          # node = local.node_assignment.db
+        "node_pool" = local.node_assignment.db
+
         }
         persistence = {
           size = var.db_resources.pv_size
@@ -104,6 +127,7 @@ resource "helm_release" "percona_cluster" {
           }
         }
         size = var.db_resources.replicas
+        readinessDelaySec = "60"
       }
       secrets = {
         passwords = {
