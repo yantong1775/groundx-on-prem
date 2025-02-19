@@ -761,7 +761,7 @@ variable "ranker_internal" {
         tag        = "latest"
       }
       pv            = {
-        access      = "ReadWriteMany"
+        access      = "ReadWriteOnce"
         capacity    = "10Gi"
         mount       = "/mnt/ranker-model"
       }
@@ -956,7 +956,7 @@ variable "summary_internal" {
         tag         = "latest"
       }
       pv            = {
-        access      = "ReadWriteMany"
+        access      = "ReadWriteOnce"
         capacity    = "20Gi"
         mount       = "/mnt/summary-model"
       }
