@@ -1,5 +1,30 @@
 # Progress
 
+# 02/18
+
+1. Change Tolerations for summary_inference and rank_inference to nvidia.com/gpu = present. To fix the pod unschedulerable error.
+2. Locate the bug for persistent volume claim. The original PVC has ReadWriteMany access type, gke doesn't support rwx. There are some solutions to that:
+   1. Just change the access type to read write only, this allows only the current node can perform read and write to the pod. (while rwx allows multiple nodes to perform read and write). 
+   2. Use gke provided filestore or cloud storage fuse csi. file store seems like an overkill, I can only provision 1Tib at minimum. cloud storage fuse csi is object store, I'm not sure if it's suitable here.
+   3. Use gke on aws, need to explore this one, not sure how to do it. 
+3. While "fix" the second bug by changing the access type to rwo, there's another bug. When loading the model, it shows:
+   ```
+   safetensors_rust.SafetensorError: Error while deserializing header: MetadataIncompleteBuffer
+   ```
+   It looks like the safetensor is corrupted. maybe the downloading? i'll check the checksum after downloading.
+
+### TODO
+1. fix the safetensor corrupt
+2. need to confirm if the previous fix to persistent volume claim is valid.
+
+
+### reference
+https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes
+https://cloud.google.com/kubernetes-engine/multi-cloud/docs/aws/how-to/storage-class#ebs-volume
+https://cloud.google.com/kubernetes-engine/docs/concepts/cloud-storage-fuse-csi-driver
+https://cloud.google.com/kubernetes-engine/docs/concepts/filestore-for-gke
+
+
 ## 02/14
 
 ### TODO
