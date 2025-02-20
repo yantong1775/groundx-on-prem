@@ -1,5 +1,13 @@
 # Progress
 
+# 02/19
+
+1. Fix the corrputed safetensor -> turns out to be insufficient disk space
+2. Pods still not available -> gpu memory is not enough -> cpu memory is also not enough after changing the gpu memory size
+
+### TODO
+t4 GPU doesn't support bfloat16. not sure how to fix this.
+
 # 02/18
 
 1. Change Tolerations for summary_inference and rank_inference to nvidia.com/gpu = present. To fix the pod unschedulerable error.

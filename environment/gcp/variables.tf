@@ -189,7 +189,7 @@ variable "nodes" {
         max_shared_clients_per_gpu = 2
       }
       ranker_nodes = {
-        name        = "layout_nodes"
+        name        = "ranker_nodes"
         machine_type = "n1-standard-8" # 8 vCPUs, 30 GB memory !!! need to be confirmed.
         image_type = "cos_containerd" # x86 family Container Optimized OS
         min_count = 1
@@ -207,8 +207,8 @@ variable "nodes" {
 
       }
       summary_nodes = {
-        name        = "layout_nodes"
-        machine_type = "g2-standard-4" # 4 vCPUs, 24 GB memory !!! need to be confirmed.
+        name        = "summary_nodes"
+        machine_type = "n1-highmem-4" # 4 vCPUs, 32 GB memory !!! need to be confirmed.
         image_type = "cos_containerd" # x86 family Container Optimized OS
         min_count = 1
         max_count = 10
@@ -217,8 +217,8 @@ variable "nodes" {
         disk_size_gb = 75
         disk_type    = "pd-balanced" # 15,000 IOPS and 240 MiBps max throughput
 
-        accelerator_count  = 1
-        accelerator_type = "nvidia-l4-vws"
+        accelerator_count  = 2
+        accelerator_type = "nvidia-tesla-t4"
         gpu_driver_version = "LATEST"
         gpu_sharing_strategy = "MPS"
         max_shared_clients_per_gpu = 2
